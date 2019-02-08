@@ -3,8 +3,8 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <a class="navbar-brand" href="{{ url('/') }}">
-        <img class="navbar-brand-full" src="/svg/caos.svg" width="89" height="25" alt="Caos Logo">
-        <img class="navbar-brand-minimized" src="/svg/nova_logo.svg" width="30" height="30" alt="Caos Logo">
+        <img class="navbar-brand-full" src="/img/logo_dark.png" width="89" height="45" alt="New Sun Travel Logo">
+        <img class="navbar-brand-minimized" src="/img/logo_dark.png" width="20" height="30" alt="New Sun Travel Logo">
     </a>
     <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
         <span class="navbar-toggler-icon"></span>

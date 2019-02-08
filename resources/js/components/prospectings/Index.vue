@@ -4,6 +4,7 @@
       <h4 class="float-left pt-2">prospectings</h4>
       <div class="card-header-actions mr-1">
         <a class="btn btn-success" href="/prospectings/create">New prospecting</a>
+        <a class="btn btn-primary" href="/prospectings/track-prospecting"> {{ $t('Prospecting.Prospecting_track') }} <i class="nav-icon currentColor icon-target"></i> </a>
       </div>
     </div>
     <div class="card-body px-0">

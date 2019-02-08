@@ -13,40 +13,6 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        // Module
-        $moduleId = DB::table('modules')->insertGetId([
-            'name' => 'roles',
-            'display_name' => 'Roles',
-            'icon' => 'icon-key'
-        ]);
-
-        // Permissions
-        DB::table('permissions')->insert([
-            [
-                'name' => 'read-roles',
-                'display_name' => 'Leer',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ],
-            [
-                'name' => 'create-roles',
-                'display_name' => 'Crear',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ],
-            [
-                'name' => 'update-roles',
-                'display_name' => 'Actualizar',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ],
-            [
-                'name' => 'delete-roles',
-                'display_name' => 'Eliminar',
-                'guard_name' => 'web',
-                'module_id' => $moduleId
-            ]
-        ]);
 
         // Create default roles
         $admin = Role::create([
@@ -58,7 +24,6 @@ class RolesTableSeeder extends Seeder
             'display_name' => 'User'
         ]);
 
-        // Assign permissions to admin role
-        $admin->givePermissionTo(Permission::all());
+
     }
 }

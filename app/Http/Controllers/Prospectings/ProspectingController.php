@@ -102,7 +102,7 @@ class ProspectingController extends Controller
 
         $database = $firebase->getDatabase();
         $database->getReference("prospectings/{$prospecting}")->remove();
-        $database->getReference("prospecting_tracks/$prospecting")->remove());
+        $database->getReference("prospecting_tracks/$prospecting")->remove();
 
         return Prospecting::destroy($prospecting);
     }

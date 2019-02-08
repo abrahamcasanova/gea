@@ -143,6 +143,11 @@ Vue.component('branches-index', require('./components/branches/Index.vue'));
 Vue.component('branches-create', require('./components/branches/Create.vue'));
 Vue.component('branches-edit', require('./components/branches/Edit.vue'));
 
+// Product
+Vue.component('products-index', require('./components/products/Index.vue'));
+Vue.component('products-create', require('./components/products/Create.vue'));
+Vue.component('products-edit', require('./components/products/Edit.vue'));
+
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;
 

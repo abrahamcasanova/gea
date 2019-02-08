@@ -12332,3 +12332,5 @@ a.text-dark:focus {
 .currentColor {
     color: currentColor !important;
 }
+
+.navbar-nav .nav-link{padding-right:0;padding-left:15px !important}

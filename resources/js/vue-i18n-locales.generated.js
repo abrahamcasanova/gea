@@ -303,6 +303,22 @@ export default {
             "Warning_Delete": "Una vez eliminado, no podrá recuperar este usuario!",
             "Registered": "Registrado"
         },
+        "Prospecting":{
+            "Prospectings": "Prospectos",
+            "Prospecting_track": "Seguimiento",
+            "Prospecting": "Prospecto",
+            "New_Prospecting": "Nuevo Prospecto",
+            "New_prospecting": "Nuevo Prospecto",
+            "Edit_Prospecting": "Editar Prospecto",
+            "full_name": "Nombre de prospecto",
+            "password": "Contraseña",
+            "Roles": "Roles",
+            "Save": "Guardar",
+            "Delete": "Eliminar",
+            "Warning_Title": "¿Estás seguro?",
+            "Warning_Delete": "Una vez eliminado, no podrá recuperar este prospecto!",
+            "Registered": "Registrado"
+        },
         "rol":{
             "New_role": "Nuevo rol",
             "New_Role": "Nuevo Rol",
@@ -316,6 +332,16 @@ export default {
         "tables": {
             "User": "Usuario",
             "Rol": "Rol",
+            "Registed": "Registrado",
+            "Slug": "ficha",
+            "User_using": "Usuarios mismo rol",
+            "Permissions": "Permisos",
+            "Created": "Creado",
+            "of": "de"
+        },
+        "Product": {
+            "Product": "Producto",
+            "New_Product": "Nuevo Producto",
             "Registed": "Registrado",
             "Slug": "ficha",
             "User_using": "Usuarios mismo rol",

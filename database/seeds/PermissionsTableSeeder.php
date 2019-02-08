@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Role;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class PermissionsTableSeeder extends Seeder
 {
@@ -14,74 +15,239 @@ class PermissionsTableSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
         DB::table('permissions')->truncate();
-        $idRole = App\Role::where('name', 'Administrator')->value('id');
-        DB::table('permission_role')->where('role_id', $idRole)->delete();
+        DB::table('modules')->truncate();
+
         Schema::enableForeignKeyConstraints();
 
-        $allpermissions = DB::table('permissions')->insert([
-
-            /* CREATE NEW USER'S PERMISSION'S */
-            [
-                'name'			=> 'create_user',
-                'display_name' 	=> 'Crear Usuario',
-                'description' 	=> 'permite crear usuarios',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'edit_user',
-                'display_name' 	=> 'Editar Usuario',
-                'description' 	=> 'permite editar usuarios',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'see_user',
-                'display_name' 	=> 'Ver Usuarios',
-                'description' 	=> 'permite ver usuarios',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'delete_user',
-                'display_name' 	=> 'Eliminar Usuarios',
-                'description' 	=> 'permite eliminar usuarios',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
-            [
-                'name'			=> 'see_actions',
-                'display_name' 	=> 'Ver Acciones',
-                'description' 	=> 'Ver acciones',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
-
-            /* CREATE NEW ROLE'S PERMISSION'S */
-            [
-                'name'			=> 'create_role',
-                'display_name' 	=> 'Crear Rol',
-                'description' 	=> 'Crear nuevos roles',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'edit_role',
-                'display_name' 	=> 'Editar Rol',
-                'description' 	=> 'Editar roles existentes',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'see_role',
-                'display_name' 	=> 'Ver Roles',
-                'description' 	=> 'Ver la lista de roles registrados.',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'delete_role',
-                'display_name' 	=> 'Eliminar Rol',
-                'description' 	=> 'Te permite eliminar un rol',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],[
-                'name'			=> 'assign_permission',
-                'display_name' 	=> 'Asignar permisos',
-                'description' 	=> 'Permite asignar permisos a roles existentes.',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
-
-
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'roles',
+            'display_name' => 'Roles',
+            'icon' => 'icon-key'
         ]);
 
-           $adminRole = \App\Role::where('name', 'admin')->first();
-           $adminRole->attachPermissions(\App\Permission::all());
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-roles',
+                'display_name' => 'Leer',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-roles',
+                'display_name' => 'Crear',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-roles',
+                'display_name' => 'Actualizar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-roles',
+                'display_name' => 'Eliminar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'users',
+            'display_name' => 'Users',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-users',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-users',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-users',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-users',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'prospectings',
+            'display_name' => 'Prospectings',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-prospectings',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-prospectings',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-prospectings',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-prospectings',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'catalogs',
+            'display_name' => 'Catalogs',
+            'icon' => 'icon-folder'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-catalogs',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-catalogs',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-catalogs',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-catalogs',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'customers',
+            'display_name' => 'Customers',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-customers',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-customers',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-customers',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-customers',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'sales',
+            'display_name' => 'Sales',
+            'icon' => 'icon-basket-loaded'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-sales',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'payments',
+            'display_name' => 'Payments',
+            'icon' => 'icon-wallet'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-payments',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'reports',
+            'display_name' => 'Reports',
+            'icon' => 'icon-graph'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-reports',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+        ]);
+
+        // Assign permissions to admin role
+        $admin = Role::findByName('admin');
+        $admin->givePermissionTo(Permission::all());
 
     }
 }

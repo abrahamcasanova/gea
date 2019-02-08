@@ -1,5 +1,7 @@
 <template>
-  <button class="sidebar-minimizer brand-minimizer" type="button" @click="toogleStorage"></button>
+  <!--
+    <button class="sidebar-minimizer brand-minimizer" type="button" @click="toogleStorage"></button>
+  -->
 </template>
 
 <script>
