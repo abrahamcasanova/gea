@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">branches</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-success" href="/branches/create">New branch</a>
+        <a class="btn btn-sm btn-success" href="/branches/create">New branch</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -90,8 +90,8 @@
       </div>
       <div class="no-items-found text-center mt-5" v-if="!loading && !branches.length > 0">
         <i class="icon-magnifier fa-3x text-muted"></i>
-        <p class="mb-0 mt-3"><strong>Could not find any items</strong></p>
-        <p class="text-muted">Try changing the filters or add a new one</p>
+        <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
+        <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
         <a class="btn btn-success" href="/branches/create" role="button">
           <i class="fa fa-plus"></i>&nbsp; New Branch
         </a>

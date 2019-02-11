@@ -4,7 +4,7 @@
       <h4 class="float-left pt-2">prospectings</h4>
       <div class="card-header-actions mr-1">
         <a class="btn btn-success" href="/prospectings/create">{{ $t('Product.New_Product') }}</a>
-        <a class="btn btn-primary" href="/prospectings/track-prospecting"> {{ $t('Prospecting.Prospecting_track') }} <i class="nav-icon currentColor icon-target"></i> </a>
+        <a class="btn btn-sm btn-primary" href="/prospectings/track-prospecting"> {{ $t('Prospecting.Prospecting_track') }} <i class="nav-icon currentColor icon-target"></i> </a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -118,8 +118,8 @@
       </div>
       <div class="no-items-found text-center mt-5" v-if="!loading && !prospectings.length > 0">
         <i class="icon-magnifier fa-3x text-muted"></i>
-        <p class="mb-0 mt-3"><strong>Could not find any items</strong></p>
-        <p class="text-muted">Try changing the filters or add a new one</p>
+        <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
+        <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
         <a class="btn btn-success" href="/prospectings/create" role="button">
           <i class="fa fa-plus"></i>&nbsp; New prospecting
         </a>

@@ -33,4 +33,6 @@ require __DIR__ . '/groups/groups.php';
 require __DIR__ . '/offices/offices.php';
 require __DIR__ . '/prospectings/prospectings.php';
 require __DIR__ . '/products/products.php';
+require __DIR__ . '/products_type/products_type.php';
+require __DIR__ . '/suppliers/suppliers.php';
 require __DIR__ . '/branches/branches.php';

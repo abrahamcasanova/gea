@@ -337,6 +337,15 @@ export default {
             "User_using": "Usuarios mismo rol",
             "Permissions": "Permisos",
             "Created": "Creado",
+            "Name": "Nombre",
+            "Clabe": "Clave",
+            "Email": "Correo electronico",
+            "Address": "Dirección",
+            "Commission": "% Comisión",
+            "Phone": "Telefono",
+            "Cellphone": "Celular",
+            "Note": "Comentarios",
+            "Status": "Estatus",
             "of": "de"
         },
         "Product": {
@@ -347,6 +356,35 @@ export default {
             "User_using": "Usuarios mismo rol",
             "Permissions": "Permisos",
             "Created": "Creado",
+            "of": "de"
+        },
+        "Products-Type": {
+            "Product_Type": "Tipo de Productos",
+            "New_Product_Type": "Nuevo Tipo de Producto",
+            "Edit_Product": "Editar Tipo de Producto",
+            "Registed": "Registrado",
+            "Save": "Guardar",
+            "Slug": "ficha",
+            "User_using": "Usuarios mismo rol",
+            "Permissions": "Permisos",
+            "Created": "Creado",
+            "Warning_Title": "¿Estás seguro?",
+            "Warning_Delete": "Una vez eliminado, no podrá recuperar este tipo de proveedor!",
+            "of": "de"
+        },
+        "Supplier": {
+            "Supplier": "Proveedor",
+            "New_Supplier": "Nuevo Proveedor",
+            "Edit_Supplier": "Editar Proveedor",
+            "Registed": "Registrado",
+            "Slug": "ficha",
+            "Email": "Correo electronico",
+            "User_using": "Usuarios mismo rol",
+            "Permissions": "Permisos",
+            "Created": "Creado",
+            "Update": "Actualizar",
+            "Warning_Title": "¿Estás seguro?",
+            "Warning_Delete": "Una vez eliminado, no podrá recuperar este proveedor!",
             "of": "de"
         }
     }

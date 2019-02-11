@@ -148,6 +148,16 @@ Vue.component('products-index', require('./components/products/Index.vue'));
 Vue.component('products-create', require('./components/products/Create.vue'));
 Vue.component('products-edit', require('./components/products/Edit.vue'));
 
+// Product Type
+Vue.component('products-type-index', require('./components/products_type/Index.vue'));
+Vue.component('products-type-create', require('./components/products_type/Create.vue'));
+Vue.component('products-type-edit', require('./components/products_type/Edit.vue'));
+
+// Suppliers
+Vue.component('suppliers-index', require('./components/suppliers/Index.vue'));
+Vue.component('suppliers-create', require('./components/suppliers/Create.vue'));
+Vue.component('suppliers-edit', require('./components/suppliers/Edit.vue'));
+
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;
 
@@ -162,8 +172,20 @@ const app = new Vue({
     created() {
         window.Echo.channel('task-channel')
         .listen('.task-event', (e) => {
-            console.log(e['first_name'])
-            let toast = this.$toasted.show("New prospecting created!", {
+            console.log(e)
+            let toast = this.$toasted.show("Nuevo prospecto creado!", {
+            	 theme: "toasted-primary",
+               iconPack: 'fontawesome',
+               icon : 'user',
+            	 position: "top-right",
+            	 duration : 30000
+            });
+        });
+
+        window.Echo.channel('task-channel')
+        .listen('.task-event-supplier', (e) => {
+            console.log(e)
+            let toast = this.$toasted.show("Nuevo proveedor creado!", {
             	 theme: "toasted-primary",
                iconPack: 'fontawesome',
                icon : 'user',

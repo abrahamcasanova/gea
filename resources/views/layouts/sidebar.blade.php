@@ -1,7 +1,7 @@
 <div class="sidebar">
     <nav class="sidebar-nav">
         <ul class="navbar-nav">
-          
+
             <li>
                 <a class="nav-link" href="/dashboard">
                     <i class="nav-icon icon-speedometer"></i> Dashboard
@@ -22,7 +22,8 @@
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="nav-icon icon-folder"></i> {{ __('Catalogs') }}</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown01">
                             <a class="dropdown-item" href="/products"> <i class="nav-icon currentColor icon-bag"></i> {{ __('Products') }} </a>
-                            <a class="dropdown-item" href="/providers"> <i class="nav-icon currentColor icon-people"></i> {{ __('Providers') }} </a>
+                            <a class="dropdown-item" href="/products_type"> <i class="nav-icon currentColor icon-bag"></i> {{ __('ProductType') }} </a>
+                            <a class="dropdown-item" href="/suppliers"> <i class="nav-icon currentColor icon-people"></i> {{ __('Providers') }} </a>
                             @can('read-prospectings')
                                 <a class="dropdown-item" href="/prospectings"> <i class="nav-icon currentColor icon-user"></i> {{ __('Prospectings') }} </a>
                             @endcan
