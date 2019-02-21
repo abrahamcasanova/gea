@@ -10,7 +10,7 @@ Route::middleware('auth')->group(function () {
 
         // api
         Route::group(['prefix' => 'api/products'], function() {
-            Route::get('/getUserRoles/{product}', 'ProductController@getUserRoles');
+            Route::get('/get-product/{product}', 'ProductController@getProduct');
             Route::get('/count', 'ProductController@count');
             Route::post('/filter', 'ProductController@filter')->middleware('permission:read-products');
 

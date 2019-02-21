@@ -12,8 +12,8 @@ Route::middleware('auth')->group(function () {
         Route::group(['prefix' => 'api/products_type'], function() {
             Route::get('/get-product_type/{product_type}', 'ProductTypeController@getProductType');
             Route::get('/count', 'ProductTypeController@count');
+            Route::get('/all', 'ProductTypeController@all');
             Route::post('/filter', 'ProductTypeController@filter')->middleware('permission:read-products-type');
-
             Route::get('/{product_type}', 'ProductTypeController@show')->middleware('permission:read-products-type');
             Route::post('/store', 'ProductTypeController@store')->middleware('permission:create-products-type');
             Route::put('/update/{product_type}', 'ProductTypeController@update')->middleware('permission:update-products-type');

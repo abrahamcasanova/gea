@@ -13,43 +13,52 @@
           </div>
         </div>
         <div class="col-md-12 card-body px-0">
-            <div class="row">
+          <div class="row">
+              <div class="form-group col-md-6">
+                  <label>Clave</label>
+                  <input type="text" class="form-control" required :class="{'is-invalid': errors.clabe}" v-model="product.clabe" placeholder="9999">
+                  <div class="invalid-feedback" v-if="errors.clabe">{{errors.clabe[0]}}</div>
+              </div>
               <div class="form-group col-md-6">
                   <label>Nombre</label>
-                  <input type="text" class="form-control" required :class="{'is-invalid': errors.first_name}" v-model="prospecting.first_name" placeholder="Sabina">
-                  <div class="invalid-feedback" v-if="errors.first_name">{{errors.first_name[0]}}</div>
+                  <input type="text" class="form-control" required :class="{'is-invalid': errors.name}" v-model="product.name" placeholder="Hotel...">
+                  <div class="invalid-feedback" v-if="errors.name">{{errors.name[0]}}</div>
               </div>
               <div class="form-group col-md-6">
-                  <label>Apellidos</label>
-                  <input type="text" class="form-control" required :class="{'is-invalid': errors.last_name}" v-model="prospecting.last_name" placeholder="Casanova Ortiz">
-                  <div class="invalid-feedback" v-if="errors.last_name">{{errors.last_name[0]}}</div>
+                  <label>Tipo de producto</label>
+                  <multiselect
+                    v-model="product.product_types"
+                    :options="product_types"
+                    openDirection="bottom"
+                    track-by="id"
+                    label="name"
+                    :class="{'border border-danger rounded': errors.product_types}">
+                  </multiselect>
+                  <small class="form-text text-danger" v-if="errors.product_types">{{errors.product_types[0]}}</small>
               </div>
               <div class="form-group col-md-6">
-                <label>Email</label>
-                <input type="email" class="form-control" :class="{'is-invalid': errors.email}" v-model="prospecting.email" placeholder="sabina.casanova@hotmail.com">
-                <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
+                  <label>Cargar imagen</label>
+                  <div class="row">
+                      <div class="col-md-6" v-if="image">
+                          <img :src="image" class="img-responsive" height="90" width="190">
+                       </div>
+                       <div class="col-md-6" v-else="product.url_image">
+                           <img :src="'/storage/product_img/' + product.url_image" class="img-responsive" height="90" width="190">
+                        </div>
+                      <div class="col-md-6">
+                          <input type="file" v-on:change="onImageChange" class="form-control">
+                      </div>
+                  </div>
               </div>
               <div class="form-group col-md-6">
-                  <label>Telefono</label>
-                  <input type="text" class="form-control" :class="{'is-invalid': errors.phone}" v-model="prospecting.phone" placeholder="9202163">
-                  <div class="invalid-feedback" v-if="errors.phone">{{errors.phone[0]}}</div>
+                  <label>Descripcón del hotel</label>
+                  <input type="text" class="form-control" :class="{'is-invalid': errors.description}" v-model="product.description" placeholder="....">
+                  <div class="invalid-feedback" v-if="errors.description">{{errors.description[0]}}</div>
               </div>
               <div class="form-group col-md-6">
-                  <label>Celular</label>
-                  <input type="text" class="form-control" :class="{'is-invalid': errors.cellphone}" v-model="prospecting.cellphone" placeholder="9999978202">
-                  <div class="invalid-feedback" v-if="errors.cellphone">{{errors.cellphone[0]}}</div>
-              </div>
-              <div class="form-group col-md-6">
-                <label>Ramo</label>
-                <multiselect
-                  v-model="prospecting.branches"
-                  :options="branches"
-                  openDirection="bottom"
-                  track-by="id"
-                  label="name"
-                  :class="{'border border-danger rounded': errors.branches}">
-                </multiselect>
-                <small class="form-text text-danger" v-if="errors.branches">{{errors.branches[0]}}</small>
+                  <label>Ubicación</label>
+                  <input type="text" class="form-control" :class="{'is-invalid': errors.location}" v-model="product.location" placeholder="9202163">
+                  <div class="invalid-feedback" v-if="errors.location">{{errors.location[0]}}</div>
               </div>
             </div>
         </div>
@@ -62,34 +71,31 @@
 export default {
   data () {
     return {
-      prospecting: {
-          user: {
-              profile: {}
-          },
-      },
-      branches: [],
-      errors: {},
-      loading: true,
-      submiting: false,
-      submitingDestroy: false
+        product: {},
+        product_types: [],
+        errors: {},
+        image: '',
+        url: null,
+        submiting: false,
     }
   },
   mounted () {
-    this.getProspecting()
-    this.getBranches()
+    this.getProduct()
+    this.getProductType()
   },
   methods: {
-    getProspecting() {
+    getProduct() {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/prospectings/get-prospecting/${res[2]}`)
+      axios.get(`/api/products/get-product/${res[2]}`)
+
       .then(response => {
-          this.prospecting = response.data
+          this.product = response.data
       })
       .catch(error => {
           this.$toasted.global.error('User does not exist!')
-          location.href = '/prospectings'
+          location.href = '/products'
       })
       .then(() => {
         this.loading = false
@@ -98,10 +104,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/prospectings/update/${this.prospecting.id}`, this.prospecting)
+        axios.put(`/api/products/update/${this.product.id}`, this.product)
         .then(response => {
-            this.$toasted.global.error('Updated prospecting!')
-            location.href = '/prospectings'
+            this.$toasted.global.error('Updated product!')
+            location.href = '/products'
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -109,20 +115,20 @@ export default {
         })
       }
     },
-    getBranches() {
-        axios.get(`/api/branches/all`).then(response => {
-            this.branches = response.data
+    getProductType() {
+        axios.get(`/api/products_type/all`).then(response => {
+            this.product_types = response.data
         })
         .catch(error => {
             this.errors = error.response.data.errors
         })
     },
     onChange() {
-        this.$delete(this.prospecting, 'subgroup_id')
-        this.$delete(this.prospecting, 'subgroup')
+        this.$delete(this.product, 'subgroup_id')
+        this.$delete(this.product, 'subgroup')
 
         axios.post(`/api/groups/subgroup_by_gruoup_id`, {
-            id: this.prospecting.group.id
+            id: this.product.group.id
         })
         .then(response => {
             this.subgroups = response.data;
@@ -130,6 +136,26 @@ export default {
         .catch(error => {
           this.errors = error.response.data.errors
         })
+    },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      this.url = URL.createObjectURL(file);
+      this.product.url_image = this.url;
+    }
+    ,onImageChange(e) {
+                let files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.createImage(files[0]);
+    },
+    createImage(file) {
+        let reader = new FileReader();
+        let vm = this;
+        reader.onload = (e) => {
+            vm.image = e.target.result;
+            this.product.url_image = e.target.result;
+        };
+        reader.readAsDataURL(file);
     },
   }
 }

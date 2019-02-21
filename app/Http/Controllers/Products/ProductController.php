@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Products;
 
-use Pusher\Pusher;
 use App\Product;
+use Pusher\Pusher;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -14,107 +15,82 @@ class ProductController extends Controller
         $query = Product::query();
 
         if($request->search) {
-            $query->where('first_name', 'LIKE', '%'.$request->search.'%');
+            $query->where('name', 'LIKE', '%'.$request->search.'%');
         }
 
-        $prospecting = $query->with('branches')->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
+        $product = $query->with('product_types')->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
                     ->paginate($request->input('pagination.per_page'));
 
-        return $prospecting;
+        return $product;
     }
 
     public function store (Request $request)
     {
+        $base64_image = $request->input('url_image'); // base64 encoded
+        @list($type, $file_data) = explode(';', $base64_image);
+        @list(, $file_data) = explode(',', $file_data);
+        $imageName = str_random(10).'.'.'png';
+        Storage::put('public/product_img/'.$imageName, base64_decode($file_data));
+
         $this->validate($request, [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'phone' => 'required|numeric',
-            'cellphone' => 'required|numeric',
-            'branches' => 'required|array',
-            'email' => 'required|email|unique:prospectings',
+            'name' => 'required|string',
+            'clabe' => 'required|unique:products',
+            'product_type_id' => 'required'
         ]);
 
-        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.caos_json'));
-
-        $firebase = (new Factory)->withServiceAccount($serviceAccount)
-            ->withDatabaseUri('https://caos-4fa8a.firebaseio.com/')->create();
-
-        $database = $firebase->getDatabase();
-
-        $request->merge(['branch_id' => $request->branches['id']]);
-        $prospecting = Prospecting::create($request->all());
-
-        $options = array(
-            'cluster' => 'us2',
-            'encrypted' => true
-        );
-
-        $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
-        );
-
-        $pusher->trigger('task-channel', 'task-event', $prospecting->toArray());
-
-        $database->getReference("prospectings/{$prospecting->id}")->set($prospecting->toArray());
-
-        return $prospecting;
+        $request->merge(['product_type_id' => $request->product_types['id']]);
+        $product = new Product;
+        $product->fill($request->all());
+        $product->url_image = $imageName;
+        $product->save();
+        return $product;
     }
 
     public function update (Request $request)
     {
-
         $this->validate($request, [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'phone' => 'required|numeric',
-            'cellphone' => 'required|numeric',
-            'branches' => 'required|array',
-            'email' => 'required|email|unique:customers,email,'.$request->id,
+            'name' => 'required|string',
+            'product_type_id' => 'required',
+            'clabe' => 'required|unique:products,clabe,'.$request->id,
         ]);
-        $request->merge(['branch_id' => $request->branches['id']]);
 
-        $prospecting = Prospecting::find($request->id);
-        $prospecting->fill($request->all())->save();
+        $base64_image = $request->input('url_image'); // base64 encoded
+        @list($type, $file_data) = explode(';', $base64_image);
+        @list(, $file_data) = explode(',', $file_data);
+        $imageName = str_random(10).'.'.'png';
+        Storage::put('public/product_img/'.$imageName, base64_decode($file_data));
 
-        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.caos_json'));
-        $firebase = (new Factory)->withServiceAccount($serviceAccount)
-            ->withDatabaseUri('https://caos-4fa8a.firebaseio.com/')->create();
+        $request->merge([
+            'product_type_id' => $request->product_types['id'],
+            'url_image' => $imageName
+        ]);
+        $product = Product::find($request->id);
+        if(file_exists(storage_path('app/public/product_img/'.$product->url_image))){
+            unlink(storage_path('app/public/product_img/'.$product->url_image));
+        }
+        $product->fill($request->all())->save();
 
-        $database = $firebase->getDatabase();
-        $database->getReference("prospectings/{$prospecting->id}")->update($prospecting->toArray());
-
-        return $prospecting;
+        return $product;
     }
 
-    public function destroy ($prospecting)
+    public function destroy ($product)
     {
-        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.caos_json'));
 
-        $firebase = (new Factory)->withServiceAccount($serviceAccount)
-            ->withDatabaseUri('https://caos-4fa8a.firebaseio.com/')->create();
-
-        $database = $firebase->getDatabase();
-        $database->getReference("prospectings/{$prospecting}")->remove();
-        $database->getReference("prospecting_tracks/$prospecting")->remove();
-
-        return Prospecting::destroy($prospecting);
+        return Product::destroy($product);
     }
 
-    public function getProspecting ($customer)
+    public function getProduct ($product)
     {
-        return Prospecting::with('branches')->findOrFail($customer);
+        return Product::with('product_types')->findOrFail($product);
     }
 
     public function count ()
     {
-        return Prospecting::count();
+        return Product::count();
     }
 
     public function all()
     {
-        return Prospecting::with('branches')->Active()->get();
+        return Product::active()->get();
     }
 }

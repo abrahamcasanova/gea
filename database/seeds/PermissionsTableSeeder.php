@@ -195,6 +195,75 @@ class PermissionsTableSeeder extends Seeder
 
         // Module
         $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'suppliers',
+            'display_name' => 'Suppliers',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-suppliers',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-suppliers',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-suppliers',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-suppliers',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'Product',
+            'display_name' => 'products',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-products',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-products',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-products',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-products',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
             'name' => 'catalogs',
             'display_name' => 'Catalogs',
             'icon' => 'icon-folder'
