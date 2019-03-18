@@ -3,37 +3,37 @@
     <div class="row justify-content-md-center">
       <div class="col-md-12 col-xl-9">
         <div class="card-header px-0 mt-2 bg-transparent clearfix">
-          <h4 class="float-left pt-2">Edit Permission</h4>
+          <h4 class="float-left pt-2">Editar Permiso</h4>
           <div class="card-header-actions mr-1">
             <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="update">
               <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
               <i class="fas fa-check" v-else></i>
-              <span class="ml-1">Save</span>
+              <span class="ml-1">Actualizar</span>
             </a>
             <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy" @click.prevent="destroy">
               <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
               <i class="far fa-trash-alt" v-else></i>
-              <span class="d-md-down-none ml-1">Delete</span>
+              <span class="d-md-down-none ml-1">Eliminar</span>
             </a>
           </div>
         </div>
         <div class="card-header px-0 bg-transparent">
           <strong>General</strong><br>
-          <small class="text-muted">Update name and permissions of permission.</small>
+          <small class="text-muted">Actualizar nombre y permisos de permiso.</small>
         </div>
         <div class="card-body px-0">
           <div class="row" v-if="!loading">
             <div class="form-group col-sm-9">
-              <label>Permission name</label>
+              <label>Nombre permiso</label>
               <input type="text" class="form-control" :class="{'is-invalid': errors.display_name}" v-model="permission.display_name" placeholder="Admin" autofocus>
               <div class="invalid-feedback" v-if="errors.display_name">{{errors.display_name[0]}}</div>
             </div>
             <div class="form-group col-sm-3">
-              <label>Permission ID</label>
+              <label>ID permiso</label>
               <input type="text" class="form-control" v-model="permission.id" readonly>
             </div>
             <div class="form-group col-sm-12">
-              <label>Permission slug</label>
+              <label>Permiso slug</label>
               <input type="text" class="form-control" :class="{'is-invalid': errors.name}" v-model="permission.name" placeholder="admin" readonly>
               <div class="invalid-feedback" v-if="errors.name">{{errors.name[0]}}</div>
             </div>
@@ -96,14 +96,14 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/permissions/getPermissionModulesPermissions/${res[2]}`)
+      axios.get(`../../api/permissions/getPermissionModulesPermissions/${res[3]}`)
       .then(response => {
           this.permission = response.data[0]
           this.permission.module_id = response.data[1]
       })
       .catch(error => {
         this.$toasted.global.error('Permission does not exist!')
-        location.href = '/permissions'
+        location.href = '../../permissions'
       })
       .then(() => {
         this.loading = false
@@ -111,7 +111,7 @@ export default {
     },
     getModulesPermissions () {
       this.loading = true
-      axios.get('/api/permissions/getModules')
+      axios.get('../../api/permissions/getModules')
       .then(response => {
         this.permission.modulesPermissions = response.data
         this.loading = false
@@ -121,10 +121,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/permissions/update/${this.permission.id}`, this.permission)
+        axios.put(`../../api/permissions/update/${this.permission.id}`, this.permission)
         .then(response => {
           this.$toasted.global.error('Updated permission!')
-          location.href = '/permissions'
+          location.href = '../../permissions'
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -136,18 +136,18 @@ export default {
       if (!this.submitingDestroy) {
         this.submitingDestroy = true
         swal({
-          title: "Are you sure?",
-          text: "Once deleted, you will not be able to recover this permission!",
+          title: "¿Esta seguro?",
+          text: "Una vez eliminado, no podrá recuperar este permiso!",
           icon: "warning",
           buttons: true,
           dangerMode: true,
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/permissions/${this.permission.id}`)
+            axios.delete(`../../api/permissions/${this.permission.id}`)
             .then(response => {
               this.$toasted.global.error('Deleted permission!')
-              location.href = '/permissions'
+              location.href = '../../permissions'
             })
             .catch(error => {
               this.errors = error.response.data.errors
@@ -158,7 +158,7 @@ export default {
       }
     },
     getPermissionsCount() {
-      axios.get(`/api/permissions/count`)
+      axios.get(`../../api/permissions/count`)
       .then(response => {
         this.permissionsCount = response.data
       })

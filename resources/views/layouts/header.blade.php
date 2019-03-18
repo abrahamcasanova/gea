@@ -3,8 +3,8 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <a class="navbar-brand" href="{{ url('/') }}">
-        <img class="navbar-brand-full" src="/img/logo_dark.png" width="89" height="45" alt="New Sun Travel Logo">
-        <img class="navbar-brand-minimized" src="/img/logo_dark.png" width="20" height="30" alt="New Sun Travel Logo">
+        <img class="navbar-brand-full" src="{{asset('/public/img/logo_dark.png')}}" width="89" height="45" alt="New Sun Travel Logo">
+        <img class="navbar-brand-minimized" src="{{asset('/public/img/logo_dark.png')}}" width="20" height="30" alt="New Sun Travel Logo">
     </a>
     <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
         <span class="navbar-toggler-icon"></span>
@@ -12,7 +12,7 @@
     <ul class="nav navbar-nav ml-auto mr-3">
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <img class="img-avatar" src="{{ Auth::user()->avatar_url }}">
+                <img class="img-avatar" src="{{ asset('./'.Auth::user()->avatar_url) }}">
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow mt-2">
                 <a class="dropdown-item">

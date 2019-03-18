@@ -35,6 +35,16 @@
                 <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
               </div>
               <div class="form-group">
+                <label>Telefono</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.phone}" v-model="user.phone" placeholder="9202163">
+                <div class="invalid-feedback" v-if="errors.phone">{{errors.phone[0]}}</div>
+              </div>
+              <div class="form-group">
+                <label>Celular</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.cellphone}" v-model="user.cellphone" placeholder="9994450668">
+                <div class="invalid-feedback" v-if="errors.cellphone">{{errors.cellphone[0]}}</div>
+              </div>
+              <div class="form-group">
                 <label>{{ $t('user.password') }}</label>
                 <input type="password" class="form-control" :class="{'is-invalid': errors.password}" v-model="user.password">
                 <div class="invalid-feedback" v-if="errors.password">{{errors.password[0]}}</div>
@@ -45,7 +55,7 @@
                   v-model="user.roles"
                   :options="roles"
                   :multiple="true"
-                  openDirection="bottom"
+                  openDirection="top"
                   track-by="id"
                   label="display_name"
                   :class="{'border border-danger rounded': errors.roles}">
@@ -92,20 +102,20 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/users/getUserRoles/${res[2]}`)
+      axios.get(`../../api/users/getUserRoles/${res[3]}`)
       .then(response => {
         this.user = response.data
       })
       .catch(error => {
         this.$toasted.global.error('User does not exist!')
-        location.href = '/users'
+        location.href = '../../users'
       })
       .then(() => {
         this.loading = false
       })
     },
     getRoles () {
-      axios.get(`/api/roles/all`)
+      axios.get(`../../api/roles/all`)
       .then(response => {
         this.roles = response.data
       })
@@ -116,10 +126,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/users/update/${this.user.id}`, this.user)
+        axios.put(`../../api/users/update/${this.user.id}`, this.user)
         .then(response => {
           this.$toasted.global.error('Updated user!')
-          location.href = '/users'
+          location.href = '../../users'
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -139,10 +149,10 @@ export default {
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/users/${this.user.id}`)
+            axios.delete(`../../api/users/${this.user.id}`)
             .then(response => {
               this.$toasted.global.error('Deleted user!')
-              location.href = '/users'
+              location.href = '../../users'
             })
             .catch(error => {
               this.errors = error.response.data.errors

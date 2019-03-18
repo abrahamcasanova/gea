@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">{{ $t('Products-Type.Product_Type') }}</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-success" href="/products_type/create">{{ $t('Products-Type.New_Product_Type') }}</a>
+        <a class="btn btn-success" href="./products_type/create">{{ $t('Products-Type.New_Product_Type') }}</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -140,7 +140,7 @@ export default {
       loading: true,
       submitingDestroy: false,
       options: {
-          target: '/api/products_type/upload',
+          target: './api/products_type/upload',
           testChunks: false,
           singleFile: true,
           withCredentials: true,
@@ -188,7 +188,7 @@ export default {
 
       localStorage.setItem("filtersTableprospectings", JSON.stringify(this.filters));
 
-      axios.post(`/api/products_type/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/products_type/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.products_type = response.data.data
         delete response.data.data
@@ -198,7 +198,7 @@ export default {
     },
     getDocuments (id) {
         this.loading = true
-        axios.post('/api/products_type/docs',{
+        axios.post('./api/products_type/docs',{
             customer_id: id
         }).then(response => {
             //console.log(response.data)
@@ -207,7 +207,7 @@ export default {
         });
     },
     editCustomer (customerId) {
-      location.href = `/products_type/${customerId}/edit`
+      location.href = `./products_type/${customerId}/edit`
     },
     // filters
     filter() {
@@ -246,10 +246,10 @@ export default {
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/products_type/${customerId}`)
+            axios.delete(`./api/products_type/${customerId}`)
             .then(response => {
                 this.$toasted.global.error('Deleted product_type!')
-                location.href = '/products_type'
+                location.href = './products_type'
             })
             .catch(error => {
                 this.errors = error.response.data.errors ? error.response.data.errors:error.response.data.message

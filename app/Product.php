@@ -12,6 +12,7 @@ class Product extends Model
     protected $fillable = [
       'clabe',
       'name',
+      'category',
       'product_type_id',
       'url_image',
       'description',

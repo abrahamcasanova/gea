@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
-      <h4 class="float-left pt-2">Permissions</h4>
+      <h4 class="float-left pt-2">Permisos</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="/permissions/create">New permissions</a>
+        <a class="btn btn-sm btn-success" href="./permissions/create">Nuevo permiso</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -97,7 +97,7 @@
         <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
         <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
         <a class="btn btn-success" href="/users/create" permission="button">
-          <i class="fa fa-plus"></i>&nbsp; New Permission
+          <i class="fa fa-plus"></i>&nbsp; Nuevo Permiso
         </a>
       </div>
       <content-placeholders v-if="loading">
@@ -146,7 +146,7 @@ export default {
       this.loading = true
       this.permissions = []
       localStorage.setItem("filtersTablePermissions", JSON.stringify(this.filters));
-      axios.post(`/api/permissions/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/permissions/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.permissions = response.data.data
         delete response.data.data
@@ -155,10 +155,10 @@ export default {
       })
     },
     editPermission(permisionId) {
-      location.href = `/permissions/${permisionId}/edit`
+      location.href = `./permissions/${permisionId}/edit`
     },
     getPermissionsCount() {
-      axios.get(`/api/permissions/count`)
+      axios.get(`./api/permissions/count`)
       .then(response => {
         this.permissionsCount = response.data
       })
@@ -190,18 +190,18 @@ export default {
       if (!this.submitingDestroy) {
         this.submitingDestroy = true
         swal({
-          title: "Are you sure?",
-          text: "Once deleted, you will not be able to recover this permission!",
+          title: "¿Esta seguro?",
+          text: "Una vez eliminado, no podrá recuperar este permiso!",
           icon: "warning",
           buttons: true,
           dangerMode: true,
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/permissions/${permisionId}`)
+            axios.delete(`./api/permissions/${permisionId}`)
             .then(response => {
-              this.$toasted.global.error('Deleted permission!')
-              location.href = '/permissions'
+              this.$toasted.global.error('Permiso eliminado!')
+              location.href = './permissions'
             })
             .catch(error => {
               this.errors = error.response.data.errors

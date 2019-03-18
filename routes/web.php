@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes(['verify' => true]);
@@ -35,4 +35,10 @@ require __DIR__ . '/prospectings/prospectings.php';
 require __DIR__ . '/products/products.php';
 require __DIR__ . '/products_type/products_type.php';
 require __DIR__ . '/suppliers/suppliers.php';
+require __DIR__ . '/customer_orders/customer_orders.php';
 require __DIR__ . '/branches/branches.php';
+require __DIR__ . '/quotes/quotes.php';
+require __DIR__ . '/quote_tracks/quote_tracks.php';
+require __DIR__ . '/quote_details/quote_details.php';
+require __DIR__ . '/sales/sales.php';
+

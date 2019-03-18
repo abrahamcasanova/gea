@@ -38,10 +38,10 @@ class ProspectingController extends Controller
             'email' => 'required|email|unique:prospectings',
         ]);
 
-        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.caos_json'));
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.firebase'));
 
         $firebase = (new Factory)->withServiceAccount($serviceAccount)
-            ->withDatabaseUri('https://caos-4fa8a.firebaseio.com/')->create();
+            ->withDatabaseUri(config('firebase.firebase_uri'))->create();
 
         $database = $firebase->getDatabase();
 

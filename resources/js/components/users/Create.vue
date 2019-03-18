@@ -24,6 +24,16 @@
             <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
           </div>
           <div class="form-group">
+            <label>Telefono</label>
+            <input type="text" class="form-control" :class="{'is-invalid': errors.phone}" v-model="user.phone" placeholder="9202163">
+            <div class="invalid-feedback" v-if="errors.phone">{{errors.phone[0]}}</div>
+          </div>
+          <div class="form-group">
+            <label>Celular</label>
+            <input type="text" class="form-control" :class="{'is-invalid': errors.cellphone}" v-model="user.cellphone" placeholder="9994450668">
+            <div class="invalid-feedback" v-if="errors.cellphone">{{errors.cellphone[0]}}</div>
+          </div>
+          <div class="form-group">
             <label>{{ $t('user.password') }}</label>
             <input type="password" class="form-control" :class="{'is-invalid': errors.password}" v-model="user.password">
             <div class="invalid-feedback" v-if="errors.password">{{errors.password[0]}}</div>
@@ -34,7 +44,7 @@
               v-model="user.roles"
               :options="roles"
               :multiple="true"
-              openDirection="bottom"
+              openDirection="top"
               track-by="id"
               placeholder="Seleccionar..."
               label="display_name"
@@ -67,10 +77,10 @@ export default {
     create () {
       if (!this.submiting) {
         this.submiting = true
-        axios.post(`/api/users/store`, this.user)
+        axios.post(`../api/users/store`, this.user)
         .then(response => {
           this.$toasted.global.error('Created user!')
-          location.href = '/users'
+          location.href = '../users'
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -79,7 +89,7 @@ export default {
       }
     },
     getRoles () {
-      axios.get(`/api/roles/all`)
+      axios.get(`../api/roles/all`)
       .then(response => {
         this.roles = response.data
       })

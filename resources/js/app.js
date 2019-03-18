@@ -11,29 +11,50 @@ window.Vue = require('vue');
 
 
 // Dependencies --------------------------------------
-
-import Toasted from 'vue-toasted';
-import VueClip from 'vue-clip'
-import Multiselect from 'vue-multiselect'
-import swal from 'sweetalert';
-import VueContentPlaceholders from 'vue-content-placeholders'
+import es from './es';
 import axios from 'axios';
-import VeeValidate from 'vee-validate'
-import uploader from 'vue-simple-uploader'
-import App from './components/folder/App.vue'
-import VModal from 'vue-js-modal'
-import Pusher from 'pusher-js';
-import Echo from "laravel-echo";
+import 'moment/locale/es';
+import moment from 'moment';
+import rate from 'vue-rate';
+import swal from 'sweetalert';
+import Vuetify from 'vuetify';
 import VueFire from 'vuefire';
+import Pusher from 'pusher-js';
+import VueClip from 'vue-clip';
+import Echo from "laravel-echo";
 import Firebase from 'firebase';
-import LightTimeline from 'vue-light-timeline';
+import VModal from 'vue-js-modal';
+import Toasted from 'vue-toasted';
+import VueNumeric from 'vue-numeric';
+import Timeline from 'timeline-vuejs';
+import 'vuetify/dist/vuetify.min.css';
+import VeeValidate from 'vee-validate';
+import Vue2Filters from 'vue2-filters';
+import BootstrapVue from 'bootstrap-vue';
+import Datepicker from 'vuejs-datepicker';
+import Multiselect from 'vue-multiselect';
+import locale from 'element-ui/lib/locale';
+import uploader from 'vue-simple-uploader';
+import DaySpanVuetify from 'dayspan-vuetify';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import App from './components/folder/App.vue';
 import VueInternationalization from 'vue-i18n';
+import 'timeline-vuejs/dist/timeline-vuejs.css';
 import Locale from './vue-i18n-locales.generated';
+import lang_es from 'element-ui/lib/locale/lang/es';
+import 'dayspan-vuetify/dist/lib/dayspan-vuetify.min.css';
+import VueContentPlaceholders from 'vue-content-placeholders';
 
-Vue.use(VueInternationalization);
-Vue.use(LightTimeline);
+locale.use(lang_es);
+Vue.use(Vuetify)
+Vue.use(rate)
 Vue.use(VueFire)
 Vue.use(Firebase)
+Vue.use(Datepicker)
+Vue.use(BootstrapVue)
+Vue.use(VueNumeric)
+Vue.use(Vue2Filters)
+Vue.use(VueInternationalization);
 
 const lang = document.documentElement.lang.substr(0, 2);
 
@@ -58,31 +79,51 @@ Vue.use(VeeValidate, {
 Vue.use(require('moment/locale/es'));
 
 import VueMoment from 'vue-moment'
-const moment = require('moment')
+
 require('moment/locale/es')
 Vue.use(VueMoment, {
   moment
 })
+moment.locale("es");
+var m = moment().format("LLL")
 
 Vue.use(Toasted)
 Vue.toasted.register('error', message => message, {
     position : 'bottom-center',
     duration : 1500
 })
+console.log(moment.weekdaysShort(true))
+Vue.use( DaySpanVuetify, {
+  data: {
+    locales: { es },
+    defaults: {
+      dsWeeksView: {
+          weekdays: moment.weekdaysShort(true)
+      }
+    }
 
+  },
+  computed: {
+  },
+  methods: {
+     getDefaultEventColor: () => '#1976d2'
+  }
+});
+
+Vue.$dayspan.setLocale('es');
 
 Vue.use(VueClip)
 Vue.component('multiselect', Multiselect)
 Vue.use(VueContentPlaceholders)
 Vue.use(uploader)
 // Initialize Firebase
-let config = {
-  apiKey: "AIzaSyAl0sdBOKeyIGcV25WXWPSapv-_aCFisNY",
-  authDomain: "caos-4fa8a.firebaseapp.com",
-  databaseURL: "https://caos-4fa8a.firebaseio.com",
-  projectId: "caos-4fa8a",
-  storageBucket: "caos-4fa8a.appspot.com",
-  messagingSenderId: "512709825599"
+var config = {
+    apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
+    authDomain: "travel-f0875.firebaseapp.com",
+    databaseURL: "https://travel-f0875.firebaseio.com",
+    projectId: "travel-f0875",
+    storageBucket: "travel-f0875.appspot.com",
+    messagingSenderId: "76422469644"
 };
 
 
@@ -128,6 +169,7 @@ Vue.component('permissions-edit', require('./components/permissions/Edit.vue'));
 Vue.component('customers-index', require('./components/customers/Index.vue'));
 Vue.component('customers-create', require('./components/customers/Create.vue'));
 Vue.component('customers-edit', require('./components/customers/Edit.vue'));
+Vue.component('customers-orden', require('./components/customers/Orden.vue'));
 
 // Folder
 Vue.component('folder', require('./components/folder/App.vue'));
@@ -158,6 +200,24 @@ Vue.component('suppliers-index', require('./components/suppliers/Index.vue'));
 Vue.component('suppliers-create', require('./components/suppliers/Create.vue'));
 Vue.component('suppliers-edit', require('./components/suppliers/Edit.vue'));
 
+// Custsomer Orders
+Vue.component('customers-orders-index', require('./components/customers_orders/Index.vue'));
+Vue.component('customers-orders-create', require('./components/customers_orders/Create.vue'));
+Vue.component('customers-quote-create', require('./components/customers_orders/Quote.vue'));
+Vue.component('customers-orders-edit', require('./components/customers_orders/Edit.vue'));
+
+// quotes
+Vue.component('quotes-index', require('./components/quotes/Index.vue'));
+Vue.component('quotes-edit', require('./components/quotes/Edit.vue'));
+Vue.component('quotes-track', require('./components/quotes/Track.vue'));
+
+// sales
+Vue.component('sales-input', require('./components/sales/Input.vue'));
+
+//Calendar
+Vue.component('calendar', require('./components/dashboard/Calendar.vue'));
+
+
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;
 
@@ -166,6 +226,15 @@ var pusher = new Pusher('758c1ced7318559c6c9d', {
   forceTLS: true
 });
 
+export default {
+  components: {
+    Datepicker,
+    Timeline,
+  },
+  mixins: [Vue2Filters.mixin],
+
+}
+
 const app = new Vue({
     el: '#app',
     i18n,
@@ -173,12 +242,12 @@ const app = new Vue({
         window.Echo.channel('task-channel')
         .listen('.task-event', (e) => {
             console.log(e)
-            let toast = this.$toasted.show("Nuevo prospecto creado!", {
+            let toast = this.$toasted.show("Seguimiento Actualizado!", {
             	 theme: "toasted-primary",
                iconPack: 'fontawesome',
                icon : 'user',
             	 position: "top-right",
-            	 duration : 30000
+            	 duration : 15000
             });
         });
 

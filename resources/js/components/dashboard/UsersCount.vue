@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     getUsersCount () {
-      axios.get(`/api/users/count`)
+      axios.get(`./api/users/count`)
       .then(response => {
         this.users = response.data
       })

@@ -3,12 +3,12 @@
     <div class="row justify-content-md-center">
       <div class="col-md-9 col-xl-7">
         <div class="card-header px-0 mt-2 bg-transparent clearfix">
-          <h4 class="float-left pt-2">New Permission</h4>
+          <h4 class="float-left pt-2">Nuevo permiso</h4>
           <div class="card-header-actions mr-1">
             <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="create">
               <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
               <i class="fas fa-check" v-else></i>
-              <span class="ml-1">Save</span>
+              <span class="ml-1">Guardar</span>
             </a>
           </div>
         </div>
@@ -33,7 +33,7 @@
               v-model="permission.modules"
               :options="modules"
               :multiple="false"
-              openDirection="bottom"
+              openDirection="top"
               track-by="id"
               label="display_name"
               :class="{'border border-danger rounded': errors.modules}">
@@ -67,10 +67,10 @@ export default {
     create () {
       if (!this.submiting) {
         this.submiting = true
-        axios.post('/api/permissions/store', this.permission)
+        axios.post('../api/permissions/store', this.permission)
         .then(response => {
-          this.$toasted.global.error('Created permission!')
-          setTimeout(location.href = '/permissions', 2000)
+          this.$toasted.global.error('Permiso Creado!')
+          setTimeout(location.href = '../permissions', 2000)
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -80,7 +80,7 @@ export default {
     },
     getModulesPermissions () {
       this.loading = true
-      axios.get('/api/modules/getModulesPermissions')
+      axios.get('../api/modules/getModulesPermissions')
       .then(response => {
         this.permission.modulesPermissions = response.data
         this.loading = false

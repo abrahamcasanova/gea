@@ -6,10 +6,10 @@
         <div class="card">
             <div class="card-body p-5">
                 <div class="text-center d-lg-none">
-                    <img src="svg/caos.svg" class="mb-5" width="150" alt="Caos Logo">
+                    <img src="{{asset('/public/img/logo_dark.png')}}" class="mb-5" width="150" alt="New sun Logo">
                 </div>
                 <h1>{{ __('Login') }}</h1>
-                <p class="text-muted">Sign In to your account</p>
+                <p class="text-muted">Iniciar sesión en su cuenta</p>
 
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
@@ -70,8 +70,9 @@
         </div>
         <div class="card text-white bg-primary py-5 d-md-down-none">
             <div class="card-body text-center">
-                <div>
-                    <h1 style="color: black;font-weight: bolder;">CAOS</h1>
+                <h1 style="color: black;font-weight: bolder;">NEW SUN TRAVEL</h1>
+                <div class="d-none">
+                    <h1 style="color: black;font-weight: bolder;">NEW SUN TRAVEL</h1>
                     <h2>{{ __('Sign up') }}</h2>
                     <p>If you don't have account create one.</p>
                     <a class="btn btn-primary active mt-2" href="{{ route('register') }}">{{ __('Register Now!') }}</a>

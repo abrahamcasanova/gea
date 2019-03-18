@@ -13,6 +13,8 @@ const mix = require('laravel-mix');
 
 mix.js('resources/js/app.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
+    .stylus('resources/assets/stylus/main.styl', 'public/css')
+   .setResourceRoot('../')
    .browserSync('laravel-scaffold.test');
 
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
@@ -21,7 +23,7 @@ mix.webpackConfig({
    new SWPrecacheWebpackPlugin({
        cacheId: 'ls_pwa',
        filename: 'service-worker.js',
-       staticFileGlobs: ['public/**/*.{css,eot,svg,ttf,woff,woff2,js,html}'],
+       staticFileGlobs: ['/public/**/*.{css,eot,svg,ttf,woff,woff2,js,html}'],
        minify: true,
        stripPrefix: 'public/',
        handleFetch: true,

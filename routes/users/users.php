@@ -12,8 +12,10 @@ Route::middleware('auth')->group(function () {
         Route::group(['prefix' => 'api/users'], function() {
             Route::get('/getUserRoles/{user}', 'UserController@getUserRoles');
             Route::get('/count', 'UserController@count');
+            Route::get('/all', 'UserController@all');
+            Route::post('/calendar', 'UserController@calendar');
+            Route::post('/-get-calendar', 'UserController@getCalendar');
             Route::post('/filter', 'UserController@filter')->middleware('permission:read-users');
-
             Route::get('/{user}', 'UserController@show')->middleware('permission:read-users');
             Route::post('/store', 'UserController@store')->middleware('permission:create-users');
             Route::put('/update/{user}', 'UserController@update')->middleware('permission:update-users');

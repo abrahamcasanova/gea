@@ -5,6 +5,14 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item active">Dashboard</li>
     </ol>
+
+    <v-layout wrap>
+      <v-container>
+        <v-layout justify-center>
+            <calendar :user_id={{ auth()->user()->id }}></calendar>
+        </v-layout>
+      </v-container>
+    </v-layout> 
     <div class="container">
         <div class="card-body">
             @if (session('status'))

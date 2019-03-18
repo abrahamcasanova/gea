@@ -158,6 +158,78 @@ class PermissionsTableSeeder extends Seeder
                 'module_id' => $moduleId
             ]
         ]);
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'request_quotes',
+            'display_name' => 'Solicitudes de cotizaciones',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-customer-orders',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-customer-orders',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-customer-orders',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-customer-orders',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'quotes',
+            'display_name' => 'Cotizaciones',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-quotes',
+                'display_name' => 'Read',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-quotes',
+                'display_name' => 'Create',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-quotes',
+                'display_name' => 'Update',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-quotes',
+                'display_name' => 'Delete',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
         // Module
         $moduleId = DB::table('modules')->insertGetId([
             'name' => 'ProductType',

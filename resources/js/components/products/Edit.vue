@@ -19,6 +19,13 @@
                   <input type="text" class="form-control" required :class="{'is-invalid': errors.clabe}" v-model="product.clabe" placeholder="9999">
                   <div class="invalid-feedback" v-if="errors.clabe">{{errors.clabe[0]}}</div>
               </div>
+              <div class="form-group col-md-3">
+                <label>Categoria</label>
+                <input type="number" class="d-none form-control" :class="{'is-invalid': errors.category}" v-model="product.category" placeholder="Categoria..">
+                <center>
+                  <rate :length="5" v-model="product.category" :value="product.category" :showcount="false" />
+                </center>
+              </div>
               <div class="form-group col-md-6">
                   <label>Nombre</label>
                   <input type="text" class="form-control" required :class="{'is-invalid': errors.name}" v-model="product.name" placeholder="Hotel...">
@@ -43,7 +50,7 @@
                           <img :src="image" class="img-responsive" height="90" width="190">
                        </div>
                        <div class="col-md-6" v-else="product.url_image">
-                           <img :src="'/storage/product_img/' + product.url_image" class="img-responsive" height="90" width="190">
+                           <img :src="'../../storage/app/public/product_img/' + product.url_image" class="img-responsive" height="90" width="190">
                         </div>
                       <div class="col-md-6">
                           <input type="file" v-on:change="onImageChange" class="form-control">
@@ -88,14 +95,14 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/products/get-product/${res[2]}`)
+      axios.get(`../../api/products/get-product/${res[3]}`)
 
       .then(response => {
           this.product = response.data
       })
       .catch(error => {
           this.$toasted.global.error('User does not exist!')
-          location.href = '/products'
+          location.href = '../../products'
       })
       .then(() => {
         this.loading = false
@@ -104,10 +111,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/products/update/${this.product.id}`, this.product)
+        axios.put(`../../api/products/update/${this.product.id}`, this.product)
         .then(response => {
             this.$toasted.global.error('Updated product!')
-            location.href = '/products'
+            location.href = '../../products'
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -116,7 +123,7 @@ export default {
       }
     },
     getProductType() {
-        axios.get(`/api/products_type/all`).then(response => {
+        axios.get(`../../api/products_type/all`).then(response => {
             this.product_types = response.data
         })
         .catch(error => {
@@ -127,7 +134,7 @@ export default {
         this.$delete(this.product, 'subgroup_id')
         this.$delete(this.product, 'subgroup')
 
-        axios.post(`/api/groups/subgroup_by_gruoup_id`, {
+        axios.post(`../../api/groups/subgroup_by_gruoup_id`, {
             id: this.product.group.id
         })
         .then(response => {

@@ -55,13 +55,13 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/products_type/get-product_type/${res[2]}`)
+      axios.get(`../../api/products_type/get-product_type/${res[3]}`)
       .then(response => {
           this.product_type = response.data
       })
       .catch(error => {
           this.$toasted.global.error('Type product does not exist!')
-          location.href = '/products_type'
+          location.href = '../../products_type'
       })
       .then(() => {
         this.loading = false
@@ -70,10 +70,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/products_type/update/${this.product_type.id}`, this.product_type)
+        axios.put(`../../api/products_type/update/${this.product_type.id}`, this.product_type)
         .then(response => {
             this.$toasted.global.error('Updated product_type!')
-            location.href = '/products_type'
+            location.href = '../../products_type'
         })
         .catch(error => {
           this.errors = error.response.data.errors

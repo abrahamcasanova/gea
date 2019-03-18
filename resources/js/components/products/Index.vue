@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">productos</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="/products/create">{{ $t('Product.New_Product') }}</a>
+        <a class="btn btn-sm btn-success" href="./products/create">{{ $t('Product.New_Product') }}</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -57,10 +57,6 @@
               <a href="#" class="text-dark" @click.prevent="sort('location')">Ubicación</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'location' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'location' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th>
-              <a href="#" class="text-dark" @click.prevent="sort('status')">Estatus</a>
-              <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'status' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'status' && filters.orderBy.direction == 'desc'}"></i>
-            </th>
             <th class="d-none d-sm-table-cell">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Registrado</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
@@ -74,12 +70,21 @@
             <td class="">{{product.clabe}}</td>
             <td class="">{{product.name}}</td>
             <td class="">{{product.product_types.name}}</td>
-            <td class=""><a  target="_blank" v-bind:href="'./storage/product_img/'+product.url_image">{{ product.url_image }}</a></td>
-            <td class="">{{product.location}}</td>
-            <td class="d-none d-sm-table-cell">
-                <label v-if="product.status == 1">Activo</label>
-                <label v-else>Inactivo</label>
+            <td class="">
+              <div class="media">
+                <div class="avatar_product float-left mr-3">
+                  <img class="img-avatar" :src="'./storage/app/public/product_img/'+product.url_image">
+                </div>
+                <div class="media-body">
+                  <a  target="_blank" v-bind:href="'./storage/app/public/product_img/'+product.url_image">{{ product.url_image }}
+                  </a>
+                  <div class="small text-muted">
+                     <rate disabled :length="5" v-model="product.category" :value="product.category" :showcount="false" />
+                  </div>
+                </div>
+              </div>
             </td>
+            <td class="">{{product.location}}</td>
             <td class="d-none d-sm-table-cell">
               <small>{{product.created_at | moment("LL")}}</small> - <small class="text-muted">{{product.created_at | moment("LT")}}</small>
             </td>
@@ -119,7 +124,7 @@
         <i class="icon-magnifier fa-3x text-muted"></i>
         <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
         <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
-        <a class="btn btn-success" href="/products/create" role="button">
+        <a class="btn btn-success" href="./products/create" role="button">
           <i class="fa fa-plus"></i>&nbsp; {{ $t('Product.New_Product') }}
         </a>
       </div>
@@ -155,7 +160,7 @@ export default {
       loading: true,
       submitingDestroy: false,
       options: {
-          target: '/api/products/upload',
+          target: './api/products/upload',
           testChunks: false,
           singleFile: true,
           withCredentials: true,
@@ -203,7 +208,7 @@ export default {
 
       localStorage.setItem("filtersTableproducts", JSON.stringify(this.filters));
 
-      axios.post(`/api/products/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/products/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.products = response.data.data
         delete response.data.data
@@ -213,7 +218,7 @@ export default {
     },
     getDocuments (id) {
         this.loading = true
-        axios.post('/api/products/docs',{
+        axios.post('./api/products/docs',{
             customer_id: id
         }).then(response => {
             //console.log(response.data)
@@ -222,7 +227,7 @@ export default {
         });
     },
     editCustomer (customerId) {
-      location.href = `/products/${customerId}/edit`
+      location.href = `./products/${customerId}/edit`
     },
     // filters
     filter() {
@@ -253,18 +258,18 @@ export default {
       if (!this.submitingDestroy) {
         this.submitingDestroy = true
         swal({
-          title: "Are you sure?",
-          text: "Once deleted, you will not be able to recover this product!",
+          title: "¿Esta seguro?",
+          text: "Una vez eliminado, no podrá recuperar este producto!",
           icon: "warning",
           buttons: true,
           dangerMode: true,
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/products/${customerId}`)
+            axios.delete(`./api/products/${customerId}`)
             .then(response => {
                 this.$toasted.global.error('Deleted product!')
-                location.href = '/products'
+                location.href = './products'
             })
             .catch(error => {
                 this.errors = error.response.data.errors ? error.response.data.errors:error.response.data.message

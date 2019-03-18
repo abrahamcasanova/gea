@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">Roles</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="/roles/create">New role</a>
+        <a class="btn btn-sm btn-success" href="./roles/create">Nuevo Rol</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -62,13 +62,14 @@
             <td>
               <div class="avatars-stack">
                 <div class="avatar-sm" v-for="(user, index) in role.users.slice(0,4)">
-                  <img class="img-avatar" :src="user.avatar_url">
+                  <img class="img-avatar" :src="'./' + user.avatar_url">
+
                 </div>
                 <div class="avatar-sm ml-3" v-if="role.users.length > 4"> +{{role.users.length - 4}}</div>
               </div>
             </td>
             <td>
-              Level
+              Nivel
               <small class="text-muted float-right">{{role.permissions.length}} of {{permissionsCount}}</small>
               <div class="progress" style="height: 4px;">
                 <div class="progress-bar bg-info" role="progressbar" :style="`width: ${role.permissions.length*100/permissionsCount}%`" :aria-valuenow="role.permissions.length*100/permissionsCount" aria-valuemin="0" :aria-valuemax="this.permissionsCount"></div>
@@ -108,8 +109,8 @@
         <i class="icon-magnifier fa-3x text-muted"></i>
         <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
         <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
-        <a class="btn btn-success" href="/users/create" role="button">
-          <i class="fa fa-plus"></i>&nbsp; New Role
+        <a class="btn btn-success" href="./users/create" role="button">
+          <i class="fa fa-plus"></i>&nbsp; Nuevo Rol
         </a>
       </div>
       <content-placeholders v-if="loading">
@@ -159,7 +160,7 @@ export default {
 
       localStorage.setItem("filtersTableRoles", JSON.stringify(this.filters));
 
-      axios.post(`/api/roles/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/roles/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.roles = response.data.data
         delete response.data.data
@@ -168,10 +169,10 @@ export default {
       })
     },
     editRole(roleId) {
-      location.href = `/roles/${roleId}/edit`
+      location.href = `./roles/${roleId}/edit`
     },
     getPermissionsCount() {
-      axios.get(`/api/permissions/count`)
+      axios.get(`./api/permissions/count`)
       .then(response => {
         this.permissionsCount = response.data
       })

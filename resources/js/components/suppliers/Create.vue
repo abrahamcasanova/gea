@@ -72,10 +72,10 @@ export default {
     create () {
       if (!this.submiting) {
         this.submiting = true
-        axios.post(`/api/suppliers/store`, this.supplier)
+        axios.post(`../api/suppliers/store`, this.supplier)
         .then(response => {
             this.$toasted.global.error('Created suppliers!')
-            location.href = '/suppliers'
+            location.href = '../suppliers'
         })
         .catch(error => {
           this.errors = error.response.data.errors

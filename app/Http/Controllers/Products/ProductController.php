@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Products;
 
 use App\Product;
 use Pusher\Pusher;
+use App\QuoteDetail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -33,9 +34,10 @@ class ProductController extends Controller
         Storage::put('public/product_img/'.$imageName, base64_decode($file_data));
 
         $this->validate($request, [
-            'name' => 'required|string',
-            'clabe' => 'required|unique:products',
-            'product_type_id' => 'required'
+            'name'          => 'required|string',
+            'clabe'         => 'required|unique:products',
+            'category'      => 'required',
+            'product_types' => 'required'
         ]);
 
         $request->merge(['product_type_id' => $request->product_types['id']]);
@@ -49,11 +51,13 @@ class ProductController extends Controller
     public function update (Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string',
-            'product_type_id' => 'required',
-            'clabe' => 'required|unique:products,clabe,'.$request->id,
+            'name'          => 'required|string',
+            'product_types' => 'required',
+            'category'      => 'required',
+            'clabe'         => 'required|unique:products,clabe,'.$request->id,
         ]);
 
+        $request->merge(['product_type_id' => $request->product_types['id']]);
         $base64_image = $request->input('url_image'); // base64 encoded
         @list($type, $file_data) = explode(';', $base64_image);
         @list(, $file_data) = explode(',', $file_data);
@@ -82,6 +86,12 @@ class ProductController extends Controller
     public function getProduct ($product)
     {
         return Product::with('product_types')->findOrFail($product);
+    }
+
+
+    public function getProductByQuote($quoteId)
+    {
+        return QuoteDetail::with('product')->WhereQuoteId($quoteId)->get();
     }
 
     public function count ()

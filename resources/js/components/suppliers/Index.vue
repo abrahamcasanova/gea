@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">{{ $t('Supplier.Supplier') }}</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="/suppliers/create">{{ $t('Supplier.New_Supplier') }}</a>
+        <a class="btn btn-sm btn-success" href="./suppliers/create">{{ $t('Supplier.New_Supplier') }}</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -131,7 +131,7 @@
         <i class="icon-magnifier fa-3x text-muted"></i>
         <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
         <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
-        <a class="btn btn-success" href="/suppliers/create" role="button">
+        <a class="btn btn-success" href="./suppliers/create" role="button">
           <i class="fa fa-plus"></i>&nbsp; {{ $t('Supplier.New_Supplier') }}
         </a>
       </div>
@@ -167,7 +167,7 @@ export default {
       loading: true,
       submitingDestroy: false,
       options: {
-          target: '/api/suppliers/upload',
+          target: './api/suppliers/upload',
           testChunks: false,
           singleFile: true,
           withCredentials: true,
@@ -215,7 +215,7 @@ export default {
 
       localStorage.setItem("filtersTableprospectings", JSON.stringify(this.filters));
 
-      axios.post(`/api/suppliers/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/suppliers/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.suppliers = response.data.data
         delete response.data.data
@@ -225,7 +225,7 @@ export default {
     },
     getDocuments (id) {
         this.loading = true
-        axios.post('/api/suppliers/docs',{
+        axios.post('./api/suppliers/docs',{
             customer_id: id
         }).then(response => {
             //console.log(response.data)
@@ -234,7 +234,7 @@ export default {
         });
     },
     editCustomer (customerId) {
-      location.href = `/suppliers/${customerId}/edit`
+      location.href = `./suppliers/${customerId}/edit`
     },
     // filters
     filter() {
@@ -273,10 +273,10 @@ export default {
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`/api/suppliers/${customerId}`)
+            axios.delete(`./api/suppliers/${customerId}`)
             .then(response => {
                 this.$toasted.global.error('Deleted supplier!')
-                location.href = '/suppliers'
+                location.href = './suppliers'
             })
             .catch(error => {
                 this.errors = error.response.data.errors ? error.response.data.errors:error.response.data.message

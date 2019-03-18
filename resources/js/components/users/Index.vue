@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">{{ $t('user.Users') }}</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="/users/create">{{ $t('user.New_User') }} </a> 
+        <a class="btn btn-sm btn-success" href="./users/create">{{ $t('user.New_User') }} </a> 
       </div>
     </div>
     <div class="card-body px-0">
@@ -41,6 +41,14 @@
               <a href="#" class="text-dark" @click.prevent="sort('name')">{{ $t('user.User') }}</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'name' && filters.orderBy.direction == 'desc'}"></i>
             </th>
+            <th>
+              <a href="#" class="text-dark" @click.prevent="sort('phone')">Telefono</a>
+              <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'phone' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'phone' && filters.orderBy.direction == 'desc'}"></i>
+            </th>
+            <th>
+              <a href="#" class="text-dark" @click.prevent="sort('cellphone')">Celular</a>
+              <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'cellphone' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'cellphone' && filters.orderBy.direction == 'desc'}"></i>
+            </th>
             <th>Roles</th>
             <th class="d-none d-sm-table-cell">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">{{ $t('user.Registered') }} </a>
@@ -55,7 +63,7 @@
             <td>
               <div class="media">
                 <div class="avatar float-left mr-3">
-                  <img class="img-avatar" :src="user.avatar_url">
+                  <img class="img-avatar" :src="'./' + user.avatar_url">
                   <span class="avatar-status badge-success"></span>
                 </div>
                 <div class="media-body">
@@ -66,6 +74,8 @@
                 </div>
               </div>
             </td>
+            <td class="d-none d-sm-table-cell">{{user.phone}}</td>
+            <td class="d-none d-sm-table-cell">{{user.cellphone}}</td>
             <td>
               <span v-for="(role, index) in user.roles">
                 {{role.name}}<span v-if="index+1 < user.roles.length">, </span>
@@ -105,8 +115,8 @@
         <i class="icon-magnifier fa-3x text-muted"></i>
         <p class="mb-0 mt-3"><strong>No se pudo encontrar ningún artículo</strong></p>
         <p class="text-muted">Intenta cambiar los filtros o añadir uno nuevo.</p>
-        <a class="btn btn-success" href="/users/create" role="button">
-          <i class="fa fa-plus"></i>&nbsp; New User
+        <a class="btn btn-success" href="./users/create" role="button">
+          <i class="fa fa-plus"></i>&nbsp; Crear usuario
         </a>
       </div>
       <content-placeholders v-if="loading">
@@ -154,7 +164,7 @@ export default {
 
       localStorage.setItem("filtersTableUsers", JSON.stringify(this.filters));
 
-      axios.post(`/api/users/filter?page=${this.filters.pagination.current_page}`, this.filters)
+      axios.post(`./api/users/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.users = response.data.data
         delete response.data.data
@@ -163,7 +173,7 @@ export default {
       })
     },
     editUser (userId) {
-      location.href = `/users/${userId}/edit`
+      location.href = `./users/${userId}/edit`
     },
     // filters
     filter() {

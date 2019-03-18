@@ -1,36 +1,36 @@
 <template>
-  <div class="card text-white bg-primary">
+  <div class="card">
     <div class="card-body">
-      <div class="h1 text-muted text-right mb-12">
-        <i class="icon-people"></i>
+      <div class="h3 text-muted text-right mb-12">
+        <h4 class="text-muted text-uppercase font-weight-bold">ultimos seguimientos registrados {{items.length}}
+            <i class="fa-lg icon-people text-primary"></i>
+        </h4>
       </div>
-
-      <div class="text-value">{{items.length}}</div>
-      <small class="text-muted text-uppercase font-weight-bold">{{ $t('dashboard.prospecting_created') }}</small>
       <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
+          <table class="table table-striped table-hover">
+            <thead class="thead-dark">
               <tr>
-                <th>Nombres</th>
-                <th>Telefono</th>
+                <th># Folio</th>
+                <th>Cliente</th>
                 <th>Celular</th>
-                <th>Ramo</th>
+                <th>Agente</th>
                 <th>Estatus</th>
+                <th>Comentario</th>
+                <th>Fecha Contacto</th>
               </tr>
             </thead>
             <tbody>
                 <tr v-for="item of items" :key="item['.key']">
-                  <td>{{ item.first_name }} {{ item.last_name }}</td>
-                  <td>{{ item.phone }}</td>
-                  <td>{{ item.cellphone }}</td>
-                  <td v-if="item.branch_id === 1" >AUTOS</td>
-                  <td v-else-if="item.branch_id === 2" >PERSONAS</td>
-                  <td v-if="item.branch_id === 3" >DAÑOS</td>
-                  <td v-if="item.status">{{ item.status }}</td>
-                  <td v-else>Creado recientemente</td>
+                  <td>{{ item.quote_id }}</td>
+                  <td>{{ item.quote.customer_order.customer.full_name }}</td>
+                  <td>{{ item.quote.customer_order.cellphone }}</td>
+                  <td>{{ item.user.name }}</td>
+                  <td>{{ item.track_status }}</td>
+                  <td>{{ item.comments }}</td>                  
+                  <td>{{ item.contact_date }}</td>                  
                 </tr>
             </tbody>
-          </table>
+          </table>        
       </div>
     </div>
   </div>
@@ -44,18 +44,34 @@ export default {
   data () {
     return {
       prospectings: 0,
-      items: []
+      items: [],
+      selected: [],
+      pagination: {
+        sortBy: 'name'
+      },
+      headers: [
+        {
+          text: 'Dessert (100g serving)',
+          align: 'left',
+          value: 'name'
+        },
+        { text: 'Calories', value: 'calories' },
+        { text: 'Fat (g)', value: 'fat' },
+        { text: 'Carbs (g)', value: 'carbs' },
+        { text: 'Protein (g)', value: 'protein' },
+        { text: 'Iron (%)', value: 'iron' }
+      ],
     }
   },
   firebase: {
-    items: db.ref('prospectings')
+    items: db.ref('quote_tracks')
   },
   mounted () {
-    this.getRolesCount()
+    this.getCountQuoteTrack()
   },
   methods: {
-    getRolesCount () {
-      axios.get(`/api/prospectings/count`)
+    getCountQuoteTrack () {
+      axios.get(`./api/quote-tracks/count`)
       .then(response => {
         this.prospectings = response.data
       })

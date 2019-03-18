@@ -2,4 +2,39 @@
     color: currentColor !important;
 }
 
+.avatar_product{
+    position:relative;
+    display: inline-block;
+    width: 80px;
+    height: 70px;
+}
+
+.ds-calendar-event{
+    position: relative !important;
+}
+
+.v-navigation-drawer{
+	height: auto !important;
+}
+
+.v-overlay--active{
+	z-index: 1000 !important;
+}
+.v-dialog__content{
+	z-index: 9999 !important;
+}
+.v-dialog:not(.v-dialog--fullscreen){
+	max-height: 80% !important;
+}
+.v-menu__content {
+	z-index: 10001 !important;
+}
 .navbar-nav .nav-link{padding-right:0;padding-left:15px !important}
+
+.ds-app-calendar-toolbar{
+	position:relative !important;
+}
+
+.ds-expand{
+	min-height: -webkit-fill-available !important;
+}

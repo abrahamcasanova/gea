@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     getRolesCount () {
-      axios.get(`/api/roles/count`)
+      axios.get(`./api/roles/count`)
       .then(response => {
         this.roles = response.data
       })

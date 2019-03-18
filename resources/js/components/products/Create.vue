@@ -18,6 +18,13 @@
                 <input type="text" class="form-control" required :class="{'is-invalid': errors.clabe}" v-model="product.clabe" placeholder="9999">
                 <div class="invalid-feedback" v-if="errors.clabe">{{errors.clabe[0]}}</div>
             </div>
+            <div class="form-group col-md-3">
+              <label>Categoria</label>
+              <input type="number" class="d-none form-control" :class="{'is-invalid': errors.category}" v-model="product.category" placeholder="Categoria..">
+              <center>
+                <rate :length="5" v-model="product.category" :value="product.category" :showcount="false" />
+              </center>
+            </div>
             <div class="form-group col-md-6">
                 <label>Nombre</label>
                 <input type="text" class="form-control" required :class="{'is-invalid': errors.name}" v-model="product.name" placeholder="Hotel...">
@@ -84,10 +91,10 @@ export default {
       create () {
         if (!this.submiting) {
           this.submiting = true
-          axios.post(`/api/products/store`, this.product)
+          axios.post(`../api/products/store`, this.product)
           .then(response => {
               this.$toasted.global.error('Created products!')
-              location.href = '/products'
+              location.href = '../products'
           })
           .catch(error => {
             this.errors = error.response.data.errors
@@ -98,7 +105,7 @@ export default {
       },
       getProductTypes() {
 
-          axios.get(`/api/products_type/all`).then(response => {
+          axios.get(`../api/products_type/all`).then(response => {
               this.product_types = response.data
           })
           .catch(error => {

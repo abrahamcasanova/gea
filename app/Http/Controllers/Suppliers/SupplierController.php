@@ -90,6 +90,6 @@ class SupplierController extends Controller
 
   public function all()
   {
-      return Supplier::with('branches')->Active()->get();
+      return Supplier::Active()->get();
   }
 }

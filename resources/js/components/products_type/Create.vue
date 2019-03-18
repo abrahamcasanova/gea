@@ -41,17 +41,16 @@ export default {
     }
   },
   mounted () {
-    this.getBranches()
     this.csrf = window.Laravel.csrfToken;
   },
   methods: {
     create () {
       if (!this.submiting) {
         this.submiting = true
-        axios.post(`/api/products_type/store`, this.product_type)
+        axios.post(`../api/products_type/store`, this.product_type)
         .then(response => {
             this.$toasted.global.error('Created products_type!')
-            location.href = '/products_type'
+            location.href = '../products_type'
         })
         .catch(error => {
           this.errors = error.response.data.errors

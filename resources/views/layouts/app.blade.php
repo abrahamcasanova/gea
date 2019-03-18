@@ -17,7 +17,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/icon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="{{ asset('/public/manifest.json') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/icon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
@@ -29,7 +29,7 @@
 
     <!-- Scripts -->
 
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('/public/js/app.js') }}" defer></script>
 
     <script>
       window.Laravel = {!! json_encode([
@@ -42,7 +42,7 @@
     <script>
     if ('serviceWorker' in navigator ) {
       window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+          navigator.serviceWorker.register("{{ asset('/public/service-worker.js') }} ").then(function(registration) {
             // Registration was successful
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
           }, function(err) {
@@ -60,7 +60,9 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
     <!-- Styles -->
+    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
+
 </head>
 <body class="app header-fixed sidebar-fixed sidebar-lg-show">
     <div id="app">

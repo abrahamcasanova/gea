@@ -80,13 +80,13 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      axios.get(`/api/suppliers/get-supplier/${res[2]}`)
+      axios.get(`../../api/suppliers/get-supplier/${res[3]}`)
       .then(response => {
           this.supplier = response.data
       })
       .catch(error => {
           this.$toasted.global.error('User does not exist!')
-          //location.href = '/suppliers'
+          location.href = '../../suppliers'
       })
       .then(() => {
         this.loading = false
@@ -95,10 +95,10 @@ export default {
     update () {
       if (!this.submiting) {
         this.submiting = true
-        axios.put(`/api/suppliers/update/${this.supplier.id}`, this.supplier)
+        axios.put(`../../api/suppliers/update/${this.supplier.id}`, this.supplier)
         .then(response => {
             this.$toasted.global.error('Updated supplier!')
-            location.href = '/suppliers'
+            location.href = '../../suppliers'
         })
         .catch(error => {
           this.errors = error.response.data.errors

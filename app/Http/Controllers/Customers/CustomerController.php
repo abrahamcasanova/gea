@@ -7,8 +7,11 @@ use App\Role;
 use App\User;
 use App\Profile;
 use App\Customer;
+use Carbon\Carbon;
+use App\CustomerOrder;
 use App\CustomerDocument;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 
@@ -25,8 +28,6 @@ class CustomerController extends Controller
         $customers = $query->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
                     ->paginate($request->input('pagination.per_page'));
 
-        $customers->load('group','subgroup');
-
         return $customers;
     }
 
@@ -38,56 +39,35 @@ class CustomerController extends Controller
     public function store (Request $request)
     {
         $request->merge(['type_of_person' => $request->type_of_person['id']]);
-        $request->merge(['office_id'      => $request->office_id['id']]);
-        $request->merge(['group_id'       => $request->group_id['id']]);
-        $request->merge(['subgroup_id'    => $request->subgroup_id['id']]);
+        $request->merge(['level' => $request->level['id']]);
+        $request->merge(['customer_id' => $request->recommended['id']]);
 
         $this->validate($request, [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|confirmed',
-            'password_confirmation' => 'required|min:6',
-            'type_of_person' => 'required'
+            'first_name' => 'required|string',
+            'email' => 'required|email|unique:customers',
+            'type_of_person' => 'required',
         ]);
 
-        $user = new User($request->all());
-        $user->password = Hash::make($request->password);
-        $user->save();
-        $user->assignRole('customers');
-
         $customer = Customer::create($request->all());
-        $customer->user_id = $user->id;
         $customer->save();
 
-        $profile = Profile::create($request->all());
-        $profile->user_id = $user->id;
-        $profile->save();
-
-        return $user;
+        return $customer;
     }
 
     public function update (Request $request)
     {
         $this->validate($request, [
-            'user.name' => 'required|string',
+            'first_name' => 'required|string',
             'email' => 'required|email|unique:customers,email,'.$request->id,
-            'password' => 'string|nullable'
+            'type_of_person' => 'required',
         ]);
         $request->merge(['type_of_person' => $request->type_of_person['id']]);
-        $request->merge(['office_id'      => isset($request->office) ? $request->office['id']:null]);
-        $request->merge(['group_id'       => isset($request->group) ? $request->group['id']:null]);
-        $request->merge(['subgroup_id'    => isset($request->subgroup) ? $request->subgroup['id']:null]);
 
         $customer = Customer::find($request->id);
         $customer->fill($request->all())->save();
 
-        $user = User::find($request->user_id);
-        $user->fill($request->user)->save();
 
-        $profile = Profile::WhereUserId($request->user_id)->first();
-        $profile->fill($request->user['profile'])->save();
-
-        return $user;
+        return $customer;
     }
 
     public function destroy ($customer)
@@ -102,9 +82,54 @@ class CustomerController extends Controller
         return Customer::count();
     }
 
+    public function order(Request $request,$customer)
+    {
+        $url = URL::temporarySignedRoute(
+            'customers.order', now()->addMinutes(30), ['customer_id' => $customer]
+        );
+
+        return redirect($url);
+    }
+
+    public function orderWhatsapp(Request $request){
+        return URL::temporarySignedRoute(
+            'customers.order', now()->addMinutes(30), ['customer_id' => $request->customer_id]
+        );
+    }
+
+    public function storeOrder(Request $request)
+    {
+        $this->validate($request, [
+            'travel_month'        => 'required',
+            'travel_date'         => 'required|',
+            'cellphone'           => 'required|',
+            'email'               => 'required|',
+            'call_time'           => 'required|',
+            'travel_destination'  => 'required',
+            'number_adults'       => 'required',
+            'number_childs'       => 'required',
+            'services'            => 'required',
+            'with_us'             => 'required',
+        ]);
+
+        $request->merge(['travel_month' => $request->travel_month['id']]);
+        $request->merge(['with_us' => $request->with_us['id']]);
+
+        return CustomerOrder::updateOrCreate([
+            'customer_id' => $request->customer_id
+            ],
+            $request->all()
+        );
+    }
+
     public function getCustomer ($customer)
     {
-        return Customer::with('user','office','group','subgroup')->findOrFail($customer);
+        return Customer::findOrFail($customer);
+    }
+
+    public function all()
+    {
+        return Customer::Active()->get();
     }
 
     public function upload(Request $request)
