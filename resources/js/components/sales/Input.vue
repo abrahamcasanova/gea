@@ -15,23 +15,23 @@
                 <div class="invalid-feedback" v-if="errors.first_name">{{errors.first_name[0]}}</div>
             </div>
             <div class="form-group col-md-6">
-                <label>Precio</label>
+                <label>Precio MXN</label>
                 <input type="number" class="form-control" :class="{'is-invalid': errors.price}" v-model="sale.price" placeholder="">
                 <div class="invalid-feedback" v-if="errors.last_name">{{errors.last_name[0]}}</div>
             </div>
             <div class="form-group col-md-6">
               <label>Fecha limite de pago</label>
-              <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="sale.date_payment_limit"></datepicker>
+              <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterLimit" v-model="sale.date_payment_limit"></datepicker>
               <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
             </div>
             <div class="form-group col-md-6">
                 <label>Fecha de pagar al proveedor</label>
-                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="sale.date_payment_supplier"></datepicker>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterSupplier" v-model="sale.date_payment_supplier"></datepicker>
                 <div class="invalid-feedback" v-if="errors.phone">{{errors.phone[0]}}</div>
             </div>
             <div class="form-group col-md-6">
                 <label>Fecha de anticipo</label>
-                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="sale.date_advance"></datepicker>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterAdvance" v-model="sale.date_advance"></datepicker>
                 <div class="invalid-feedback" v-if="errors.cellphone">{{errors.cellphone[0]}}</div>
             </div>
             <div class="form-group col-md-6">
@@ -118,6 +118,7 @@
 var csrf_token = $('meta[name="csrf-token"]').attr('content');
 import Datepicker from 'vuejs-datepicker';
 import {en, es} from 'vuejs-datepicker/dist/locale'
+import { uuid } from 'vue-uuid';
 import moment from 'moment';
 
 export default {
@@ -129,6 +130,7 @@ export default {
       sale: {
         events:[]
       },
+      uuid: uuid.v1(),
       initialData: [],
       suppliers:[],
       submiting:false,
@@ -142,7 +144,7 @@ export default {
       es: es,
     }
   },
-  props: ['quote_id','quote_sale'],
+  props: ['quote_id','quote_sale','type','saleEdit'],
   watch:{
     'quote_id'(){
         this.$emit('update:quote_id',this.quote_id)
@@ -151,11 +153,22 @@ export default {
     },
     'quote_sale'(){
         this.$emit('update:quote_sale',this.quote_sale)
+    },
+    'type'(){
+        this.$emit('update:type',this.type)
+    },
+    'saleEdit'(){
+        this.$emit('update:saleEdit',this.saleEdit)
+        this.sale = this.type == "edit" ?  this.saleEdit: this.sale;
+
     }
   },
   mounted () {
     this.csrf = window.Laravel.csrfToken;
-    this.getSuppliers();
+    let url = this.type == "edit" ?  '../../api/suppliers/all':'./api/suppliers/all';
+    this.getSuppliers(url);
+    this.getProductsByQuote();
+    
   },
   methods: {
       productName ({ product }) {
@@ -166,6 +179,7 @@ export default {
       },
       createSale(){
           var now = moment(this.sale.date_advance);
+          var advance = moment(this.sale.date_advance).format('YYYY-MM-DD');
           var then = moment(this.sale.date_payment_limit);
           var then_compare = moment(this.sale.date_payment_limit).format('YYYY-MM-DD');
           var events = [];
@@ -186,8 +200,9 @@ export default {
                  let date = now.add(1,'week').format('YYYY-MM-DD');
                  if(then_compare != date){
                     events.push({
-                      i: i,
-                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name,
+                      id: uuid.v1(),
+                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name +
+                      ' Importe a cobrar: $ ' + this.sale.amount_receivable + '. Folio: ' + this.quote_sale.id,
                       date: date,
                       open: false,
                       type: 'info',
@@ -204,8 +219,9 @@ export default {
                  let date = now.add(2,'week').format('YYYY-MM-DD');
                  if(then_compare != date){
                     events.push({
-                      i: i,
-                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name,
+                      id: uuid.v1(),
+                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name +
+                      ' Importe a cobrar: $ ' + this.sale.amount_receivable + '. Folio: ' + this.quote_sale.id,
                       date: date,
                       open: false,
                       type: 'info',
@@ -220,8 +236,9 @@ export default {
                  let date = now.add(1,'month').format('YYYY-MM-DD');
                  if(then_compare != date){
                     events.push({
-                      i: i,
-                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name,
+                      id: uuid.v1(),
+                      details: 'Fecha de abono cliente: ' + this.quote_sale.customer_order.customer.full_name +
+                      ' Importe a cobrar: $ ' + this.sale.amount_receivable + '. Folio: ' + this.quote_sale.id,
                       date: date,
                       open: false,
                       type: 'info',
@@ -233,35 +250,73 @@ export default {
           }
 
           events.push({
-              i: events.length + 1,
-              details: 'Fecha limite de pago cliente: ' + this.quote_sale.customer_order.customer.full_name 
-              + ' Importe a cobrar: $ ' + this.sale.amount_receivable,
-              date: then_compare,
+              id: uuid.v1(),
+              details: 'Fecha de anticipo cliente: ' + this.quote_sale.customer_order.customer.full_name,
+              date: advance,
               open: false,
-              type: 'warning',
-              title: 'Abono ' + this.quote_sale.customer_order.customer.full_name
+              type: 'success',
+              title: 'Pago anticipo ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
           });
 
           events.push({
-              i: events.length + 1,
+              id: uuid.v1(),
+              details: 'Fecha limite de pago cliente: ' + this.quote_sale.customer_order.customer.full_name 
+              + ' Importe a cobrar: $ ' + this.sale.price,
+              date: then_compare,
+              open: false,
+              type: 'warning',
+              title: 'Pago Limite ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
+          });
+
+          events.push({
+              id: uuid.v1(),
               details: 'Fecha limite de pago proveedor, Folio: ' + this.quote_sale.id,
               date: moment(this.sale.date_payment_supplier).format('YYYY-MM-DD'),
               open: false,
               type: 'danger',
-              title: 'Abono ' + this.quote_sale.customer_order.customer.full_name
+              title: 'Pago Proveedor ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
           });
 
+          this.sale.quote_id = this.quote_id;
           this.sale.events = events
 
-          axios.post(`./api/sales/store`, this.sale).then(response => {
-              console.log(response.data)
+          swal({
+            title: "¿Esta seguro?",
+            text: "Una vez guardado, se necesitaran permisos especiales para modificar!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: false,
           })
-          .catch(error => {
-              this.errors = error.response.data.errors
+          .then((willCreate) => {
+            if (willCreate) {
+              swal("Espere un momento porfavor..", {
+                  icon: 'info',
+                  buttons: false,
+              });
+              axios.post(`./api/sales/store`, this.sale).then(response => {
+                swal("Venta generada correctamente!!", {
+                  icon: 'success',
+                  buttons: false,
+                });
+                setTimeout(function(){
+                    location.href = './quotes'
+                }, 1500);
+
+              })
+              .catch(error => {
+                  swal("Error!", {
+                    icon: 'error',
+                    buttons: false,
+                    timer: 1500
+                  });
+                  this.errors = error.response.data.errors
+              })
+            }
+            this.submitingDestroy = false
           })
       },
-      getSuppliers() {
-          axios.get(`./api/suppliers/all`)
+      getSuppliers(url) {
+          axios.get(url)
           .then(response => {
               this.suppliers = response.data
           })
@@ -276,9 +331,19 @@ export default {
           this.sale.price = parseFLoat(value);
       },
       getPrice(value){
+          this.sale.quote_detail_id = value.id;
           this.sale.price = value.price;
       },
-      customFormatter(date) {
+      customFormatterSupplier(date) {
+          this.sale.date_payment_supplier = moment(date).format('YYYY/MM/DD');
+          return moment(date).format('YYYY/MM/DD');
+      },
+      customFormatterLimit(date) {
+          this.sale.date_payment_limit = moment(date).format('YYYY/MM/DD');
+          return moment(date).format('YYYY/MM/DD');
+      },
+      customFormatterAdvance(date) {
+          this.sale.date_advance = moment(date).format('YYYY/MM/DD');
           return moment(date).format('YYYY/MM/DD');
       },
       getProductsByQuote() {

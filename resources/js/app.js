@@ -14,6 +14,7 @@ window.Vue = require('vue');
 import es from './es';
 import axios from 'axios';
 import 'moment/locale/es';
+import UUID from 'vue-uuid';
 import moment from 'moment';
 import rate from 'vue-rate';
 import swal from 'sweetalert';
@@ -35,16 +36,15 @@ import Datepicker from 'vuejs-datepicker';
 import Multiselect from 'vue-multiselect';
 import locale from 'element-ui/lib/locale';
 import uploader from 'vue-simple-uploader';
-import DaySpanVuetify from 'dayspan-vuetify';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import App from './components/folder/App.vue';
 import VueInternationalization from 'vue-i18n';
 import 'timeline-vuejs/dist/timeline-vuejs.css';
 import Locale from './vue-i18n-locales.generated';
 import lang_es from 'element-ui/lib/locale/lang/es';
-import 'dayspan-vuetify/dist/lib/dayspan-vuetify.min.css';
 import VueContentPlaceholders from 'vue-content-placeholders';
-
+ 
+Vue.use(UUID);
 locale.use(lang_es);
 Vue.use(Vuetify)
 Vue.use(rate)
@@ -92,25 +92,6 @@ Vue.toasted.register('error', message => message, {
     position : 'bottom-center',
     duration : 1500
 })
-console.log(moment.weekdaysShort(true))
-Vue.use( DaySpanVuetify, {
-  data: {
-    locales: { es },
-    defaults: {
-      dsWeeksView: {
-          weekdays: moment.weekdaysShort(true)
-      }
-    }
-
-  },
-  computed: {
-  },
-  methods: {
-     getDefaultEventColor: () => '#1976d2'
-  }
-});
-
-Vue.$dayspan.setLocale('es');
 
 Vue.use(VueClip)
 Vue.component('multiselect', Multiselect)
@@ -127,7 +108,7 @@ var config = {
 };
 
 
-var firebase = Firebase.initializeApp(config)
+export const firebase = Firebase.initializeApp(config)
 export const db = firebase.database()
 
 
@@ -213,6 +194,8 @@ Vue.component('quotes-track', require('./components/quotes/Track.vue'));
 
 // sales
 Vue.component('sales-input', require('./components/sales/Input.vue'));
+Vue.component('sales-index', require('./components/sales/Index.vue'));
+Vue.component('sales-edit', require('./components/sales/Edit.vue'));
 
 //Calendar
 Vue.component('calendar', require('./components/dashboard/Calendar.vue'));

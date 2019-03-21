@@ -28,7 +28,6 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-
     <script src="{{ asset('/public/js/app.js') }}" defer></script>
 
     <script>

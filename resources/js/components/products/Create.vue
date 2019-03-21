@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="form-group col-md-6">
-                <label>Descripcón del hotel</label>
+                <label>Descripcion del hotel</label>
                 <input type="text" class="form-control" :class="{'is-invalid': errors.description}" v-model="product.description" placeholder="....">
                 <div class="invalid-feedback" v-if="errors.description">{{errors.description[0]}}</div>
             </div>

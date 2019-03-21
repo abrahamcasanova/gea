@@ -21,7 +21,7 @@ class CustomerOrderController extends Controller
             $query->where('first_name', 'LIKE', '%'.$request->search.'%');
         }
 
-        $customers = $query->with('customer')->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
+        $customers = $query->with('customer')->Active()->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
                     ->paginate($request->input('pagination.per_page'));
 
         return $customers;

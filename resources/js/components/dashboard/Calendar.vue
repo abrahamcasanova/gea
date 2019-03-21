@@ -1,15 +1,19 @@
 <template>
   <v-app id="dayspan" v-cloak>
+    <v-layout wrap>
     <v-calendar
-          :now="today"
           :value="today"
+          ref="calendar"
+          v-model="today"
+          :type="type"
+          :end="end"
           color="primary"
           locale="es-419"
-        >
+          >
           <template v-slot:day="{ date }">
             <template v-for="event in eventsMap[date]">
               <v-menu
-                :key="event.title"
+                :key="event.id"
                 v-model="event.open"
                 full-width
                 offset-x
@@ -18,7 +22,7 @@
                   <div
                     v-if="!event.time"
                     v-ripple
-                    class="my-event"
+                    :class="event.type"
                     v-on="on"
                     v-html="event.title"
                   ></div>
@@ -29,19 +33,13 @@
                   flat
                 >
                   <v-toolbar
-                    color="primary"
+                    :color="event.type"
                     dark
                   >
-                    <v-btn icon>
-                      <v-icon>edit</v-icon>
-                    </v-btn>
                     <v-toolbar-title v-html="event.title"></v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon>
-                      <v-icon>favorite</v-icon>
-                    </v-btn>
-                    <v-btn icon>
-                      <v-icon>more_vert</v-icon>
+                      <v-icon>attach_money</v-icon>
                     </v-btn>
                   </v-toolbar>
                   <v-card-title primary-title>
@@ -52,7 +50,10 @@
                       flat
                       color="secondary"
                     >
-                      Cancel
+                      Cancelar
+                    </v-btn>
+                    <v-btn round color="success" v-on:click="firebasePayment(event.id)">
+                      Pagar
                     </v-btn>
                   </v-card-actions>
                 </v-card>
@@ -60,12 +61,60 @@
             </template>
           </template>
         </v-calendar>
+         <v-flex
+            sm4
+            xs12
+            md6
+            class="text-sm-left text-xs-center"
+          >
+            <v-btn @click="$refs.calendar.prev()">
+              <v-icon
+                dark
+                left
+              >
+                keyboard_arrow_left
+              </v-icon>
+              Prev
+            </v-btn>
+          </v-flex>
+          <v-flex
+            sm4
+            xs12
+            md6
+            class="text-sm-right text-xs-center"
+          >
+            <v-btn @click="$refs.calendar.next()">
+              Siguiente
+              <v-icon
+                right
+                dark
+              >
+                keyboard_arrow_right
+              </v-icon>
+            </v-btn>
+          </v-flex>
+            </v-layout>
 
   </v-app>
 
 </template>
 <style lang="stylus" scoped>
-  .my-event {
+    .success {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-radius: 2px;
+      background-color: #4caf50;
+      color: #ffffff;
+      border: 1px solid #4caf50;
+      width: 100%;
+      font-size: 12px;
+      padding: 3px;
+      cursor: pointer;
+      margin-bottom: 1px;
+    }
+
+  .info {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -79,81 +128,51 @@
     cursor: pointer;
     margin-bottom: 1px;
   }
-</style>
-<style>
-#dayspan {
-            font-family: Roboto, sans-serif;
-            width: 100%;
-            height: 100%;
-        }
 
-        .v-toolbar--clipped{
-            position: relative;
-        }
+  .warning {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 2px;
+    background-color: #ffeb3b;
+    color: #ffffff;
+    border: 1px solid #ffeb3b;
+    width: 100%;
+    font-size: 12px;
+    padding: 3px;
+    cursor: pointer;
+    margin-bottom: 1px;
+  }
 
-        .v-dialog__content{
-            position:absolute !important;
-        }
-        .v-navigation-drawer--fixed{
-            z-index:5;
-            position:absolute;
-        }
-        .ds-fullscreen{
-              z-index:9999 !important;
-        }
-        .v-toolbar__content, .v-toolbar__extension{
-            top: 0;
-            position: sticky;
-            width:100%;
-            left: 0;
-        }
-
-        .v-content{
-            position:relative;
-            top: 0;
-            left: 0;
-        }
-
-        .v-content__wrap{
-            z-index: 3;
-        }
-        .v-menu__content{
-            position:fixed;
-        }
-        .v-dialog__content{
-            position:fixed !important;
-        }
-        .v-dialog{
-            width:auto;
-            border-radius: 15px;
-            box-shadow: 3px -1px 43px 12px rgba(0,0,0,.5);
-        }
-        .application--wrap{
-            height:100%;
-            min-height:unset;
-        }
+  .danger {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 2px;
+    background-color: #f44336;
+    color: #ffffff;
+    border: 1px solid #f44336;
+    width: 100%;
+    font-size: 12px;
+    padding: 3px;
+    cursor: pointer;
+    margin-bottom: 1px;
+  }
 </style>
 <script>
-import { Calendar, Weekday, Month } from 'dayspan';
 import { db } from '../../app';
+import { firebase } from '../../app';
 import moment from 'moment';
 import {en, es} from 'vuejs-datepicker/dist/locale'
-console.log(moment().format('l'))
-Vue.$dayspan.setLocale('es');
-localStorage.removeItem('dayspanState');
 
 export default {
-  name: 'dayspan',
   data: vm => ({
-    storeKey: 'dayspanState',
-    calendar: Calendar.months(),
     readOnly: false,
     isReadOnly:false,
     canSave: true,
     labels: {
         save:'Guardar'
     },
-    currentLocale: vm.$dayspan.currentLocale,
     defaultEvents: [],
     today: moment().format('YYYY-MM-DD'), 
     events: [
@@ -163,26 +182,48 @@ export default {
           date: '2019-03-13',
           open: false
         }
+      ],
+      type: 'month',
+      start: '2019-01-01',
+      end: '2019-01-06',
+      typeOptions: [
+        { text: 'Day', value: 'day' },
+        { text: '4 Day', value: '4day' },
+        { text: 'Week', value: 'week' },
+        { text: 'Month', value: 'month' },
+        { text: 'Custom Daily', value: 'custom-daily' },
+        { text: 'Custom Weekly', value: 'custom-weekly' }
       ]
   }),
   es: es,
   firebase: {
-    calendarEvents: db.ref('user')
+    calendarEvents: db.ref('events')
   },
   mounted()
   {
       window.app = this;
       window.app.refs = this.$refs.app;
-      var userRef = db.ref('/user/' + this.user_id);
+      var userRef = db.ref('/events');
       let json = null;
       userRef.on('value', function(snapshot) {
           let data = snapshot.val()
+          var arr3 = [];
+          $.each( data, function( key, value ) {
+              $.each( value, function( key, value ) {
+                  if(value){
+                    arr3.push(value);
+                  }
+              });
+          });
+
+          data = arr3;
           if(data){
               window.app.loadFirebase(data)
           }else{
               window.app.loadState()
           }
-      });
+      }); 
+
       this.setLocale('es')
   },
   props: {
@@ -192,7 +233,11 @@ export default {
       // convert the list of events into a map of lists keyed by date
       eventsMap () {
         const map = {}
-        this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e))
+
+        this.events.forEach(
+
+          e => (map[e.date] = map[e.date] || []).push(e)
+        )
         return map
       }
   },
@@ -217,15 +262,12 @@ export default {
     setLocale(code)
     {
       moment.locale(code);
-      this.$dayspan.setLocale(code);
-      this.$dayspan.refreshTimes();
       //this.$refs.app.$forceUpdate();
     },
     saveState()
     {
       let state = this.calendar.toInput(true);
       let json = JSON.stringify(state);
-      console.log(state)
       localStorage.setItem(this.storeKey, json);
       if(state){
         axios.post(`./api/users/calendar`,state)
@@ -237,6 +279,18 @@ export default {
           console.log(this.errors)
         })
       }
+    },
+    firebasePayment(value){
+        //Eliminar de firebase y actualiza Calendario
+        db.ref('/events').on("child_added", function(snapshot) {
+          snapshot.forEach(function(data) {
+              let datas = data.val();
+              if(datas.id == value){
+                  console.log(snapshot.key);
+                  db.ref('/events/'+ snapshot.key +'/' + data.key).remove();
+              }
+          });
+        });
     },
     loadFirebase(data){
         let state = {};
@@ -251,8 +305,7 @@ export default {
         {
           console.log( e );
         }
-        console.log(state.events,this.events)
-        this.events = state.events
+        this.events = state
     },
     loadState()
     {

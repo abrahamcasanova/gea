@@ -299,6 +299,43 @@ class PermissionsTableSeeder extends Seeder
                 'module_id' => $moduleId
             ]
         ]);
+
+
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'sales',
+            'display_name' => 'Ventas',
+            'icon' => 'icon-people'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-sales',
+                'display_name' => 'Leer',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-sales',
+                'display_name' => 'Crear',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-sales',
+                'display_name' => 'ACtualizar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-sales',
+                'display_name' => 'Eliminar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
         // Module
         $moduleId = DB::table('modules')->insertGetId([
             'name' => 'Product',

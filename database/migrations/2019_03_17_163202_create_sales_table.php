@@ -28,12 +28,19 @@ class CreateSalesTable extends Migration
             $table->string('quadruple_room')->nullable();
             $table->float('rate_price')->nullable();
             $table->string('confirmation')->nullable();
+            $table->string('path')->nullable();
             $table->char('status',1)->default(1);
             $table->unsignedInteger('product_id');
             $table->unsignedInteger('supplier_id');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('quote_id');
+            $table->unsignedInteger('quote_detail_id');
             $table->timestamps();
 
+            $table->foreign('quote_detail_id')->references('id')->on('quote_details')
+                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('quote_id')->references('id')->on('quotes')
+                ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')

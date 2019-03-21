@@ -40,8 +40,11 @@ class HappyBirthday extends Command
      */
     public function handle()
     {
-        //
-        $customers = Customer::whereMonth('birthdate', '=', date('m'))->whereDay('birthdate', '=', date('d'))->get();
+        date_default_timezone_set('America/Mexico_City');
+
+        $customers = Customer::whereMonth('birthdate', '=', date('m'))
+            ->whereDay('birthdate', '=', date('d'))->get();
+        //dd(date('m'),date('d'));
         foreach( $customers as $customer ) {
           if($customer->email) {
               Mail::to($customer->email)->send(new Birthday($customer));

@@ -23,12 +23,12 @@
             <div class="row justify-content-md-center">
                 <div class="col-sm-6 col-xl-4">
                     @can('read-users')
-                    <users-count></users-count>
+                      {{--  <users-count></users-count> --}}
                     @endcan
                 </div>
                 <div class="col-sm-6 col-xl-4">
                     @can('read-roles')
-                    <roles-count></roles-count>
+                        {{-- <roles-count></roles-count> --}}
                     @endcan
                 </div>
                 <div class="col-sm-12 col-xl-12">

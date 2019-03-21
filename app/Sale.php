@@ -23,12 +23,24 @@ class Sale extends Model
       'product_id',
       'supplier_id',
       'user_id',
+      'quote_id',
+      'quote_detail_id',
       'status',
     ];
 
     public function product()
     {
         return $this->hasOne(Product::class,'id','product_id')->with('product_types');
+    }
+
+    public function quote()
+    {
+        return $this->hasOne(Quote::class,'id','quote_id')->with('customerOrder','quoteDetails');
+    }
+
+    public function quoteDetail()
+    {
+        return $this->hasOne(QuoteDetail::class,'id','quote_detail_id')->with('product');
     }
 
     public function user()
