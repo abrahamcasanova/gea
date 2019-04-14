@@ -223,6 +223,31 @@ class SaleController extends Controller
         }
     }
 
+    public function generateCoupon(Sale $sale){
+
+        $user =  auth()->user();
+        $destinations = Destination::whereIn('id',explode(',',$sale->travel_destination))
+                ->get();
+
+        $details = ProductDetailSale::with('product','quote')->where('quote_id',$sale->quote_id)
+            ->where('sale_id',$sale->id)->get();
+        
+        $pdf = PDF::loadView('sales.pdf.coupon',compact('sale','user','destinations','details'))
+                ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
+                ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/sales/coupon/'."{$sale->quote->customerOrder->customer->full_name}_{$sale->id}.pdf"));
+       
+       return response()->download(storage_path('app/public/pdf/sales/coupon/'."{$sale->quote->customerOrder->customer->full_name}_{$sale->id}.pdf"), "{$sale->quote->customerOrder->customer->full_name}", [], 'inline');
+
+    }
+
+    public function saveNoteCoupon(Request $request){
+        Sale::find(intval($request->sale_id))->update([
+            'note' => $request->note
+        ]);
+
+        return 'success';
+    }
+
     /**
      * Display the specified resource.
      *
@@ -358,7 +383,7 @@ class SaleController extends Controller
                         $collection->push($array);
                     }
                 }
-                $database->getReference("events/{$sale->id}")->set($collection->toArray());
+                $database->getReference("events/{$sale->id}")->set($collection);
             }
         }
 

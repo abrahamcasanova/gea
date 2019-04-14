@@ -46,7 +46,7 @@ class QuoteTrackController extends Controller
         if($request->track_status == 'Reservado' || $request->track_status == 'No viajo'){
             $database->getReference("quote_tracks/{$quote_track->quote_id}")->remove();
             if($request->track_status == 'No viajo'){
-                //Status 4 es eliminado parcial
+                //Estatus 4 es eliminado parcial
                 Quote::find($request->quote_id)->update([
                     'status' => 4
                 ]);    

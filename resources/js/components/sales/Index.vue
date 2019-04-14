@@ -105,6 +105,9 @@
                   <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar whatsapp" @click="sendWhatsapp(sale.id)" class="card-header-action ml-1 text-muted">
                     <i style="color:green" class="fa-lg fab fa-whatsapp text-success"></i>
                   </a>
+                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Imprimir cupón" @click="showModalPrint(sale.id)" class="card-header-action ml-1 text-muted">
+                    <i class="fa-lg fas fa-print"></i>
+                  </a>
                   <a v-if="$can('take-payment-sales')" :href="'./payments/create/' + sale.id" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-hand-holding-usd"></i>
                   </a>
@@ -170,6 +173,14 @@
           </div>
           <b-button class="mt-3" variant="outline-success" block @click="saveSaleAndHideModal">Guardar</b-button>
         </b-modal>
+
+        <!-- Modal Print -->
+        <b-modal size="lg" id="modal2" ref="myModalRef3" hide-footer title="Nota Adiccional">
+          <div class="d-block">
+            <textarea class="form-control" rows="5" v-model="notePrint"></textarea>
+          </div>
+          <b-button class="mt-3" variant="outline-success" block @click="print"><strong>Imprimir Cupón</strong></b-button>
+        </b-modal>
     </div>
   </div>
 </template>
@@ -198,6 +209,8 @@ export default {
       searchQuery:'',
       quoteId: null,
       type: "create",
+      notePrint:null,
+      sale_id_print:null,
       quoteSale: [],
       filters: {
         pagination: {
@@ -324,6 +337,25 @@ export default {
           }
           this.submitingDestroy = false
         })
+    },
+    print(){
+      axios.post(`./api/sales/save-note-coupon`, {
+          sale_id : this.sale_id_print,
+          note: this.notePrint
+      })
+      .then(response => {
+          this.notePrint = '';
+          this.$refs.myModalRef3.hide()
+          window.open("./api/sales/coupon/"+ this.sale_id_print +"",'_blank');
+      })
+      .catch(error => {
+        this.errors = error.response.data.errors
+        this.submiting = false
+      })
+    },
+    showModalPrint(saleId){
+      this.sale_id_print = saleId;
+      this.$refs.myModalRef3.show()
     },
     sendWhatsapp(saleId){
         axios.get(`./api/sales/get-sale/` + saleId)

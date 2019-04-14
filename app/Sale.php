@@ -18,6 +18,8 @@ class Sale extends Model
       'simple_room',
       'double_room',
       'triple_room',
+      'path',
+      'note',
       'quadruple_room',
       'rate_price',
       'confirmation',

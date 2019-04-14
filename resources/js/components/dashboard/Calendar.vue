@@ -36,7 +36,7 @@
                     :color="event.type"
                     dark
                   >
-                    <v-toolbar-title v-html="event.title"></v-toolbar-title>
+                    <v-toolbar-title v-html="event.title + ' Folio venta: ' + event.sale_id"></v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon>
                       <v-icon>attach_money</v-icon>
