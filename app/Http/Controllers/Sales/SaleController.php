@@ -159,9 +159,10 @@ class SaleController extends Controller
             $sale->save();
 
             if($request->events){
+                $collection = collect([]);
                 foreach ($request->events as $key => $value) {
                     if($this->validateDate($value['date'],'Y-m-d')){
-                        Event::create([
+                        $array = [
                             'date'                  => $value['date'],
                             'details'               => $value['details'],
                             'firebase_id'           => $value['id'],
@@ -174,13 +175,16 @@ class SaleController extends Controller
                             'date_payment_supplier' => $request->date_payment_supplier,
                             'quote_id'              => $request->quote_id,
                             'sale_id'               => $sale->id,
-                        ]);
+                        ];
+
+                        Event::create($array);
+                        $collection->push($array);
                     }
                 }
+                $database->getReference("events/{$sale->id}")->set($collection);
             }
         }
-
-        $database->getReference("events/{$sale->id}")->set($request->events);
+        
         $customerSaleGenerate = $sale;
         
         if(isset($sale->quote->customerOrder->customer->email)){
@@ -332,10 +336,11 @@ class SaleController extends Controller
             if($request->events){
 
                 Event::where('sale_id',$request->id)->delete();
-
+                $collection = collect([]);
                 foreach ($request->events as $key => $value) {
                     if($this->validateDate($value['date'],'Y-m-d')){
-                        Event::create([
+
+                        $array = [
                             'date'                  => $value['date'],
                             'details'               => $value['details'],
                             'firebase_id'           => $value['id'],
@@ -348,13 +353,14 @@ class SaleController extends Controller
                             'date_payment_supplier' => $request->date_payment_supplier,
                             'quote_id'              => $request->quote_id,
                             'sale_id'               => $sale->id,
-                        ]);
+                        ];
+                        Event::create($array);
+                        $collection->push($array);
                     }
                 }
+                $database->getReference("events/{$sale->id}")->set($collection->toArray());
             }
         }
-
-        $database->getReference("events/{$sale->id}")->set($request->events);
 
         return $sale;    
     }

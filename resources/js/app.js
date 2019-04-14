@@ -103,14 +103,15 @@ Vue.use(VueContentPlaceholders)
 Vue.use(uploader)
 // Initialize Firebase
 
-/*var config = {
+var config = {
   apiKey: "AIzaSyCbyyvqiAuJeWjNvMakL9_R-jhkpa0oml4",
   authDomain: "proyecto-gea-dfbee.firebaseapp.com",
   databaseURL: "https://proyecto-gea-dfbee.firebaseio.com",
   projectId: "proyecto-gea-dfbee",
   storageBucket: "proyecto-gea-dfbee.appspot.com",
   messagingSenderId: "571952390252"
-};*/
+};
+/*
  var config = {
   apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
   authDomain: "travel-f0875.firebaseapp.com",
@@ -119,7 +120,7 @@ Vue.use(uploader)
   storageBucket: "travel-f0875.appspot.com",
   messagingSenderId: "76422469644"
 };
-
+*/
 
 export const firebase = Firebase.initializeApp(config)
 export const db = firebase.database()
