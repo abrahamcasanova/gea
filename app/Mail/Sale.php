@@ -30,7 +30,7 @@ class Sale extends Mailable
      */
     public function build()
     {
-        return $this->from('NewSuntravel@live.com', 'New Sun Travel')
+        return $this->from('contacto@appnovasolutions.com', 'New Sun Travel')
             ->markdown('emails.sale')->subject('Venta')->attach(storage_path().'/app/public/pdf/sales/'.$this->sale->path);
     }
 }

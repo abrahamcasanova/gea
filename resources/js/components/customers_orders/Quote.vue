@@ -25,12 +25,12 @@
             </div>
             <div class="form-group col-md-4">
                 <label>Fecha de la propuesta</label>
-                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="quote.proposal_date"></datepicker>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="quote.proposal_date" :input-class="{'is-invalid': errors.proposal_date}"></datepicker>
                 <div class="invalid-feedback" v-if="errors.proposal_date">{{errors.proposal_date[0]}}</div>
             </div>
           </div>
           <div class="row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-3">
                 <label>Fecha de viaje</label>
                 <input type="text" class="form-control" :class="{'is-invalid': errors.rfc}" v-model="quote.travel_date" placeholder="..." >
                 <div class="invalid-feedback" v-if="errors.travel_date">{{errors.travel_date[0]}}</div>
@@ -42,6 +42,19 @@
             <div class="form-group col-md-3">
                 <label>Menores</label>
                 <input type="text" class="form-control" :class="{'is-invalid': errors.number_childs}" v-model="quote.number_childs" placeholder="...">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Tipo de moneda</label>
+                 <multiselect
+                  v-model="quote.currency"
+                  :options="currencies"
+                  openDirection="bottom"
+                  track-by="id"
+                  placeholder="Moneda"
+                  label="name"
+                  :class="{'border border-danger rounded': errors.currency}">
+                </multiselect>
+                <div class="invalid-feedback" v-if="errors.currency">{{errors.currency[0]}}</div>
             </div>
           </div>
           <div class="card">
@@ -60,10 +73,27 @@
                         </multiselect>
                     </div>
                     <div class="form-group col-md-3">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" :class="{'is-invalid': errors.last_name}" v-model="quote_detail_add.description" placeholder="descripción">
+                    </div>
+                    <div class="form-group col-md-3">
                         <label>Precio</label>
                         <vue-numeric class="form-control"  :class="{'is-invalid': errors.price}" currency="$" separator="," :precision="2" v-model="quote_detail_add.price"></vue-numeric>
                     </div>
                     <div class="form-group col-md-3">
+                        <label>Proveedor</label>
+                        <multiselect
+                          v-model="quote_detail_add.supplier_id"
+                          :options="suppliers"
+                          openDirection="bottom"
+                          track-by="id"
+                          label="name"
+                          :class="{'border border-danger rounded': errors.supplier_id}">
+                        </multiselect>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group offset-md-10 col-md-2">
                         <label>&nbsp;</label><br>
                         <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="addProduct">
                           <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
@@ -104,7 +134,14 @@
                           </thead>
                           <tbody>
                               <tr v-for="(quote_detail, index) in quote_details">
-                                  <td class="">{{quote_detail.product.name}}</td>
+                                  <td class="">
+                                    <div class="media-body">
+                                      <div>{{quote_detail.product.name}}</div>
+                                      <div class="medium text-muted">
+                                        {{quote_detail.description}}
+                                      </div>
+                                    </div>
+                                  </td>
                                   <td class="">{{quote_detail.product.category}}</td>
                                   <td class="">{{ quote_detail.price | currency }}</td>
                                   <td class="">{{quote_detail.product.description}}</td>
@@ -115,7 +152,7 @@
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="d-none d-sm-table-cell">
+                                  <td class="">
                                     <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(quote_detail.id)">
                                         <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                                         <i class="far fa-trash-alt" v-else style="color:red"></i>
@@ -183,6 +220,11 @@ export default {
       },
       products:[],
       customers:[],
+      currencies:[
+          { id: 'NACIONAL', name: 'NACIONAL' },
+          { id: 'DOLARES', name: 'DOLARES' },
+          { id: 'EUROS', name: 'EUROS' },
+      ],
       quote:{
           customer_order:{
             customer:{
@@ -206,6 +248,7 @@ export default {
         search: ''
       },
       es: es,
+      suppliers:[],
       menu: false,
       loading: true,
       submiting: false,
@@ -224,7 +267,7 @@ export default {
   computed: {
      includeMessage: {
         get: function() {
-            return this.quote.include = '*Precio total por ' +this.quote.number_adults + ' Adulto(s) y ' + this.quote.number_childs + ' Niño(s)\n(# Habitación por)\n*Plan de alimentos especificados en cada hotel.';
+            return this.quote.include = '*Precio total por ' +this.quote.number_adults + ' Adulto(s) y ' + this.quote.number_childs + ' \n(# Habitación por)\n*Plan de alimentos especificados en cada hotel.';
         },
         set: function(includeMessage) {
             this.quote.include = includeMessage;
@@ -236,6 +279,7 @@ export default {
     this.csrf = window.Laravel.csrfToken;
     this.getQuote();
     this.getProducts();
+    this.getSuppliers();
   },
   methods: {
     create () {
@@ -310,6 +354,18 @@ export default {
           })
         }
     },
+    getSuppliers() {
+        axios.get('../../api/suppliers/all')
+        .then(response => {
+            this.suppliers = response.data
+        })
+        .catch(error => {
+            this.$toasted.global.error('Error!')
+        })
+        .then(() => {
+          this.loading = false
+        })
+    },
     getQuoteDetails (QuoteId) {
         axios.post(`../../api/quote_details/by-quote-id`,{
           quote_id: QuoteId
@@ -333,6 +389,10 @@ export default {
             this.quote.policy = '* Tarifa sujeta a cambios sin previo aviso\n* Se reserva con un anticipo del 15% y se paga poco a poco\n(Dependiendo de las políticas de reservación que tenga el hotel)\n* Se liquida aproximadamente 25 días antes de su fecha de viaje\n(Puede variar dependiendo del hotel)';
 
             this.quote.payment = '* Deposito (oxxo, 7eleven o en el banco)\n* Tarjeta de credito (Comisión bancaria)\n* Transferencias';
+            this.quote.travel_date = response.data.customer_order.travel_date + " Al " + response.data.customer_order.travel_end_date;
+            this.quote.number_adults = response.data.customer_order.number_adults
+            
+            this.quote.number_childs = response.data.customer_order.number_childs
 
             this.getQuoteDetails(response.data['id'])
 
@@ -344,6 +404,9 @@ export default {
         .then(() => {
           this.loading = false
         })
+    },
+    isNumeric: function (n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
     },
   }
 }

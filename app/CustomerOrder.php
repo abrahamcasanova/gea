@@ -9,6 +9,7 @@ class CustomerOrder extends Model
     protected $fillable = [
         'travel_month',
         'travel_date',
+        'travel_end_date',
         'phone',
         'cellphone',
         'call_time',

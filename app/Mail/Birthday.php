@@ -30,7 +30,7 @@ class Birthday extends Mailable
      */
     public function build()
     {
-        return $this->from('NewSuntravel@live.com', 'New Sun Travel')
+        return $this->from('contacto@appnovasolutions.com', 'New Sun Travel')
             ->markdown('emails.birthday')->subject('Feliz Cumpleaños');
     }
 }

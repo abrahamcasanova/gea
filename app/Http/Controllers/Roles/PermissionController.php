@@ -83,6 +83,13 @@ class PermissionController extends Controller
         $permission->save();
     }
 
+    function check($permissionName) {
+       if (! Auth::user()->hasPermissionTo($permissionName)) {
+            abort(403);
+       }
+       return response('', 204);
+    }
+
     public function destroy ($permission)
     {
         return Permission::destroy($permission);

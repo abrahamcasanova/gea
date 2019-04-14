@@ -6,31 +6,14 @@
             <i class="fa-lg icon-people text-primary"></i>
         </h4>
       </div>
-      <div class="table-responsive">
-          <table class="table table-striped table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th># Folio</th>
-                <th>Cliente</th>
-                <th>Celular</th>
-                <th>Agente</th>
-                <th>Estatus</th>
-                <th>Comentario</th>
-                <th>Fecha Contacto</th>
-              </tr>
-            </thead>
-            <tbody>
-                <tr v-for="item of items" :key="item['.key']">
-                  <td>{{ item.quote_id }}</td>
-                  <td>{{ item.quote.customer_order.customer.full_name }}</td>
-                  <td>{{ item.quote.customer_order.cellphone }}</td>
-                  <td>{{ item.user.name }}</td>
-                  <td>{{ item.track_status }}</td>
-                  <td>{{ item.comments }}</td>                  
-                  <td>{{ item.contact_date }}</td>                  
-                </tr>
-            </tbody>
-          </table>        
+      <div class="card-body px-0">
+        <b-table
+          :items="items"
+          :fields="tableFields"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          :tbody-tr-class="rowClass"
+        ></b-table>
       </div>
     </div>
   </div>
@@ -38,36 +21,95 @@
 
 <script>
 
-import { db } from '../../app';
+import { db_dashbord, firebase } from '../../app';
+import moment from 'moment'
+
 
 export default {
+  computed: {
+    dashbordFilter (){
+      var filterKey = this.searchQuery && this.searchQuery.toLowerCase()
+      var dashbord = this.items
+      if (filterKey) {
+        dashbord = dashbord.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
+        })
+      }
+      return dashbord;
+    }
+  },
   data () {
     return {
       prospectings: 0,
       items: [],
       selected: [],
+      searchQuery:'',
+      loading: true,
+      sortBy: 'id',
+      sortDesc: false,
+      tableFields: [
+        { key: 'id', sortable: true },
+        { key: 'quote.customer_order.customer.full_name',label:'Cliente', 
+        sortable: true, status:'awesome'},
+        { key: 'quote.customer_order.customer.cellphone',label:'Celular', sortable: true },
+        { key: 'user.name', sortable: true,label:'Agente' },
+        { key: 'track_status', sortable: true,label:'Estatus' },
+        { key: 'comments', sortable: true,label:'Comentario' },
+        { key: 'contact_date', sortable: true,label:'Fecha de contacto' },
+        { key: 'days', sortable: true,label:'Días transcurridos' },
+      ],
       pagination: {
         sortBy: 'name'
       },
-      headers: [
-        {
-          text: 'Dessert (100g serving)',
-          align: 'left',
-          value: 'name'
+      filters: {
+        pagination: {
+          from: 0,
+          to: 0,
+          total: 0,
+          per_page: 25,
+          current_page: 1,
+          last_page: 0
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
-      ],
+        orderBy: {
+          column: 'id',
+          direction: 'asc'
+        },
+        search: ''
+      },
+      sortKey: 'name',
+      reverse: false,
     }
   },
   firebase: {
-    items: db.ref('quote_tracks')
+    items: db_dashbord
   },
   mounted () {
     this.getCountQuoteTrack()
+    let db = firebase.database();
+    let today = Date.now();
+    let today_moment = moment(today);
+
+    db_dashbord.once('value', function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            let childKey = childSnapshot.key;
+            let childData = childSnapshot.val();
+            let childDay = childData.contact_date;
+            let days_trans = today_moment.diff(childDay,'days')
+            let type =  null;
+            if(days_trans <= 2){
+              type = 'text-success';
+            }else if(days_trans == 3 || days_trans == 4){
+              type = 'text-warning';
+            }
+            else{
+              type = 'text-danger';
+            }
+
+            db.ref("quote_tracks/" + childKey).update({ days: days_trans, type: type });
+        });
+    });
   },
   methods: {
     getCountQuoteTrack () {
@@ -75,6 +117,19 @@ export default {
       .then(response => {
         this.prospectings = response.data
       })
+    },
+    filter() {
+      this.filters.pagination.current_page = 1
+    },
+    rowClass(item, type) {
+      if (!item) return
+      if (item.type === 'text-danger') return 'bg-danger font-weight-bold'
+      if (item.type === 'text-warning') return 'bg-warning font-weight-bold'
+      if (item.type === 'text-success') return 'bg-success font-weight-bold'
+    },
+    changeSize (perPage) {
+      this.filters.pagination.current_page = 1
+      this.filters.pagination.per_page = perPage
     },
   }
 }

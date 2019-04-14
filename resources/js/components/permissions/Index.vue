@@ -33,11 +33,11 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('name')">Name</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'name' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -45,22 +45,22 @@
               <a href="#" class="text-dark" @click.prevent="sort('display_name')">Permission</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'display_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'display_name' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Created</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell"></th>
+            <th class=""></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="permission in permissions" >
-            <td class="d-none d-sm-table-cell">{{permission.id}}</td>
+            <td class="">{{permission.id}}</td>
             <td>{{permission.display_name}}</td>
-            <td class="d-none d-sm-table-cell">{{permission.name}}</td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">{{permission.name}}</td>
+            <td class="">
               <small v-if="permission.created_at">{{permission.created_at | moment("LL")}}</small> - <small class="text-muted">{{permission.created_at | moment("LT")}}</small>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <a href="#" @click="editPermission(permission.id)" class="text-muted"><i class="fas fa-pencil-alt"></i></a>
               <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(permission.id)">
                 <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>

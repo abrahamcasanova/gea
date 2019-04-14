@@ -10,6 +10,8 @@ class TypeOfPayment extends Model
 
     protected $fillable = [
       'name',
+      'with_authorization',
+      'with_percentage'
     ];
 
     public function getNameAttribute($value) {
@@ -19,5 +21,10 @@ class TypeOfPayment extends Model
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = ucfirst(strtolower($value));
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status',1);
     }
 }

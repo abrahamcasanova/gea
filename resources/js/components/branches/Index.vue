@@ -33,7 +33,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -52,11 +52,11 @@
           <tr v-for="branch in branches">
             <td class="">{{branch.id}}</td>
             <td class="">{{branch.name}}</td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
                 <label v-if="branch.status == 1">Activo</label>
                 <label v-else>Inactivo</label>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <a href="#" @click="editCustomer(branch.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt"></i></a>
               <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(branch.id)">
                   <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
@@ -126,11 +126,11 @@
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th class="d-none d-sm-table-cell">
+                          <th class="">
                               <a href="#" class="text-dark" @click.prevent="sort('name')">Name</a>
                               <i class="mr-1 fas" :class=""></i>
                           </th>
-                          <th class="d-none d-sm-table-cell">
+                          <th class="">
                               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Upload Date</a>
                               <i class="mr-1 fas" :class=""></i>
                           </th>
@@ -141,7 +141,7 @@
                           <td class="">
                               <a :href="'/storage/' + doc.url" target="_blank">{{doc.name}}</a>
                           </td>
-                          <td class="d-none d-sm-table-cell">
+                          <td class="">
                             <small>{{doc.created_at | moment("LL")}}</small> - <small class="text-muted">{{doc.created_at | moment("LT")}}</small>
                           </td>
                         </tr>

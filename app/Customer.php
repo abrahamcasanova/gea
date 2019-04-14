@@ -12,6 +12,7 @@ class Customer extends Model
         'first_name',
         'last_name',
         'email',
+        'address',
         'type_of_person',
         'status',
         'comment',
@@ -52,7 +53,25 @@ class Customer extends Model
         return $query->where('status',1);
     }
 
+    public function setFirstNameAttribute($value)
+    {
+        $this->attributes['first_name'] = mb_convert_encoding(ucwords(utf8_decode($value)), 'UTF-8', 'UTF-8');
+    }
+
+     public function getFirstNameAttribute($value) {
+        return ucwords($value);
+    }
+
+    public function setLastNameAttribute($value)
+    {
+        $this->attributes['last_name'] = mb_convert_encoding(ucwords(utf8_decode($value)), 'UTF-8', 'UTF-8');
+    }
+
+     public function getLastNameAttribute($value) {
+        return ucwords($value);
+    }
+
     public function getFullNameAttribute() {
-       return "{$this->first_name} {$this->last_name}";
+       return ucwords("{$this->first_name} {$this->last_name}");
     }
 }

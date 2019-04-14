@@ -56,6 +56,24 @@
                   <input type="text" class="form-control" :class="{'is-invalid': errors.cellphone}" v-model="customer.cellphone" placeholder="9999978202">
                   <div class="invalid-feedback" v-if="errors.cellphone">{{errors.cellphone[0]}}</div>
               </div>
+              <div class="form-group col-md-6">
+                <label>Cumpleaños</label>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="customer.birthdate"></datepicker>
+                <div class="invalid-feedback" v-if="errors.birthdate">{{errors.birthdate[0]}}</div>
+            </div>
+            
+            <div class="form-group col-md-6">
+              <label>Nivel de cliente</label>
+              <multiselect
+                v-model="customer.level"
+                :options="customerLevel"
+                openDirection="bottom"
+                track-by="id"
+                label="name"
+                :class="{'border border-danger rounded': errors.level}">
+              </multiselect>
+              <small class="form-text text-danger" v-if="errors.level">{{errors.level[0]}}</small>
+            </div>
               <div class="form-group col-md-8">
                   <label>Direccion</label>
                   <input type="text" class="form-control" :class="{'is-invalid': errors.address}" v-model="customer.address" placeholder="Direccion ..">
@@ -74,7 +92,14 @@
 </template>
 
 <script>
+import Datepicker from 'vuejs-datepicker';
+import {en, es} from 'vuejs-datepicker/dist/locale'
+import moment from 'moment'
+
 export default {
+  components: {
+      Datepicker,
+  },
   data () {
     return {
       customer: {
@@ -88,6 +113,12 @@ export default {
       ],
       type_one: { id: 'PROSPECTO', name: 'PROSPECTO' },
       type_two: { id: 'CLIENTE', name: 'CLIENTE'},
+      customerLevel:[
+        { id: 'BAJA', name: 'BAJA' },
+        { id: 'MEDIA', name: 'MEDIA' },
+        { id: 'ALTA', name: 'ALTA' },
+      ],
+      es: es,
       errors: {},
       loading: true,
       submiting: false,
@@ -106,6 +137,7 @@ export default {
       .then(response => {
           this.customer = response.data
           this.customer.type_of_person = response.data.type_of_person == 'PROSPECTO' ? this.type_one:this.type_two;
+          this.customer.level =  {id: response.data.level, name: response.data.level};
       })
       .catch(error => {
           this.$toasted.global.error('User does not exist!')
@@ -153,6 +185,10 @@ export default {
             this.submitingDestroy = false
           })
         }
+    },
+    customFormatter(date) {
+      this.customer.birthdate = moment(date).format('YYYY/MM/DD');
+      return moment(date).format('YYYY/MM/DD');
     },
     getGroups() {
         axios.get(`../../api/groups/all`).then(response => {

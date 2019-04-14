@@ -5,9 +5,11 @@ namespace App\Http\Controllers\CustomerOrder;
 use Storage;
 use App\Role;
 use App\User;
+use App\Quote;
 use App\Profile;
-use App\CustomerOrder;
 use Carbon\Carbon;
+use App\Destination;
+use App\CustomerOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -23,13 +25,32 @@ class CustomerOrderController extends Controller
 
         $customers = $query->with('customer')->Active()->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
                     ->paginate($request->input('pagination.per_page'));
+        if($customers){
+            foreach ($customers as $key => $value) {
+                $value->quote_number = Quote::selectRaw('count(*) as total')
+                ->whereHas('customerOrder', function($q) use($value){
+                    $q->where('customer_id', $value->customer_id);
+                })->where('status',2)->first();
 
+                $value->sale_number = Quote::selectRaw('count(*) as total')
+                ->whereHas('customerOrder', function($q) use($value){
+                    $q->where('customer_id', $value->customer_id);
+                })->where('status',3)->first();
+            }
+        }
         return $customers;
     }
 
     public function show ($customer)
     {
-        return CustomerOrder::with('customer')->findOrFail($customer);
+        $customerOrder = CustomerOrder::with('customer')->findOrFail($customer);
+        $destinations =  Destination::whereIn('id',explode(',',$customerOrder->travel_destination))->get();
+        $collection = collect($customerOrder);
+
+        $collection->put('travel_destination', $destinations);
+
+        return $collection;
+
     }
 
     public function store (Request $request)

@@ -28,7 +28,7 @@ class SupplierController extends Controller
       $this->validate($request, [
           'name' => 'required|string',
           'address' => 'required|string',
-          'commission' => 'required|numeric',
+          'commission' => 'nullable|numeric',
           'phone' => 'required|numeric',
           'cellphone' => 'required|numeric',
           'email' => 'nullable|email',
@@ -60,7 +60,7 @@ class SupplierController extends Controller
       $this->validate($request, [
           'name' => 'required|string',
           'address' => 'required|string',
-          'commission' => 'required|numeric',
+          'commission' => 'nullable|numeric',
           'phone' => 'required|numeric',
           'cellphone' => 'nullable|numeric',
           'email' => 'nullable|email',

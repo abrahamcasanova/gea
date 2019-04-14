@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Quotes;
 use PDF;
 use File;
 use App\Quote;
+use App\Destination;
+use App\CustomerOrder;
 use App\Mail\Quote as MailQuote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -33,6 +35,8 @@ class QuoteController extends Controller
             'customer_order_id' => 'required',
         ]);
  
+        $request->merge(['currency'  => $request->currency['id']]);
+
         $quote = Quote::updateOrCreate(
             [
                 'customer_order_id' => $request->customer_order_id,
@@ -54,11 +58,18 @@ class QuoteController extends Controller
             $quote->payment = str_replace("\n","\n \r",$quote->payment);
             $user = auth()->user();
 
-            $pdf = PDF::loadView('quotes.pdf.generate',compact('quote','user'))
+            $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
+                ->get();
+
+            $pdf = PDF::loadView('quotes.pdf.generate',compact('quote','user','destinations'))
                 ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
                 ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/'."{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf"));
             $quote->path = "{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf";
             $quote->save();
+
+            CustomerOrder::find($request->customer_order_id)->update([
+                'status' => 2
+            ]);
         }
 
         return $quote;
@@ -78,7 +89,10 @@ class QuoteController extends Controller
             $quote->payment = str_replace("\n","\n \r",$quote->payment);
             $user = auth()->user();
 
-            $pdf = PDF::loadView('quotes.pdf.generate',compact('quote','user'))
+            $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
+                ->get();
+
+            $pdf = PDF::loadView('quotes.pdf.generate',compact('quote','user','destinations'))
                 ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
                 ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/'."{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf"));
             $quote->path = "{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf";
@@ -99,8 +113,13 @@ class QuoteController extends Controller
     }
 
     public function getQuote ($quote)
-    {
-        return Quote::with('customerOrder','quoteDetails')->findOrFail($quote);
+    {   
+        $quotes = Quote::with('customerOrder','quoteDetails')->findOrFail($quote);
+        $destinations =  Destination::whereIn('id',explode(',',$quotes->customerOrder->travel_destination))
+            ->get();
+        $collection = collect($quotes);
+
+        return $collection->put('travel_destination', $destinations);
     }
 
     public function sendQuote(Request $request)

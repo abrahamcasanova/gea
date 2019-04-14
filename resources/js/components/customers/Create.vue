@@ -58,7 +58,7 @@
             </div>
             <div class="form-group col-md-6">
                 <label>Cumpleaños</label>
-                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="customer.birthdate"></datepicker>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="customer.birthdate" :input-class="{'is-invalid': errors.birthdate}"></datepicker>
                 <div class="invalid-feedback" v-if="errors.birthdate">{{errors.birthdate[0]}}</div>
             </div>
             <div class="form-group col-md-6">

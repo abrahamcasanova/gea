@@ -33,7 +33,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -50,16 +50,16 @@
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'cellphone' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'cellphone' && filters.orderBy.direction == 'desc'}"></i>
             </th>
             <th>Roles</th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">{{ $t('user.Registered') }} </a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell"></th>
+            <th class=""></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" @click="editUser(user.id)">
-            <td class="d-none d-sm-table-cell">{{user.id}}</td>
+            <td class="">{{user.id}}</td>
             <td>
               <div class="media">
                 <div class="avatar float-left mr-3">
@@ -74,17 +74,17 @@
                 </div>
               </div>
             </td>
-            <td class="d-none d-sm-table-cell">{{user.phone}}</td>
-            <td class="d-none d-sm-table-cell">{{user.cellphone}}</td>
+            <td class="">{{user.phone}}</td>
+            <td class="">{{user.cellphone}}</td>
             <td>
               <span v-for="(role, index) in user.roles">
                 {{role.name}}<span v-if="index+1 < user.roles.length">, </span>
               </span>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <small>{{user.created_at | moment("LL")}}</small> - <small class="text-muted">{{user.created_at | moment("LT")}}</small>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <a href="#" class="text-muted"><i class="fas fa-pencil-alt"></i></a>
             </td>
           </tr>

@@ -43,6 +43,10 @@
                   <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'quote.customer_order.customer.full_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'quote.customer_order.customer.full_name' && filters.orderBy.direction == 'desc'}"></i>
                 </th>
                 <th>
+                  <a href="#" class="text-dark" @click.prevent="sort('level')">Nivel</a>
+                  <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'level' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'level' && filters.orderBy.direction == 'desc'}"></i>
+                </th>
+                <th>
                   <a href="#" class="text-dark" @click.prevent="sort('last_name')">Telefonos</a>
                   <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'last_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'last_name' && filters.orderBy.direction == 'desc'}"></i>
                 </th>
@@ -74,6 +78,7 @@
                 <td class="">{{quote.id}}</td>
                 <td class="" v-if='quote.customer_order'>{{quote.customer_order.customer['full_name']}}</td>
                 <td class="" v-else='quote.customer_order.customer_order'></td>
+                <td class="">{{quote.customer_order ? quote.customer_order.customer.level:null}}</td>
                 <td class="" v-if='quote.customer_order'>{{quote.customer_order.phone}}</td>
                 <td class="" v-else></td>
                 <td class="" v-if='quote.customer_order' >{{quote.customer_order.customer.email}}</td>
@@ -88,7 +93,7 @@
                   <small>{{quote.created_at | moment("LL")}}</small> - <small class="text-muted">{{quote.created_at | moment("LT")}}</small>
                 </td>
                 <td class="">
-                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getDetailQuote(quote.id)" class="card-header-action ml-1 text-muted">
+                  <a v-if="$can('read-quotes')" href="#" data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getDetailQuote(quote.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-info-circle text-primary"></i>
                   </a>
                   <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar correo" @click="sendMail(quote.id)" class="card-header-action ml-1 text-muted">
@@ -97,11 +102,11 @@
                   <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar whatsapp" @click="sendWhatsapp(quote.id)" class="card-header-action ml-1 text-muted">
                     <i style="color:green" class="fa-lg fab fa-whatsapp text-success"></i>
                   </a>
-                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Generar Venta" @click="modalSale(quote.id)" class="card-header-action ml-1 text-muted">
+                  <a v-if="$can('create-sales')" href="#"  data-toggle="tooltip" data-placement="bottom" title="Generar Venta" @click="modalSale(quote.id)" class="card-header-action ml-1 text-muted">
                     <i style="color:#3f51b5" class="fa-lg fas  fa-file-invoice-dollar text-indigo"></i>
                   </a>
-                  <a href="#" @click="editCustomer(quote.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
-                  <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(quote.id)">
+                  <a v-if="$can('update-quotes')" href="#" @click="editCustomer(quote.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
+                  <a v-if="$can('delete-quotes')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(quote.id)">
                       <i class="fa-lg fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                       <i class="fa-lg far fa-trash-alt" v-else></i>
                       <span class="d-md-down-none ml-1"></span>
@@ -302,6 +307,7 @@ export default {
         axios.get(`./api/quotes/get-quote/` + quoteId)
         .then(response => {
             let data = response.data;
+            console.log(data)
             if(data.customer_order.customer.cellphone == null || data.customer_order.customer.cellphone == ''){
                 swal("Error..", {
                   text:'No se puede enviar el whatsapp porque no existe un telefono registrado.',
@@ -312,7 +318,12 @@ export default {
                 return false;
             }else{
                 let str = window.location
-                window.open("https://wa.me/52"+ data.customer_order.customer.cellphone +"?text=Estimado " + data.customer_order.customer.full_name + ", adjunto encontrará la cotización con destino a " + data.customer_order.travel_destination,'_blank');
+                var travel = '';
+                for (var i = 0; data.travel_destination.length > i; i++) {
+                  let nameCapitalized = capitalizeFirstLetter(data.travel_destination[i].name.toLowerCase());
+                  travel += nameCapitalized + ', ';
+                }
+                window.open("https://wa.me/52"+ data.customer_order.customer.cellphone +"?text=Estimado " + data.customer_order.customer.full_name + ", adjunto encontrará la cotización con destino a " + travel,'_blank');
             }
             
         })
@@ -408,5 +419,9 @@ export default {
       }
     },
   }
+}
+
+function capitalizeFirstLetter(string) {
+    return string[0].toUpperCase() + string.slice(1);
 }
 </script>

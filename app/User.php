@@ -46,4 +46,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne('App\Profile');
     }
+
+    public function getAllPermissionsAttribute() {
+      $permissions = [];
+        foreach (Permission::all() as $permission) {
+          if (Auth::user()->can($permission->name)) {
+            $permissions[] = $permission->name;
+          }
+        }
+        return $permissions;
+    }
 }

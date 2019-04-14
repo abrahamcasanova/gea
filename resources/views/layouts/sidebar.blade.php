@@ -27,9 +27,18 @@
                             @can('read-prospectings')
                                 <a style="display:none;" class="dropdown-item" href="{{url('/prospectings')}}"> <i class="nav-icon currentColor icon-user"></i> {{ __('Prospectings') }} </a>
                             @endcan
+                            @can('read-destinations')
+                                <a class="dropdown-item" href="{{url('/destinations')}}"> <i class="nav-icon currentColor fas fa-globe-americas"></i> Destinos </a>
+                            @endcan
                             @can('read-customers')
                                 <a class="dropdown-item" href="{{url('/customers')}}">
                                     <i class="nav-icon icon-user-following currentColor"></i> {{ __('CustomersProspecting') }}
+                                </a>
+                            @endcan
+                            @can('read-type-payments')
+                                <a class="dropdown-item" href="{{url('/type_payments')}}">
+                                    <i class="nav-icon fas fa-money-check-alt currentColor"></i>
+                                    Formas  de pago
                                 </a>
                             @endcan
                         </div>
@@ -72,7 +81,7 @@
             @endcan
             @can('read-roles')
                 <li class="nav-item dropdown">
-                	<a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  <i class="nav-icon icon-key"></i> {{ __('Roles Permissions') }}  </a>
+                	<a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown">  <i class="nav-icon icon-key"></i> Roles/Permisos  </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{url('/roles')}}"> <i class="nav-icon currentColor icon-key"></i> {{ __('Roles') }} </a></li>
                 	      <li><a class="dropdown-item" href="{{url('/permissions')}}"> <i class="nav-icon currentColor icon-key"></i> {{ __('Permissions') }}  </a></li>

@@ -33,7 +33,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -41,24 +41,24 @@
               <a href="#" class="text-dark" @click.prevent="sort('display_name')">Role</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'display_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'display_name' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('name')">Slug</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'name' && filters.orderBy.direction == 'desc'}"></i>
             </th>
             <th>Users using</th>
             <th>Permissions</th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Created</a>
               <i class="ml-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell"></th>
+            <th class=""></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="role in roles" @click="editRole(role.id)">
-            <td class="d-none d-sm-table-cell">{{role.id}}</td>
+            <td class="">{{role.id}}</td>
             <td>{{role.display_name}}</td>
-            <td class="d-none d-sm-table-cell">{{role.name}}</td>
+            <td class="">{{role.name}}</td>
             <td>
               <div class="avatars-stack">
                 <div class="avatar-sm" v-for="(user, index) in role.users.slice(0,4)">
@@ -75,10 +75,10 @@
                 <div class="progress-bar bg-info" role="progressbar" :style="`width: ${role.permissions.length*100/permissionsCount}%`" :aria-valuenow="role.permissions.length*100/permissionsCount" aria-valuemin="0" :aria-valuemax="this.permissionsCount"></div>
               </div>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <small>{{role.created_at | moment("LL")}}</small> - <small class="text-muted">{{role.created_at | moment("LT")}}</small>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <a href="#" class="text-muted"><i class="fas fa-pencil-alt"></i></a>
             </td>
           </tr>

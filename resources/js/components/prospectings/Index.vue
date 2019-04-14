@@ -34,7 +34,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -62,11 +62,11 @@
               <a href="#" class="text-dark" @click.prevent="sort('status')">Status</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'status' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'status' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Registered</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell"></th>
+            <th class=""></th>
           </tr>
         </thead>
         <tbody>
@@ -77,14 +77,14 @@
             <td class="">{{prospecting.email}}</td>
             <td class="">{{prospecting.cellphone}}</td>
             <td class="">{{prospecting.branches.name}}</td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
                 <label v-if="prospecting.status == 1">Activo</label>
                 <label v-else>Inactivo</label>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <small>{{prospecting.created_at | moment("LL")}}</small> - <small class="text-muted">{{prospecting.created_at | moment("LT")}}</small>
             </td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <a href="#" @click="editCustomer(prospecting.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt"></i></a>
               <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(prospecting.id)">
                   <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>

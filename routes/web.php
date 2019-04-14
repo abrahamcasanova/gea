@@ -21,6 +21,17 @@ Route::get('/home', function () {
     return redirect('dashboard');
 });
 
+Route::get('customers/all-destinations', function()
+{
+    return App\Destination::Active()->get();
+});
+
+Route::group(['namespace' => 'Customers'], function() {
+	Route::get('/customers/login', 'CustomerController@generateCustomerView');
+	Route::get('/customers/cotiza', 'CustomerController@generateQuotePublic');
+	Route::post('/customers/result', 'CustomerController@getPayments');
+});
+
 Route::get('/dashboard', 'DashboardController@index')->name('home')->middleware('verified');
 
 require __DIR__ . '/profile/profile.php';
@@ -41,4 +52,10 @@ require __DIR__ . '/quotes/quotes.php';
 require __DIR__ . '/quote_tracks/quote_tracks.php';
 require __DIR__ . '/quote_details/quote_details.php';
 require __DIR__ . '/sales/sales.php';
+require __DIR__ . '/destinations/destinations.php';
+require __DIR__ . '/product_detail_sale/product_detail_sale.php';
+require __DIR__ . '/payments/payments.php';
+require __DIR__ . '/type_of_payments/type_of_payments.php';
+require __DIR__ . '/reports/reports.php';
+
 

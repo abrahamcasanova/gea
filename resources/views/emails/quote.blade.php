@@ -42,6 +42,6 @@ Adjunto encontrara la cotización con destino a {{$quote->customerOrder->travel_
 @endslot
 <span style="color:orange"> **{{ config('app.name') }}**</span>
 @component('mail::panel')
-	{{ auth()->user()->username }} *Telefono:* {{ auth()->user()->phone }} *Celular:* {{ auth()->user()->cellphone }} **#CreamosMomentos**
+	{{ auth()->user()->name }} *Telefono:* {{ auth()->user()->phone }} *Celular:* {{ auth()->user()->cellphone }} **#CreamosMomentos**
 @endcomponent
 @endcomponent

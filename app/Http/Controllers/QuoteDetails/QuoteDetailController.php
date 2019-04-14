@@ -23,6 +23,7 @@ class QuoteDetailController extends Controller
 
 
         $request->merge(['product_id' => $request->product_id['id']]);
+        $request->merge(['supplier_id' => $request->supplier_id['id']]);
 
         return QuoteDetail::create($request->all());
 

@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        'App\Console\Commands\HappyBirthday'
+        'App\Console\Commands\HappyBirthday',
+        'App\Console\Commands\EmailDayPaymentLimit'
     ];
 
     /**
@@ -27,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('email:birthday')->dailyAt('09:00');
+        $schedule->command('email:day_payment_limit')->dailyAt('10:00');
     }
 
     /**

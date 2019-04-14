@@ -16,7 +16,6 @@ import axios from 'axios';
 import 'moment/locale/es';
 import UUID from 'vue-uuid';
 import moment from 'moment';
-import rate from 'vue-rate';
 import swal from 'sweetalert';
 import Vuetify from 'vuetify';
 import VueFire from 'vuefire';
@@ -24,6 +23,7 @@ import Pusher from 'pusher-js';
 import VueClip from 'vue-clip';
 import Echo from "laravel-echo";
 import Firebase from 'firebase';
+import Raters from 'vue-rate-it';
 import VModal from 'vue-js-modal';
 import Toasted from 'vue-toasted';
 import VueNumeric from 'vue-numeric';
@@ -43,11 +43,13 @@ import 'timeline-vuejs/dist/timeline-vuejs.css';
 import Locale from './vue-i18n-locales.generated';
 import lang_es from 'element-ui/lib/locale/lang/es';
 import VueContentPlaceholders from 'vue-content-placeholders';
- 
+ import Permissions from './components/Permissions';
+
 Vue.use(UUID);
 locale.use(lang_es);
 Vue.use(Vuetify)
-Vue.use(rate)
+Vue.component('star-rating', Raters.StarRating);
+Vue.component('image-rating', Raters.ImageRating);
 Vue.use(VueFire)
 Vue.use(Firebase)
 Vue.use(Datepicker)
@@ -55,6 +57,7 @@ Vue.use(BootstrapVue)
 Vue.use(VueNumeric)
 Vue.use(Vue2Filters)
 Vue.use(VueInternationalization);
+
 
 const lang = document.documentElement.lang.substr(0, 2);
 
@@ -80,6 +83,7 @@ Vue.use(require('moment/locale/es'));
 
 import VueMoment from 'vue-moment'
 
+
 require('moment/locale/es')
 Vue.use(VueMoment, {
   moment
@@ -98,19 +102,30 @@ Vue.component('multiselect', Multiselect)
 Vue.use(VueContentPlaceholders)
 Vue.use(uploader)
 // Initialize Firebase
-var config = {
-    apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
-    authDomain: "travel-f0875.firebaseapp.com",
-    databaseURL: "https://travel-f0875.firebaseio.com",
-    projectId: "travel-f0875",
-    storageBucket: "travel-f0875.appspot.com",
-    messagingSenderId: "76422469644"
+
+/*var config = {
+  apiKey: "AIzaSyCbyyvqiAuJeWjNvMakL9_R-jhkpa0oml4",
+  authDomain: "proyecto-gea-dfbee.firebaseapp.com",
+  databaseURL: "https://proyecto-gea-dfbee.firebaseio.com",
+  projectId: "proyecto-gea-dfbee",
+  storageBucket: "proyecto-gea-dfbee.appspot.com",
+  messagingSenderId: "571952390252"
+};*/
+ var config = {
+  apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
+  authDomain: "travel-f0875.firebaseapp.com",
+  databaseURL: "https://travel-f0875.firebaseio.com",
+  projectId: "travel-f0875",
+  storageBucket: "travel-f0875.appspot.com",
+  messagingSenderId: "76422469644"
 };
 
 
 export const firebase = Firebase.initializeApp(config)
 export const db = firebase.database()
-
+export const db_dashbord = firebase.database().ref('quote_tracks')
+        .orderByChild('contact_date')
+        .limitToLast(100)
 
 
 /**
@@ -125,6 +140,8 @@ export const db = firebase.database()
 // Dashboard
 Vue.component('users-count', require('./components/dashboard/UsersCount.vue'));
 Vue.component('roles-count', require('./components/dashboard/RolesCount.vue'));
+Vue.component('quotes-count', require('./components/dashboard/QuotesCount.vue'));
+Vue.component('top-products', require('./components/dashboard/TopProducts.vue'));
 Vue.component('prospectings-count', require('./components/dashboard/ProspectingsCount.vue'));
 
 // Profile
@@ -151,6 +168,7 @@ Vue.component('customers-index', require('./components/customers/Index.vue'));
 Vue.component('customers-create', require('./components/customers/Create.vue'));
 Vue.component('customers-edit', require('./components/customers/Edit.vue'));
 Vue.component('customers-orden', require('./components/customers/Orden.vue'));
+Vue.component('customers-orden-public', require('./components/customers/OrdenPublic.vue'));
 
 // Folder
 Vue.component('folder', require('./components/folder/App.vue'));
@@ -199,7 +217,29 @@ Vue.component('sales-edit', require('./components/sales/Edit.vue'));
 
 //Calendar
 Vue.component('calendar', require('./components/dashboard/Calendar.vue'));
+Vue.component('tracing-count', require('./components/dashboard/Tracing.vue'));
+Vue.component('sold-count', require('./components/dashboard/Sold.vue'));
 
+// Product
+Vue.component('destinations-index', require('./components/destinations/Index.vue'));
+Vue.component('destinations-create', require('./components/destinations/Create.vue'));
+Vue.component('destinations-edit', require('./components/destinations/Edit.vue'));
+
+// Payment
+Vue.component('payments-index', require('./components/payments/Index.vue'));
+Vue.component('payments-create', require('./components/payments/Create.vue'));
+Vue.component('payments-edit', require('./components/payments/Edit.vue'));
+
+//Type Payment
+Vue.component('type-payments-index', require('./components/type_payments/Index.vue'));
+Vue.component('type-payments-create', require('./components/type_payments/Create.vue'));
+Vue.component('type-payments-edit', require('./components/type_payments/Edit.vue'));
+
+//Permmissions
+Vue.use(require('./components/plugins/acl.js'));
+
+//Reports
+Vue.component('reports-index', require('./components/reports/Index.vue'));
 
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;
@@ -209,14 +249,15 @@ var pusher = new Pusher('758c1ced7318559c6c9d', {
   forceTLS: true
 });
 
+
 export default {
   components: {
     Datepicker,
-    Timeline,
+    Timeline
   },
   mixins: [Vue2Filters.mixin],
-
 }
+
 
 const app = new Vue({
     el: '#app',

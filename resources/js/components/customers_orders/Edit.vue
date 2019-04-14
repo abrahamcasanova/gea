@@ -30,7 +30,7 @@
               <input type="email" disabled readonly class="form-control" :class="{'is-invalid': errors.email}" v-model="customerOrder.customer['email']" placeholder="sabina.casanova@hotmail.com">
               <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
               <label>Mes del viaje</label>
               <multiselect
                 v-model="customerOrder.travel_month"
@@ -43,10 +43,15 @@
               </multiselect>
               <small class="form-text text-danger" v-if="errors.travel_month">{{errors.travel_month[0]}}</small>
             </div>
-            <div class="form-group col-md-6">
-                <label>Fecha de su viaje?</label>
+            <div class="form-group col-md-4">
+                <label>Fecha inicial de su viaje?</label>
                 <datepicker :bootstrap-styling="true" required :language="es" :format="customFormatter" v-model="customerOrder.travel_date"></datepicker>
                 <small class="form-text text-danger" v-if="errors.travel_date">{{errors.travel_date[0]}}</small>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Fecha final de su viaje?</label>
+                <datepicker :bootstrap-styling="true" required :language="es" :format="customFormatterEnd" v-model="customerOrder.travel_end_date"></datepicker>
+                <small class="form-text text-danger" v-if="errors.travel_end_date">{{errors.travel_end_date[0]}}</small>
             </div>
             <div class="form-group col-md-6">
                 <label>Telefono</label>
@@ -186,6 +191,10 @@ export default {
     },
     customFormatter(date) {
       this.customerOrder.travel_date = moment(date).format('YYYY/MM/DD');
+      return moment(date).format('YYYY-MM-DD');
+    },
+    customFormatterEnd(date) {
+      this.customerOrder.travel_end_date = moment(date).format('YYYY/MM/DD');
       return moment(date).format('YYYY-MM-DD');
     },
     update () {

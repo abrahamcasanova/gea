@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">Ventas</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-primary" href="./quotes/track-quote"> {{ $t('Prospecting.Prospecting_track') }} <i class="nav-icon currentColor icon-target"></i> </a>
+         
       </div>
     </div>
     <div class="card-body px-0">
@@ -15,7 +15,7 @@
                 <i class="fas fa-search"></i>
               </span>
             </div>
-            <input type="text" class="form-control" placeholder="Seach" v-model.trim="filters.search" @keyup.enter="filter">
+            <input type="text" name="query" v-model.trim="searchQuery"  class="form-control" placeholder="Buscar..">
           </div>
         </div>
         <div class="col-auto">
@@ -78,7 +78,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(sale, index)   in sales">
+              <tr v-for="(sale, index) in salesFilter">
                 <td class="">{{ sale.id }}</td>
                 <td class="">{{ sale.quote ? sale.quote.customer_order.customer.full_name:null }}</td>
                 <td class="">{{ sale.quote ? sale.quote.customer_order.customer.cellphone:null }}</td>
@@ -96,14 +96,20 @@
                   <small>{{sale.created_at | moment("LL")}}</small> - <small class="text-muted">{{sale.created_at | moment("LT")}}</small>
                 </td>
                 <td class="">
-                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getDetailSale(sale.id)" class="card-header-action ml-1 text-muted">
+                  <a href="#" v-if="$can('read-sales')" data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getDetailSale(sale.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-info-circle text-primary"></i>
                   </a>
                   <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar correo" @click="sendMail(sale.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-envelope text-dark"></i>
                   </a>
-                  <a href="#" @click="editSale(sale.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
-                  <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(sale.id)">
+                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar whatsapp" @click="sendWhatsapp(sale.id)" class="card-header-action ml-1 text-muted">
+                    <i style="color:green" class="fa-lg fab fa-whatsapp text-success"></i>
+                  </a>
+                  <a v-if="$can('take-payment-sales')" :href="'./payments/create/' + sale.id" class="card-header-action ml-1 text-muted">
+                    <i class="fa-lg fas fa-hand-holding-usd"></i>
+                  </a>
+                  <a v-if="$can('update-sales')" href="#" @click="editSale(sale.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
+                  <a v-if="$can('delete-sales')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(sale.id)">
                       <i class="fa-lg fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                       <i class="fa-lg far fa-trash-alt" v-else></i>
                       <span class="d-md-down-none ml-1"></span>
@@ -164,7 +170,6 @@
           </div>
           <b-button class="mt-3" variant="outline-success" block @click="saveSaleAndHideModal">Guardar</b-button>
         </b-modal>
-
     </div>
   </div>
 </template>
@@ -190,6 +195,7 @@ export default {
           }
       },
       docs: [],
+      searchQuery:'',
       quoteId: null,
       type: "create",
       quoteSale: [],
@@ -218,6 +224,18 @@ export default {
         return this.sales.map(function(quote) {
             //return customer_order.first_name + ' ' + customer_order.last_name;
         });
+    },
+    salesFilter (){
+      var filterKey = this.searchQuery && this.searchQuery.toLowerCase()
+      var sales = this.sales
+      if (filterKey) {
+        sales = sales.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
+        })
+      }
+      return sales;
     }
   },
   mounted () {
@@ -307,11 +325,11 @@ export default {
           this.submitingDestroy = false
         })
     },
-    sendWhatsapp(quoteId){
-        axios.get(`./api/quotes/get-quote/` + quoteId)
+    sendWhatsapp(saleId){
+        axios.get(`./api/sales/get-sale/` + saleId)
         .then(response => {
             let data = response.data;
-            if(data.customer_order.customer.cellphone == null || data.customer_order.customer.cellphone == ''){
+            if(data.quote.customer_order.customer.cellphone == null || data.quote.customer_order.customer.cellphone == ''){
                 swal("Error..", {
                   text:'No se puede enviar el whatsapp porque no existe un telefono registrado.',
                   icon: 'error',
@@ -321,7 +339,12 @@ export default {
                 return false;
             }else{
                 let str = window.location
-                window.open("https://wa.me/52"+ data.customer_order.customer.cellphone +"?text=Estimado " + data.customer_order.customer.full_name + ", adjunto encontrará la cotización con destino a " + data.customer_order.travel_destination,'_blank');
+                var travel = '';
+                for (var i = 0; data.travel_destination.length > i; i++) {
+                  let nameCapitalized = capitalizeFirstLetter(data.travel_destination[i].name.toLowerCase());
+                  travel += nameCapitalized + ', ';
+                }
+                window.open("https://wa.me/52"+ data.quote.customer_order.customer.cellphone +"?text=Estimado " + data.quote.customer_order.customer.full_name + ", adjunto encontrará la venta con destino a " + travel,'_blank');
             }
             
         })
@@ -417,5 +440,9 @@ export default {
       }
     },
   }
+}
+
+function capitalizeFirstLetter(string) {
+    return string[0].toUpperCase() + string.slice(1);
 }
 </script>

@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/order', 'QuoteDetailController@createOrder')->middleware('permission:create-quotes');
             Route::post('/filter', 'QuoteDetailController@filter')->middleware('permission:read-quotes');
             Route::put('/update/{quote_detail}', 'QuoteDetailController@update')->middleware('permission:update-quotes');
-            Route::delete('/{quote_detail}', 'QuoteDetailController@destroy')->middleware('permission:delete-quotes');
+            Route::delete('/{quote_detail}', 'QuoteDetailController@destroy');
         });
     });
 });

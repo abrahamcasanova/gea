@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">productos</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="./products/create">{{ $t('Product.New_Product') }}</a>
+        <a class="btn btn-sm btn-success" v-if="$can('create-products')" href="./products/create">{{ $t('Product.New_Product') }}</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -33,13 +33,9 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th class="d-none d-sm-table-cell">
-              <a href="#" class="text-dark" @click.prevent="sort('id')">ID</a>
+            <th class="">
+              <a href="#" class="text-dark" @click.prevent="sort('id')">Clave</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'id' && filters.orderBy.direction == 'desc'}"></i>
-            </th>
-            <th>
-              <a href="#" class="text-dark" @click.prevent="sort('clabe')">Clabe</a>
-              <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'clabe' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'clabe' && filters.orderBy.direction == 'desc'}"></i>
             </th>
             <th>
               <a href="#" class="text-dark" @click.prevent="sort('name')">Nombre</a>
@@ -57,17 +53,16 @@
               <a href="#" class="text-dark" @click.prevent="sort('location')">Ubicación</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'location' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'location' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell">
+            <th class="">
               <a href="#" class="text-dark" @click.prevent="sort('created_at')">Registrado</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'created_at' && filters.orderBy.direction == 'desc'}"></i>
             </th>
-            <th class="d-none d-sm-table-cell"></th>
+            <th class=""></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="product in products">
             <td class="">{{product.id}}</td>
-            <td class="">{{product.clabe}}</td>
             <td class="">{{product.name}}</td>
             <td class="">{{product.product_types.name}}</td>
             <td class="">
@@ -79,20 +74,22 @@
                   <a  target="_blank" v-bind:href="'./storage/app/public/product_img/'+product.url_image">{{ product.url_image }}
                   </a>
                   <div class="small text-muted">
-                     <rate disabled :length="5" v-model="product.category" :value="product.category" :showcount="false" />
+                    <star-rating read-only :show-rating='false' v-if="product.type == ['Estrellas']" v-model="product.category" :value="product.category" :item-size="20"></star-rating>
+                    <image-rating read-only :show-rating='false' v-if="product.type == ['Diamantes']" v-model="product.category" :value="product.category" :item-size="30" src="./public/img/diamante.png"></image-rating>
                   </div>
                 </div>
               </div>
             </td>
             <td class="">{{product.location}}</td>
-            <td class="d-none d-sm-table-cell">
+            <td class="">
               <small>{{product.created_at | moment("LL")}}</small> - <small class="text-muted">{{product.created_at | moment("LT")}}</small>
             </td>
-            <td class="d-none d-sm-table-cell">
-              <a href="#" @click="editCustomer(product.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt"></i></a>
-              <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(product.id)">
-                  <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
-                  <i class="far fa-trash-alt" v-else style="color:red"></i>
+            <td class="">
+              <a href="#" @click="exportWord(product.id,product.name)" data-toggle="tooltip" title="Exportar a word" class="card-header-action ml-1 text-muted"><i class="far fa-file-word text-primary fa-lg"></i></a>
+              <a href="#" v-if="$can('update-products')" @click="editCustomer(product.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt fa-lg"></i></a>
+              <a v-if="$can('delete-products')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(product.id)">
+                  <i class="fas fa-spinner fa-spin fa-lg" v-if="submitingDestroy"></i>
+                  <i class="far fa-trash-alt fa-lg" v-else style="color:red"></i>
                   <span class="d-md-down-none ml-1"></span>
               </a>
             </td>
@@ -202,6 +199,24 @@ export default {
     hideFolder () {
       this.$modal.hide('modal-folder');
     },
+    exportWord(productId,name){
+        axios({
+          url: `./api/products/export-word/` +  productId,
+          method: 'POST',
+          responseType: 'blob', // important
+        }).then(response => {
+           const url = window.URL.createObjectURL(new Blob([response.data]));
+           const link = document.createElement('a');
+           link.href = url;
+           link.setAttribute('download', name + '.docx'); //or any other extension
+           document.body.appendChild(link);
+           link.click();
+        })
+        .catch(error => {
+          this.errors = error.response.data.errors
+          this.submiting = false
+        })
+    },
     getProduct () {
       this.loading = true
       this.products = []
@@ -232,13 +247,13 @@ export default {
     // filters
     filter() {
       this.filters.pagination.current_page = 1
-      this.getProspectings()
+      this.getProduct()
 
     },
     changeSize (perPage) {
       this.filters.pagination.current_page = 1
       this.filters.pagination.per_page = perPage
-      this.getProspectings()
+      this.getProduct()
     },
     sort (column) {
       if(column == this.filters.orderBy.column) {
@@ -248,11 +263,11 @@ export default {
         this.filters.orderBy.direction = 'asc'
       }
 
-      this.getProspectings()
+      this.getProduct()
     },
     changePage (page) {
       this.filters.pagination.current_page = page
-      this.getProspectings()
+      this.getProduct()
     }
     ,destroy (customerId) {
       if (!this.submitingDestroy) {

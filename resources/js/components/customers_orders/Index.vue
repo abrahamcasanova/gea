@@ -40,6 +40,14 @@
                   <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'first_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'first_name' && filters.orderBy.direction == 'desc'}"></i>
                 </th>
                 <th>
+                  <a href="#" class="text-dark" @click.prevent="sort('level')">Nivel</a>
+                  <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'level' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'level' && filters.orderBy.direction == 'desc'}"></i>
+                </th>
+                <th>
+                  <a href="#" class="text-dark">Cotizaciones/Ventas</a>
+                  <i class="mr-1 fas"></i>
+                </th>
+                <th>
                   <a href="#" class="text-dark" @click.prevent="sort('last_name')">Telefonos</a>
                   <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'last_name' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'last_name' && filters.orderBy.direction == 'desc'}"></i>
                 </th>
@@ -67,6 +75,8 @@
                 <td class="">{{customer_order.id}}</td>
                 <td class="" v-if='customer_order.customer'>{{customer_order.customer['full_name']}}</td>
                 <td class="" v-else='customer_order.customer_order'>{{customer_order.first_name}}</td>
+                <td class="">{{customer_order.customer ? customer_order.customer.level:null}}</td>
+                <td class="text-center">{{customer_order.quote_number ? customer_order.quote_number.total+'/'+customer_order.sale_number.total:null}}</td>
                 <td class="">{{customer_order.phone}}</td>
                 <td class=""  v-if='customer_order.customer' >{{customer_order.customer.email}}</td>
                 <td class=""  v-else='customer_order.customer_order' ></td>
@@ -79,14 +89,14 @@
                   <small>{{customer_order.updated_at | moment("LL")}}</small> - <small class="text-muted">{{customer_order.updated_at | moment("LT")}}</small>
                 </td>
                 <td class="">
-                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getOrder(customer_order.id)" class="card-header-action ml-1 text-muted">
+                  <a v-if="$can('read-customer-orders')" href="#"  data-toggle="tooltip" data-placement="bottom" title="Ver mas info" @click="getOrder(customer_order.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-info-circle text-primary"></i>
                   </a>
-                  <a href="#" data-toggle="tooltip" data-placement="bottom" title="Crear Cotización" @click="createQuote(customer_order.id)" class="card-header-action ml-1 text-muted">
+                  <a v-if="$can('create-quotes')" href="#" data-toggle="tooltip" data-placement="bottom" title="Crear Cotización" @click="createQuote(customer_order.id)" class="card-header-action ml-1 text-muted">
                       <i class="fa-lg far fa-file-pdf text-danger"></i>
                   </a>
-                  <a href="#" @click="editCustomer(customer_order.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
-                  <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(customer_order.id)">
+                  <a v-if="$can('update-customer-orders')" href="#" @click="editCustomer(customer_order.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
+                  <a v-if="$can('delete-customer-orders')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(customer_order.id)">
                       <i class="fa-lg fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                       <i class="fa-lg far fa-trash-alt" v-else></i>
                       <span class="d-md-down-none ml-1"></span>
@@ -142,12 +152,16 @@
                     <input type="text" readonly disabled class="form-control" v-model="details.customer['email']" placeholder="Correo">
                 </div>
 
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <label>Mes de viaje</label>
                     <input type="text" readonly disabled class="form-control" v-model="details.travel_month" placeholder="Mes de viaje">
                 </div>
-                <div class="form-group col-md-6">
-                    <label>Fecha de viaje</label>
+                <div class="form-group col-md-4">
+                    <label>Fecha inicio de viaje</label>
+                    <input type="text" readonly disabled class="form-control" v-model="details.travel_end_date" placeholder="Fecha de viaje">
+                </div>
+                <div class="form-group col-md-4">
+                    <label>Fecha fin de viaje</label>
                     <input type="text" readonly disabled class="form-control" v-model="details.travel_date" placeholder="Fecha de viaje">
                 </div>
                 <div class="form-group col-md-6">
@@ -158,9 +172,34 @@
                     <label>Ha viajado con nosotros?</label>
                     <input type="text" readonly disabled class="form-control" v-model="details.with_us" placeholder="Viajado con nostros">
                 </div>
-                <div class="form-group col-md-6">
-                    <label>Destino del viaje</label>
-                    <input type="text" readonly disabled class="form-control" v-model="details.travel_destination" placeholder="Destino">
+                <div class="form-group col-md-12">
+                  <label>Destino del viaje</label>
+                  <v-autocomplete
+                  v-model="details.travel_destination"
+                  :items="items"
+                  :loading="isLoading"
+                  chips
+                  :multiple="true"
+                  clearable
+                  readonly
+                  :disabled="true"
+                  hide-details
+                  hide-selected
+                  item-text="name"
+                  item-value="id"
+                  label="Buscar destinos"
+                  solo
+                >
+                  <template v-slot:selection="{ item, selected }">
+                    <v-chip
+                      :selected="true"
+                      color="blue"
+                      class="white--text"
+                    >
+                      <span v-text="item.name"></span>
+                    </v-chip>
+                  </template>
+                </v-autocomplete>
                 </div>
                 <div class="form-group col-md-6">
                     <label>Cuantos adultos irían al viaje?</label>
@@ -202,6 +241,9 @@ export default {
           }
       },
       docs: [],
+      items:null,
+      isLoading:null,
+      search: null,
       filters: {
         pagination: {
           from: 0,
@@ -251,10 +293,22 @@ export default {
       localStorage.setItem("filtersTableCustomerOrder", this.filters);
     }
     this.getCustomerOrders()
+    this.getDestinations()
   },
   methods: {
     hideModal() {
         this.$refs.myModalRef.hide()
+    },
+    getDestinations(){
+      // Lazily load input items
+      axios.get('./api/destinations/all')
+      .then(response => {
+          this.items = response.data
+      })
+      .catch(err => {
+          console.log(err)
+      })
+      .finally(() => (this.isLoading = false))
     },
     getOrder (customerId) {
         axios.get(`./api/customers_orders/` + customerId)

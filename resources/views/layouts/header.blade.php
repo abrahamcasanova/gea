@@ -20,7 +20,7 @@
                     <small class="text-muted">{{ Auth::user()->email }}</small>
                 </a>
                 <a class="dropdown-item" href="/profile">
-                    <i class="fas fa-user"></i> Profile
+                    <i class="fas fa-user"></i> Perfil
                 </a>
                 <div class="divider"></div>
                 <a class="dropdown-item" href="/password">

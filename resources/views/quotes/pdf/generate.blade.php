@@ -27,6 +27,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body>
   <header style=""><img width="80" src="{{ public_path()}}/img/logo_dark.png"></header>
@@ -47,8 +48,11 @@
             </div>
         </div>
         <div class="row">
-          <div class="form-group col-sm-4">
-              <span><strong>Fecha de viaje:</strong> {{$quote->travel_date}}</span>
+          <div class="form-group col-sm-2">
+              <span><strong>Fecha viaje:</strong> {{$quote->travel_date}}</span>
+          </div>
+          <div class="form-group col-sm-2">
+                <span><strong>Moneda:</strong> {{ $quote->currency }}</span>
           </div>
           <div class="form-group col-sm-2">
               <span><strong>Adultos:</strong> {{$quote->number_adults}}</span>
@@ -56,8 +60,10 @@
           <div class="form-group col-sm-2">
               <span><strong>Menores:</strong> {{$quote->number_childs}}</span>
           </div>
-          <div class="form-group col-sm-2">
-              <span><strong>Destino:</strong> {{$quote->customerOrder->travel_destination}}</span>
+        </div>
+        <div class="row" style="margin-top: -15px;">
+          <div class="form-group col-sm-12">
+              <span><strong>Destino:</strong> {{ implode(',', $destinations->pluck('name')->toArray()) }}</span>
           </div>
         </div>
         <div class="row" style="margin-top: -10px;">
@@ -96,15 +102,30 @@
                               @if(isset($quote->quoteDetails))
                                   @foreach ($quote->quoteDetails as $quoteDetail)
                                       <tr>
-                                          <td class="">{{ $quoteDetail->product->name  }}</td>
                                           <td class="">
-                                              @for ($i = 0; $i < 5; $i++)
-                                                  @if($i < $quoteDetail->product->category)
-                                                      <i class="glyphicon glyphicon-star" style="color:yellow"></i>
-                                                  @else
-                                                      <i class="glyphicon glyphicon-star-empty"></i>
-                                                  @endif
-                                              @endfor
+                                            <div class="media">
+                                              <div>{{$quoteDetail->product->name}}</div>
+                                              <div class="medium">
+                                                {{$quoteDetail->description}}
+                                              </div>
+                                            </div>
+                                          </td>
+                                          <td class="">
+                                              @if($quoteDetail->product->type == 'Estrellas')
+                                                @for ($i = 0; $i < 5; $i++)
+                                                    @if($i < $quoteDetail->product->category)
+                                                        <i class="glyphicon glyphicon-star" style="color:yellow"></i>
+                                                    @else
+                                                        <i class="glyphicon glyphicon-star-empty"></i>
+                                                    @endif
+                                                @endfor
+                                              @else
+                                                @for ($i = 0; $i < 5; $i++)
+                                                    @if($i < $quoteDetail->product->category)
+                                                      <i class="far fa-gem" style="color:#2196f3"></i>
+                                                    @endif
+                                                @endfor
+                                              @endif
                                           </td>
                                           <td class="">$ {{ number_format($quoteDetail->price,2) }}</td>
                                           <td class="">{{ $quoteDetail->product->description }}</td>

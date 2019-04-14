@@ -33,7 +33,9 @@
     <script>
       window.Laravel = {!! json_encode([
         'csrfToken' => csrf_token(),
-        'user' => Auth::user()
+        'user' => Auth::user(),
+        'userId' => Auth::user()->id,
+        'permissions' => Auth::user()->getAllPermissions()->pluck('name')
       ]) !!};
 
     </script>

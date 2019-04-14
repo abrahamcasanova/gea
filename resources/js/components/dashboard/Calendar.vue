@@ -52,7 +52,7 @@
                     >
                       Cancelar
                     </v-btn>
-                    <v-btn round color="success" v-on:click="firebasePayment(event.id)">
+                    <v-btn round color="success" style="width: auto;" v-on:click="firebasePayment(event.id)">
                       Pagar
                     </v-btn>
                   </v-card-actions>

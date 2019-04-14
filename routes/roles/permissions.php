@@ -11,6 +11,7 @@ Route::middleware('auth')->group(function () {
 
         // api
         Route::group(['prefix' => 'api/permissions'], function() {
+            Route::get('/permission/{permissionName}', 'PermissionController@check');
             Route::get('/count', 'PermissionController@count');
             Route::get('/getModules', 'PermissionController@getModules');
             Route::get('/getPermissionModulesPermissions/{permission}','PermissionController@getPermissionModulesPermissions');

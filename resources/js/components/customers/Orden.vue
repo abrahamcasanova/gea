@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div class="row justify-content-md-center">
+    <v-app id="dayspan" v-cloak>
+      <v-layout wrap>        
+      <div class="row justify-content-md-center">
       <div class="card">
           <div class="col-md-12 col-xl-12">
         <div class="card-header px-0 mt-2 bg-transparent clearfix">
@@ -30,7 +32,7 @@
               <input type="email" disabled readonly class="form-control" :class="{'is-invalid': errors.email}" v-model="customerOrder.email" placeholder="sabina.casanova@hotmail.com">
               <div class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</div>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
               <label>Mes del viaje</label>
               <multiselect
                 v-model="customerOrder.travel_month"
@@ -43,10 +45,15 @@
               </multiselect>
               <small class="form-text text-danger" v-if="errors.travel_month">{{errors.travel_month[0]}}</small>
             </div>
-            <div class="form-group col-md-6">
-                <label>Fecha de su viaje?</label>
+            <div class="form-group col-md-4">
+                <label>Fecha inicial de viaje?</label>
                 <datepicker :bootstrap-styling="true" required :language="es" :format="customFormatter" v-model="customerOrder.travel_date"></datepicker>
                 <small class="form-text text-danger" v-if="errors.travel_date">{{errors.travel_date[0]}}</small>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Fecha final de su viaje?</label>
+                <datepicker :bootstrap-styling="true" required :language="es" :format="customFormatterEnd" v-model="customerOrder.travel_end_date"></datepicker>
+                <small class="form-text text-danger" v-if="errors.travel_end_date">{{errors.travel_end_date[0]}}</small>
             </div>
             <div class="form-group col-md-6">
                 <label>Telefono</label>
@@ -68,6 +75,7 @@
               <multiselect
                 v-model="customerOrder.with_us"
                 :options="TravelWithUs"
+                :disabled="isDisabled"
                 openDirection="bottom"
                 track-by="id"
                 label="name"
@@ -77,8 +85,54 @@
             </div>
             <div class="form-group col-md-8">
                 <label>Destino del viaje</label>
-                <input type="text" class="form-control" :class="{'is-invalid': errors.travel_destination}" v-model="customerOrder.travel_destination" placeholder="Destino ..">
-                <div class="invalid-feedback" v-if="errors.travel_destination">{{errors.travel_destination[0]}}</div>
+                <v-autocomplete
+                  v-model="customerOrder.travel_destination"
+                  :items="items"
+                  :loading="isLoading"
+                  :search-input.sync="search"
+                  chips
+                  :multiple="true"
+                  clearable
+                  hide-details
+                  hide-selected
+                  item-text="name"
+                  item-value="id"
+                  label="Buscar destinos"
+                  solo
+                >
+                  <template v-slot:no-data>
+                    <v-list-tile>
+                      <v-list-tile-title>
+                        Ejemplo..
+                        <strong>Riviera Maya</strong>
+                      </v-list-tile-title>
+                    </v-list-tile>
+                  </template>
+                  <template v-slot:selection="{ item, selected }">
+                    <v-chip
+                      :selected="selected"
+                      color="blue-grey"
+                      @input="remove(item)"
+                      close
+                      class="white--text"
+                    >
+                      <span v-text="item.name"></span>
+                    </v-chip>
+                  </template>
+                  <template v-slot:item="{ item }">
+                    <v-list-tile-avatar
+                      color="indigo"
+                      class="headline font-weight-light white--text"
+                    >
+                      {{ item.name.charAt(0) }}
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <v-list-tile-title v-text="item.name"></v-list-tile-title>
+                    </v-list-tile-content>
+  
+                  </template>
+                </v-autocomplete>
+                <small class="form-text text-danger" v-if="errors.travel_destination">{{errors.travel_destination[0]}}</small>
             </div>
             <div class="form-group col-md-8">
                 <label>Cuantos adultos irían al viaje?</label>
@@ -105,6 +159,10 @@
       </div>
       </div>
     </div>
+    </v-layout>
+  </v-app>
+
+    
   </div>
 </template>
 
@@ -118,12 +176,20 @@ export default {
   components: {
       Datepicker,
   },
+  watch: {
+
+  },
   data () {
     return {
       customerOrder: {},
       errors: {},
       customers:[],
+      isLoading: false,
+      items: [],
+      model: null,
+      search: null,
       es: es,
+      isDisabled: false,
       menu: false,
       loading: true,
       submiting: false,
@@ -156,6 +222,19 @@ export default {
   mounted () {
     this.csrf = window.Laravel.csrfToken;
     this.getCustomers()
+
+    this.isLoading = true
+
+    // Lazily load input items
+    axios.get('../../api/destinations/all')
+    .then(response => {
+        this.items = response.data
+    })
+    .catch(err => {
+        console.log(err)
+    })
+    .finally(() => (this.isLoading = false))
+
   },
   methods: {
     create () {
@@ -164,9 +243,24 @@ export default {
 
         axios.post(`../../api/customers/store-order`, this.customerOrder)
         .then(response => {
-            Vue.toasted.success('Creado correctamente, cerrar ventana!')
+         
+          axios.post(`../../api/customers/send-received`,{
+            id: response.data.id
+          })
+          .then(response => {
+              swal("Creado correctamente, cerrar ventana!", {
+                icon: 'success',
+                buttons: false,
+              });
+
             this.submiting = true
             setTimeout(function(){ window.close(); }, 2500);
+          }).catch(error => {
+              this.$toasted.global.error('Ocurrio un error, intente nuevamente!')
+          }).then(() => {
+            this.loading = false
+          });
+
         })
         .catch(error => {
           this.errors = error.response.data.errors
@@ -174,8 +268,16 @@ export default {
         })
       }
     },
+    remove(itemRemove) {
+        const index2 = this.customerOrder.travel_destination.indexOf(itemRemove.id)
+        if (index2 >= 0) this.customerOrder.travel_destination.splice(index2, 1)
+    },
     customFormatter(date) {
       this.customerOrder.travel_date = moment(date).format('YYYY/MM/DD');
+      return moment(date).format('YYYY-MM-DD');
+    },
+    customFormatterEnd(date) {
+      this.customerOrder.travel_end_date = moment(date).format('YYYY/MM/DD');
       return moment(date).format('YYYY-MM-DD');
     },
     getCustomers () {
@@ -187,6 +289,12 @@ export default {
       .then(response => {
           this.customerOrder = response.data
           this.customerOrder.customer_id = response.data['id']
+          if(response.data.type_of_person == 'CLIENTE'){
+              this.customerOrder.with_us = { id: 'SI', name: 'SI'};
+              this.isDisabled = true;
+          }else{
+              this.isDisabled = false;
+          }
 
       })
       .catch(error => {
@@ -197,5 +305,10 @@ export default {
       })
     },
   }
+}
+
+function indexWhere(array, conditionFn) {
+    const item = array.find(conditionFn)
+    return array.indexOf(item)
 }
 </script>

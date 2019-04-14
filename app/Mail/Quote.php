@@ -30,7 +30,7 @@ class Quote extends Mailable
      */
     public function build()
     {
-        return $this->from('NewSuntravel@live.com', 'New Sun Travel')
+        return $this->from('contacto@appnovasolutions.com', 'New Sun Travel')
             ->markdown('emails.quote')->subject('Cotización')->attach(storage_path().'/app/public/pdf/'.$this->quote->path);
     }
 }

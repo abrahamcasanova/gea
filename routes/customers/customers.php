@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{customer}', 'CustomerController@show')->middleware('permission:read-customers');
             Route::get('/order/{customer}', 'CustomerController@order');
             Route::post('/order/whatsapp/', 'CustomerController@orderWhatsapp');
+            Route::post('/send-received/', 'CustomerController@sendReceived')->name('send_received');
             Route::post('/store', 'CustomerController@store')->middleware('permission:create-customers');
             Route::post('/order', 'CustomerController@createOrder')->middleware('permission:create-customers');
             Route::post('/filter', 'CustomerController@filter')->middleware('permission:read-customers');
@@ -32,5 +33,6 @@ Route::view('customers/{customer}/order', 'customers.order')->name('customers.or
 Route::group(['namespace' => 'Customers'], function() {
     Route::group(['prefix' => 'api/customers'], function() {
         Route::post('/store-order', 'CustomerController@storeOrder');
+        Route::post('/send-received/', 'CustomerController@sendReceived')->name('send_received');
     });
 });

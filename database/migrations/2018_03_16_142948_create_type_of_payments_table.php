@@ -16,6 +16,7 @@ class CreateTypeOfPaymentsTable extends Migration
         Schema::create('type_of_payments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name',200);
+            //FALTAN DATOS PARA catalogo de formas de pago
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

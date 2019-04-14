@@ -15,6 +15,7 @@ class Quote extends Model
       'policy',
       'payment',
       'path',
+      'currency',
       'customer_order_id',
       'status',
     ];

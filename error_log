@@ -1,0 +1,18 @@
+[10-Apr-2019 13:30:33 America/Mexico_City] PHP Warning:  Uncaught ErrorException: require(/home/famy/public_html/travel/routes/reports/reports.php): failed to open stream: No such file or directory in /home/famy/public_html/travel/routes/web.php:59
+Stack trace:
+#0 /home/famy/public_html/travel/routes/web.php(59): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(2, 'require(/home/f...', '/home/famy/publ...', 59, Array)
+#1 /home/famy/public_html/travel/routes/web.php(59): require()
+#2 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/Router.php(417): require('/home/famy/publ...')
+#3 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/Router.php(373): Illuminate\Routing\Router->loadRoutes('/home/famy/publ...')
+#4 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/RouteRegistrar.php(121): Illuminate\Routing\Router->group(Array, '/home/famy/publ...')
+#5 /home/famy/public_html/travel/app/Providers/RouteServiceProvider.php(56): Illuminate\Routing\RouteRegistrar->group('/home/famy in /home/famy/public_html/travel/routes/web.php on line 59
+[10-Apr-2019 13:30:33 America/Mexico_City] PHP Fatal error:  Illuminate\Routing\Router::main(): Failed opening required '/home/famy/public_html/travel/routes/reports/reports.php' (include_path='.:/opt/alt/php71/usr/share/pear') in /home/famy/public_html/travel/routes/web.php on line 59
+[10-Apr-2019 13:30:59 America/Mexico_City] PHP Warning:  Uncaught ErrorException: require(/home/famy/public_html/travel/routes/reports/reports.php): failed to open stream: No such file or directory in /home/famy/public_html/travel/routes/web.php:59
+Stack trace:
+#0 /home/famy/public_html/travel/routes/web.php(59): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(2, 'require(/home/f...', '/home/famy/publ...', 59, Array)
+#1 /home/famy/public_html/travel/routes/web.php(59): require()
+#2 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/Router.php(417): require('/home/famy/publ...')
+#3 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/Router.php(373): Illuminate\Routing\Router->loadRoutes('/home/famy/publ...')
+#4 /home/famy/public_html/travel/vendor/laravel/framework/src/Illuminate/Routing/RouteRegistrar.php(121): Illuminate\Routing\Router->group(Array, '/home/famy/publ...')
+#5 /home/famy/public_html/travel/app/Providers/RouteServiceProvider.php(56): Illuminate\Routing\RouteRegistrar->group('/home/famy in /home/famy/public_html/travel/routes/web.php on line 59
+[10-Apr-2019 13:30:59 America/Mexico_City] PHP Fatal error:  Illuminate\Routing\Router::main(): Failed opening required '/home/famy/public_html/travel/routes/reports/reports.php' (include_path='.:/opt/alt/php71/usr/share/pear') in /home/famy/public_html/travel/routes/web.php on line 59

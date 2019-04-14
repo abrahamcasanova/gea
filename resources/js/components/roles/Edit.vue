@@ -89,10 +89,10 @@
         </div>
         <div class="card-body collapse" id="collapseUsers">
           <ul class="list-unstyled">
-            <a :href="`/users/${user.id}/edit`" v-for="user in role.users">
+            <a :href="`../../users/${user.id}/edit`" v-for="user in role.users">
             <li class="media border-bottom border-light pb-2 mb-2">
               <div class="avatar float-left mr-3">
-                <img class="img-avatar" :src="user.avatar_url">
+                <img class="img-avatar" :src="'../../' + user.avatar_url">
               </div>
               <div class="media-body">
                 <div>{{user.name}}</div>

@@ -8,6 +8,7 @@ class Sale extends Model
 {
     protected $fillable = [
       'price',
+      'travel_destination',
       'date_payment_limit',
       'date_payment_supplier',
       'date_advance',
@@ -41,6 +42,16 @@ class Sale extends Model
     public function quoteDetail()
     {
         return $this->hasOne(QuoteDetail::class,'id','quote_detail_id')->with('product');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class,'sale_id','id');
+    }
+
+    public function saleDetail()
+    {
+        return $this->hasMany(ProductDetailSale::class,'sale_id','id')->with('product','quote','supplier');
     }
 
     public function user()

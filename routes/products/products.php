@@ -13,8 +13,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/get-product/{product}', 'ProductController@getProduct');
             Route::get('/count', 'ProductController@count');
             Route::get('/all', 'ProductController@all');
+            Route::post('/export-word/{product}', 'ProductController@exportWord')->middleware('permission:read-products');
             Route::post('/filter', 'ProductController@filter')->middleware('permission:read-products');
             Route::post('/by-quote/{quoteId}', 'ProductController@getProductByQuote')
+                ->middleware('permission:read-products');
+            Route::post('/by-quote-special/{quoteId}', 'ProductController@getProductByQuoteSpecial')
                 ->middleware('permission:read-products');
             Route::get('/{product}', 'ProductController@show')->middleware('permission:read-products');
             Route::post('/store', 'ProductController@store')->middleware('permission:create-products');

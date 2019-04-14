@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">Clientes/Prospectos</h4>
       <div class="card-header-actions mr-1">
-        <a class="btn btn-sm btn-success" href="./customers/create">Nuevo</a>
+        <a class="btn btn-sm btn-success" v-if="$can('create-customers')" href="./customers/create">Nuevo</a>
       </div>
     </div>
     <div class="card-body px-0">
@@ -85,14 +85,14 @@
                   <small>{{customer.created_at | moment("LL")}}</small> - <small class="text-muted">{{customer.created_at | moment("LT")}}</small>
                 </td>
                 <td class="">
-                  <a href="#" data-toggle="tooltip" data-placement="bottom" title="Crear solicitud de cotizacion" @click="createOrder(customer.id)" class="card-header-action ml-1 text-muted">
+                  <a v-if="$can('create-customer-orders')" href="#" data-toggle="tooltip" data-placement="bottom" title="Crear solicitud de cotizacion" @click="createOrder(customer.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-plus-square text-primary"></i>
                   </a>
                   <a href="#" data-toggle="tooltip" data-placement="bottom" title="Enviar solicitud de cotizacion" @click="createOrderWhatsapp(customer.id)" class="card-header-action ml-1 text-muted">
                       <i class="fa-lg fab fa-whatsapp-square text-success"></i>
                   </a>
-                  <a href="#" @click="editCustomer(customer.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
-                  <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(customer.id)">
+                  <a v-if="$can('update-customers')" href="#" @click="editCustomer(customer.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
+                  <a v-if="$can('delete-customers')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(customer.id)">
                       <i class="fa-lg fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                       <i class="fa-lg far fa-trash-alt" v-else style="color:red"></i>
                       <span class="d-md-down-none ml-1"></span>
@@ -313,9 +313,11 @@ export default {
                     return false;
                 }else{
                     let str = window.location
-                    console.log(str)
+                    let url_location = str.pathname;
+                    let url = url_location.split('/');
+                    console.log(url)
                     window.open(
-                    "https://wa.me/52" + data.cellphone + "?text=Favor de llenar la siguiente solicitud: %20"+ str.origin + '/api/customers/order/' + customerId,
+                    "https://wa.me/52" + data.cellphone + "?text=Favor de llenar la siguiente solicitud: %20"+ str.origin + '/' + url[1] + '/api/customers/order/' + customerId,
                     '_blank');
                 }
                 
