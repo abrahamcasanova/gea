@@ -141,6 +141,7 @@ export const db_dashbord = firebase.database().ref('quote_tracks')
 Vue.component('users-count', require('./components/dashboard/UsersCount.vue'));
 Vue.component('roles-count', require('./components/dashboard/RolesCount.vue'));
 Vue.component('quotes-count', require('./components/dashboard/QuotesCount.vue'));
+Vue.component('quotes', require('./components/dashboard/Quotes.vue'));
 Vue.component('top-products', require('./components/dashboard/TopProducts.vue'));
 Vue.component('prospectings-count', require('./components/dashboard/ProspectingsCount.vue'));
 

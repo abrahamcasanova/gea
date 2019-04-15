@@ -7,6 +7,7 @@ Route::middleware('auth')->group(function () {
         	Route::get('/count-tracing', 'QuoteTrackController@countTracing');
         	Route::get('/count-sold', 'QuoteTrackController@countSold');
             Route::get('/count-quotes', 'QuoteTrackController@countQuote');
+            Route::get('/count-quote', 'QuoteTrackController@countQuoteDashboard');
             Route::get('/top-products', 'QuoteTrackController@topProducts');
             Route::post('/get-track', 'QuoteTrackController@getTrack')->middleware('permission:create-quotes');
             Route::post('/store-track', 'QuoteTrackController@storeTrack')->middleware('permission:create-quotes');

@@ -140,6 +140,12 @@ class QuoteTrackController extends Controller
             ->where('status',1)->first();
     }
 
+    public function countQuoteDashboard(){
+        return $collection = Quote::selectRaw('count(*) as total')
+            ->whereBetween('updated_at',[date('Y-m-d')." 00:00:00",date('Y-m-d')." 23:59:59"])
+            ->where('status',2)->first();   
+    }
+
     public function topProducts()
     {
         $fromDate = Carbon::now()->subDay(6)->startOfWeek()->toDateString();
