@@ -105,7 +105,7 @@
                   <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Enviar whatsapp" @click="sendWhatsapp(sale.id)" class="card-header-action ml-1 text-muted">
                     <i style="color:green" class="fa-lg fab fa-whatsapp text-success"></i>
                   </a>
-                  <a href="#"  data-toggle="tooltip" data-placement="bottom" title="Imprimir cupón" @click="showModalPrint(sale.id)" class="card-header-action ml-1 text-muted">
+                  <a href="#" v-if="$can('print-coupon')"  data-toggle="tooltip" data-placement="bottom" title="Imprimir cupón" @click="showModalPrint(sale.id)" class="card-header-action ml-1 text-muted">
                     <i class="fa-lg fas fa-print"></i>
                   </a>
                   <a v-if="$can('take-payment-sales')" :href="'./payments/create/' + sale.id" class="card-header-action ml-1 text-muted">

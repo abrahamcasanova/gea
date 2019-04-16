@@ -283,10 +283,10 @@ class SaleController extends Controller
         $this->validate($request, [
             'price'                  => 'required|numeric',
             'date_payment_limit'     => 'required|date',
-            'date_payment_supplier'  => 'required|date',
+            'date_payment_supplier'  => 'nullable|date',
             'date_advance'           => 'required|date',
             'schedule'               => 'required',
-            'amount_receivable'      => 'required',
+            'amount_receivable'      => 'nullable',
             'simple_room'            => 'nullable|numeric',
             'double_room'            => 'nullable|numeric',
             'triple_room'            => 'nullable|numeric',

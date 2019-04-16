@@ -1,9 +1,9 @@
 <html lang="es">
 <head>
     <style type="text/css">
-        @page { margin: 45px 2px}
+        @page { margin: 75px 2px}
         header { position: fixed; margin-bottom:1px; top: -65px; left: 5px; right: 0px; height: 53px; }
-        footer { text-align: center !important; position: fixed; bottom: 65px left: 0px; right: 0px; height: 25px; }
+        footer { text-align: center !important; position: fixed; bottom: 0px left: 0px; right: 0px; height: 25px; }
         .page-break {
             page-break-after: always;
         }
@@ -15,9 +15,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" />
 </head>
 <body>
-  <header style=""></header>
+  <header style="">
+    <center>
+      <img width="130" src="{{ public_path()}}/img/logo_dark.png">
+    </center>
+  </header>
   <footer>
-      <img width="130" src="{{ public_path()}}/img/logo_dark.png"><br>
       Asesor: {{$user->name}} Oficina: {{$user->phone}} Celular: {{$user->cellphone}} #CreamosMomentos
   </footer>
   <main http-equiv="Content-Type" content="text/html;charset=utf-8">
@@ -118,7 +121,7 @@
             <div class="panel panel-success">
                 <div class="panel-heading"> 
                   <h5 class="panel-title">
-                    <label class="fix">NOTA ADICCIONAL</label>
+                    <label class="fix">Nota Addicional</label>
                   </h5> 
                 </div>
                 <div class="panel-body">
@@ -132,7 +135,7 @@
             <div class="panel panel-info">
                 <div class="panel-heading"> 
                   <h5 class="panel-title">
-                    <label>Tabla de penalización</label>
+                    <label class="fix">Tabla de penalización</label>
                   </h5> 
                 </div>
                 <div class="panel-body">
@@ -184,7 +187,6 @@
             </div>
           </div>
         </div>
-        <div class="page-break"></div>
       </div>
   </main>
 </body>

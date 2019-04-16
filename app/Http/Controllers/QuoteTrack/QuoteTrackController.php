@@ -148,7 +148,7 @@ class QuoteTrackController extends Controller
 
     public function topProducts()
     {
-        $fromDate = Carbon::now()->subDay(6)->startOfWeek()->toDateString();
+        $fromDate = Carbon::now()->subDay()->startOfWeek()->toDateString();
         $tillDate = Carbon::now()->toDateString();
         $product = ProductDetailSale::groupBy('product_id')
             ->selectRaw('count(product_id) as total,product_id')->with('sale','product')->whereHas('sale', function ($query) use($fromDate,$tillDate) {

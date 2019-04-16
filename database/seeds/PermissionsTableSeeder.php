@@ -487,6 +487,12 @@ class PermissionsTableSeeder extends Seeder
                 'display_name' => 'Recibir pago',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
+            ],
+            [
+                'name' => 'print-coupon',
+                'display_name' => 'Imprimir cupón',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
             ]
         ]);
 

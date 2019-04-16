@@ -175,7 +175,7 @@
                 <multiselect
                   v-model="sale.supplier_id"
                   :options="suppliers"
-                  openDirection="bottom"
+                  openDirection="top"
                   track-by="id"
                   label="name"
                   :class="{'border border-danger rounded': errors.supplier_id}">
@@ -419,16 +419,16 @@ export default {
           this.sale.price = value.price;
     },
     customFormatterSupplier(date) {
-          this.sale.date_payment_supplier = moment(date).format('YYYY/MM/DD');
-          return moment(date).format('YYYY/MM/DD');
+          this.sale.date_payment_supplier = moment(this.sale.date_payment_supplier).format('YYYY/MM/DD');
+          return moment(this.sale.date_payment_supplier).format('YYYY/MM/DD');
     },
     customFormatterLimit(date) {
-          this.sale.date_payment_limit = moment(date).format('YYYY/MM/DD');
-          return moment(date).format('YYYY/MM/DD');
+          this.sale.date_payment_limit = moment(this.sale.date_payment_limit).format('YYYY/MM/DD');
+          return moment(this.sale.date_payment_limit).format('YYYY/MM/DD');
     },
     customFormatterAdvance(date) {
-          this.sale.date_advance = moment(date).format('YYYY/MM/DD');
-          return moment(date).format('YYYY/MM/DD');
+          this.sale.date_advance = moment(this.sale.date_advance).format('YYYY/MM/DD');
+          return moment(this.sale.date_advance).format('YYYY/MM/DD');
     },
     destroyProductDetailSale(productDetailSale){
       if (!this.submitingDestroy) {
