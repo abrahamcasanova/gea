@@ -390,28 +390,32 @@ export default {
               title: 'Pago Limite ' + this.sale.quote.customer_order.customer.full_name + ' Folio: ' + this.sale.quote.id
           });
 
-          events.push({
-              id: uuid.v1(),
-              details: 'Fecha limite de pago proveedor, Folio: ' + this.sale.quote.id,
-              date: moment(this.sale.date_payment_supplier).format('YYYY-MM-DD'),
-              open: false,
-              type: 'danger',
-              title: 'Pago Proveedor ' + this.sale.quote.customer_order.customer.full_name + ' Folio: ' + this.sale.quote.id
-          });
+          if(this.productsDetailSales.length > 0 ){
+            for (var i = this.productsDetailSales.length - 1; i >= 0; i--) {
+              events.push({
+                id: uuid.v1(),
+                details: 'Fecha limite de pago proveedor, Folio: ' + this.sale.quote.id,
+                date: moment(this.productsDetailSales[i].date_payment_supplier).format('YYYY-MM-DD'),
+                open: false,
+                type: 'danger',
+                title: 'Pago Proveedor ' + this.sale.quote.customer_order.customer.full_name + ' Folio: ' + this.sale.quote.id
+              });
+            }
+          }
 
           this.sale.quote_id = this.quote_id;
           this.sale.events = events
-
-        this.submiting = true
-        axios.put(`../../api/sales/update/${this.sale.id}`, this.sale)
-        .then(response => {
-            this.$toasted.global.error('Venta actualizada!')
-            location.href = '../../sales'
-        })
-        .catch(error => {
-          this.errors = error.response.data.errors
-          this.submiting = false
-        })
+          
+          this.submiting = true
+          axios.put(`../../api/sales/update/${this.sale.id}`, this.sale)
+          .then(response => {
+              this.$toasted.global.error('Venta actualizada!')
+              location.href = '../../sales'
+          })
+          .catch(error => {
+            this.errors = error.response.data.errors
+            this.submiting = false
+          })
       }
     },
     getPrice(value){

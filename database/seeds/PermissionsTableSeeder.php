@@ -546,6 +546,24 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ],
+            [
+                'name' => 'export-pending-payments',
+                'display_name' => 'Exportar pagos pendienes por cobrar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'export-quotes',
+                'display_name' => 'Exportar reporte de cotizaciones',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'export-sales',
+                'display_name' => 'Exportar reporte de ventas',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
         ]);
 
 

@@ -73,7 +73,7 @@ export default {
       menu:false,
       menu2:false,
       errors: {},
-      typeReports: ['Pagos pendientes por cobrar'],
+      typeReports: [],
       image: '',
       url: null,
       submiting: false,
@@ -81,6 +81,18 @@ export default {
   },
   mounted () {
     this.csrf = window.Laravel.csrfToken;
+    if(this.$can('export-pending-payments')){
+      this.typeReports.push('Pagos pendientes por cobrar');
+    }
+
+    if(this.$can('export-quotes')){
+      this.typeReports.push('Reporte de cotizaciones');
+    }
+
+    if(this.$can('export-sales')){
+      this.typeReports.push('Reporte de ventas');
+    }
+
   },
   methods: {
       exportReport () {
@@ -92,7 +104,8 @@ export default {
             params: this.report
           })
           .then(response => {
-            window.location = './storage/excel/exports/Pagos.xls';
+            
+            window.location = './storage/' + response.data;
             this.submiting = false;
             this.$toasted.global.error('Exportado correctamente!')
             this.report.type_report = this.report.initial_date = this.report.final_date = null;
