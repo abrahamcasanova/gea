@@ -291,8 +291,6 @@ class SaleController extends Controller
             'double_room'            => 'nullable|numeric',
             'triple_room'            => 'nullable|numeric',
             'quadruple_room'         => 'nullable|numeric',
-            'supplier_id'            => 'required|array',
-            'rate_price'             => 'required',
             'events'                 => 'required|array'
         ]);
         

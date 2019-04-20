@@ -6,6 +6,7 @@ use App\Sale;
 use App\Event;
 use App\Quote;
 use App\Payment;
+use Carbon\Carbon;
 use App\Destination;
 use App\ProductDetailSale;
 use Illuminate\Http\Request;
@@ -18,14 +19,14 @@ class ReportController extends Controller
 
     	switch ($request->type_report) {
     		case 'Pagos pendientes por cobrar':
-    			$report = Event::with('sale')->whereBetween('date', array($request->initial_date,$request->final_date))->get();
+    			$report = Event::with('sale')->whereBetween('date', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
     			break;
     		case 'Reporte de cotizaciones':
-    			$report = Quote::with('customerOrder')->whereBetween('created_at', array($request->initial_date,$request->final_date))->get();
+    			$report = Quote::with('customerOrder','user')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
     			
     			break;
     		case 'Reporte de ventas':
-    			$report = Sale::with('user','quote','saleDetail')->whereBetween('created_at', array($request->initial_date,$request->final_date))->get();
+    			$report = Sale::with('user','quote','saleDetail')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
 
     			break;
     	}
@@ -68,14 +69,33 @@ class ReportController extends Controller
 			    			foreach ($report as $key => $value) {
 				            	
 				            	$destinations = Destination::whereIn('id',explode(',',$value->customerOrder->travel_destination))->get();
+				            	$status = null;
+				            	switch ($value['status']) {
+				            		case 2:
+				            			$status = 'Pendiente por cerrar';
+				            			break;
+				            		case 3:
+				            			$status = 'Cotización cerrada';
+				            			break;
+				            		case 4:
+				            			$status = 'No viajo';
+				            			break;
+				            	}
+			 					//dd($value['created_at']);
+								setlocale(LC_ALL, 'es_ES');
+								$fecha = Carbon::parse($value['created_at']);
+								$fecha->format("F"); // Inglés.
+								$mes = $fecha->formatLocalized('%B');// mes en idioma español
 
 				                $collection->push([
 				                    'Folio'    	  => $value['id'],
+				                    'Agente'	  => isset($value['user']) ? $value['user']['name']:null,
 				                    'Fecha'  	  => $value['created_at'],
+				                    'Mes'		  => $mes,
 				                    'Cliente' 	  => $value['customerOrder']['customer']['full_name'],
 				                    'Destinos'	  => implode(', ', $destinations->pluck('name')->toArray()),
 				                    'Fecha de viaje' => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
-				                    'Estatus'	  => $value['status'] == 2 ? 'Pendiente por cerrar':'Cotización cerrada ' 
+				                    'Estatus'	  => $status
 				                ]);
 				            }
 
@@ -89,18 +109,22 @@ class ReportController extends Controller
 			    			break;
 			    		case 'Reporte de ventas':
 			    			foreach ($report as $key => $value) {
-				            					                
 				                $sum_payment = ProductDetailSale::where('quote_id',$value['quote_id'])->where('sale_id',$value['id'])->sum('price');
 				                
+				                $sumRatePrice = ProductDetailSale::where('quote_id',$value['quote_id'])->where('sale_id',$value['id'])->sum('rate_price');
+
 				                $payment = Payment::where('sale_id',$value['id'])->sum('price');
 				                $balance = floatval($sum_payment - $payment);
 				                $collection->push([
 				                    'Folio'    	  => $value['id'],
+				                    'Agente'	  => $value['user']['name'],
 				                    'Fecha'  	  => $value['created_at'],
 				                    'Cliente' 	  => $value['quote']['customerOrder']['customer']['full_name'],
 				                    'Fecha de viaje' => "{$value['quote']['customerOrder']['travel_date']} al {$value['quote']['customerOrder']['travel_end_date']}",
+				                    'Hotel/Servicio'	=> isset($value['saleDetail']) ? implode(', ',$value['saleDetail']->pluck('product.name')->toArray()):null,
 				                    'Precio Total'		 => $sum_payment,
 				                    'Saldo'			 => $balance,
+				                    'Tarifa Neta'	 => $sumRatePrice,
 				                    'Fecha anticipo' => "{$value['date_advance']}"
 				                ]);
 				            }

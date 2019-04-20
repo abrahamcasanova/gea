@@ -58,6 +58,8 @@ class QuoteController extends Controller
             $quote->payment = str_replace("\n","\n \r",$quote->payment);
             $user = auth()->user();
 
+            $quote->user_id = $user->id;
+            
             $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
                 ->get();
 
@@ -88,7 +90,7 @@ class QuoteController extends Controller
             $quote->policy = str_replace("\n","\n \r",$quote->policy);
             $quote->payment = str_replace("\n","\n \r",$quote->payment);
             $user = auth()->user();
-
+            $quote->user_id = $user->id;
             $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
                 ->get();
 

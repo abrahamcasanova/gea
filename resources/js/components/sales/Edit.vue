@@ -169,7 +169,7 @@
                 <div class="invalid-feedback" v-if="errors.quadruple_room">{{errors.quadruple_room[0]}}</div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" style="display: none;">
             <div class="form-group col-md-6">
                 <label>Proveedor</label>
                 <multiselect

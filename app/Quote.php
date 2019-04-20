@@ -18,6 +18,7 @@ class Quote extends Model
       'currency',
       'customer_order_id',
       'status',
+      'user_id'
     ];
 
     public function customerOrder()
@@ -28,6 +29,11 @@ class Quote extends Model
     public function quoteDetails()
     {
         return $this->hasMany(QuoteDetail::class,'quote_id','id')->with('product');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class,'id','user_id');
     }
 
     public function scopeWhereStatus($query,$status)

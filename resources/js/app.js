@@ -29,7 +29,7 @@ import Toasted from 'vue-toasted';
 import VueNumeric from 'vue-numeric';
 import Timeline from 'timeline-vuejs';
 import 'vuetify/dist/vuetify.min.css';
-import VeeValidate from 'vee-validate';
+//import VeeValidate from 'vee-validate';
 import Vue2Filters from 'vue2-filters';
 import BootstrapVue from 'bootstrap-vue';
 import Datepicker from 'vuejs-datepicker';
@@ -75,9 +75,9 @@ window.Echo = new Echo({
 });
 
 Vue.use(VModal)
-Vue.use(VeeValidate, {
+/*Vue.use(VeeValidate, {
   errorBagName: 'vErrors'
-});
+});*/
 
 Vue.use(require('moment/locale/es'));
 
@@ -102,24 +102,27 @@ Vue.component('multiselect', Multiselect)
 Vue.use(VueContentPlaceholders)
 Vue.use(uploader)
 // Initialize Firebase
+console.log(process.env.NODE_ENV)
 
-/*var config = {
-  apiKey: "AIzaSyCbyyvqiAuJeWjNvMakL9_R-jhkpa0oml4",
-  authDomain: "proyecto-gea-dfbee.firebaseapp.com",
-  databaseURL: "https://proyecto-gea-dfbee.firebaseio.com",
-  projectId: "proyecto-gea-dfbee",
-  storageBucket: "proyecto-gea-dfbee.appspot.com",
-  messagingSenderId: "571952390252"
-};*/
- var config = {
-  apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
-  authDomain: "travel-f0875.firebaseapp.com",
-  databaseURL: "https://travel-f0875.firebaseio.com",
-  projectId: "travel-f0875",
-  storageBucket: "travel-f0875.appspot.com",
-  messagingSenderId: "76422469644"
-};
-
+if ( process.env.NODE_ENV == 'production' ) {
+     var config = {
+      apiKey: "AIzaSyCiRoD159FcVQ6efXT0a6f4s-AsXFXoVqY",
+      authDomain: "travel-f0875.firebaseapp.com",
+      databaseURL: "https://travel-f0875.firebaseio.com",
+      projectId: "travel-f0875",
+      storageBucket: "travel-f0875.appspot.com",
+      messagingSenderId: "76422469644"
+    };
+} else {
+     var config = {
+       apiKey: "AIzaSyCbyyvqiAuJeWjNvMakL9_R-jhkpa0oml4",
+       authDomain: "proyecto-gea-dfbee.firebaseapp.com",
+       databaseURL: "https://proyecto-gea-dfbee.firebaseio.com",
+       projectId: "proyecto-gea-dfbee",
+       storageBucket: "proyecto-gea-dfbee.appspot.com",
+       messagingSenderId: "571952390252",
+     };
+}
 
 export const firebase = Firebase.initializeApp(config)
 export const db = firebase.database()
