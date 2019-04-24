@@ -80,8 +80,8 @@ class SaleController extends Controller
             'destinations'           => 'required',
             'events'                 => 'nullable|array'
         ]);
-        
-        
+
+
         $collection = collect($request->destinations);
 
         $user = auth()->user();
@@ -122,7 +122,7 @@ class SaleController extends Controller
                 'price' => $request->price
             ]);
         }
-        
+
         $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.firebase'));
 
         $firebase = (new Factory)->withServiceAccount($serviceAccount)
@@ -144,12 +144,12 @@ class SaleController extends Controller
                 ->get();
 
             $productSaleDetail = ProductDetailSale::where('quote_id',$request->quote_id)->where('sale_id',$sale->id)->sum('price');
-            
+
             $sale->price = $productSaleDetail;
 
             $details = ProductDetailSale::with('product')->where('quote_id',$request->quote_id)
                 ->where('sale_id',$sale->id)->get();
-            
+
             $user = auth()->user();
 
             $pdf = PDF::loadView('quotes.pdf.sale_generate',compact('sale','user','destinations','details'))
@@ -184,9 +184,9 @@ class SaleController extends Controller
                 $database->getReference("events/{$sale->id}")->set($collection);
             }
         }
-        
+
         $customerSaleGenerate = $sale;
-        
+
         if(isset($sale->quote->customerOrder->customer->email)){
             Mail::to($sale->quote->customerOrder->customer->email)
                 ->send(new CustomerSaleGenerate($customerSaleGenerate,$destinations));
@@ -213,7 +213,7 @@ class SaleController extends Controller
     public function sendSale(Request $request)
     {
         $sale = Sale::find($request->id);
-        
+
         if(!$sale->confirmation){
             return "error";
         }
@@ -231,11 +231,11 @@ class SaleController extends Controller
 
         $details = ProductDetailSale::with('product','quote')->where('quote_id',$sale->quote_id)
             ->where('sale_id',$sale->id)->get();
-        
+
         $pdf = PDF::loadView('sales.pdf.coupon',compact('sale','user','destinations','details'))
                 ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
                 ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/sales/coupon/'."{$sale->quote->customerOrder->customer->full_name}_{$sale->id}.pdf"));
-       
+
        return response()->download(storage_path('app/public/pdf/sales/coupon/'."{$sale->quote->customerOrder->customer->full_name}_{$sale->id}.pdf"), "{$sale->quote->customerOrder->customer->full_name}", [], 'inline');
 
     }
@@ -293,9 +293,9 @@ class SaleController extends Controller
             'quadruple_room'         => 'nullable|numeric',
             'events'                 => 'required|array'
         ]);
-        
+
         $user = auth()->user();
-        
+
         $request->merge(['product_id'  => $request->product_id[0]['id']]);
         $request->merge(['supplier_id' => isset($request->supplier_id[0]) ? $request->supplier_id[0]['id']:$request->supplier_id['id']]);
 
@@ -311,7 +311,7 @@ class SaleController extends Controller
             ]);
         }
 
-        //el precio no lo esta cambiando.. 
+        //el precio no lo esta cambiando..
         if($request->quote_detail_id){
             QuoteDetail::find($request->quote_detail_id)->update([
                 'price' => $request->price
@@ -328,25 +328,25 @@ class SaleController extends Controller
 
 
         $collection = collect($request->travel_destination);
-        
+
         $request->merge(['travel_destination' => implode($collection->pluck('id')->toArray(),',')]);
 
         $sale = Sale::find($request->id)->fill($request->all());
-        
+
         if(isset($sale)){
-            
+
             $user = auth()->user();
 
             $destinations = Destination::whereIn('id',explode(',',$request->travel_destination))
                 ->get();
-            
+
             $productSaleDetail = ProductDetailSale::where('quote_id',$request->quote['id'])->where('sale_id',$sale->id)->sum('price');
-            
+
             $sale->price = $productSaleDetail;
 
             $sale->save();
             $sale = $sale->load('product','quote','user','supplier','quoteDetail');
-            
+
             $details = ProductDetailSale::with('product')->where('quote_id',$request->quote['id'])
                 ->where('sale_id',$sale->id)->get();
 
@@ -385,7 +385,7 @@ class SaleController extends Controller
             }
         }
 
-        return $sale;    
+        return $sale;
     }
 
     /**

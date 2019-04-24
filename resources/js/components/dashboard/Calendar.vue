@@ -52,7 +52,7 @@
                     >
                       Cancelar
                     </v-btn>
-                    <v-btn round color="success" style="width: auto;" v-on:click="firebasePayment(event.id)">
+                    <v-btn round color="success" style="width: auto;" v-on:click="firebasePayment(event.firebase_id)">
                       Pagar
                     </v-btn>
                   </v-card-actions>
@@ -174,7 +174,7 @@ export default {
         save:'Guardar'
     },
     defaultEvents: [],
-    today: moment().format('YYYY-MM-DD'), 
+    today: moment().format('YYYY-MM-DD'),
     events: [
         {
           title: 'Vacation',
@@ -222,7 +222,7 @@ export default {
           }else{
               window.app.loadState()
           }
-      }); 
+      });
 
       this.setLocale('es')
   },
@@ -285,8 +285,7 @@ export default {
         db.ref('/events').on("child_added", function(snapshot) {
           snapshot.forEach(function(data) {
               let datas = data.val();
-              if(datas.id == value){
-                  console.log(snapshot.key);
+              if(datas.firebase_id == value){
                   db.ref('/events/'+ snapshot.key +'/' + data.key).remove();
               }
           });
