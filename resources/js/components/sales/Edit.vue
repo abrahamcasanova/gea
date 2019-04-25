@@ -144,9 +144,9 @@
               <span class="h3 text-success text-uppercase font-weight-bold" >
                   <i class="fa-md fas fa-bed text-dark"></i> Habitaciones
                 </span>
-              <v-divider inset></v-divider>  
+              <v-divider inset></v-divider>
           </div>
-          
+
           <div class="row">
             <div class="form-group col-md-6">
                 <label>Sencilla</label>
@@ -164,7 +164,7 @@
                 <div class="invalid-feedback" v-if="errors.triple_room">{{errors.triple_room[0]}}</div>
             </div>
             <div class="form-group col-md-6">
-                <label>Cuádruple</label> 
+                <label>Cuádruple</label>
                 <input type="number" class="form-control" :class="{'is-invalid': errors.quadruple_room}" v-model="sale.quadruple_room" placeholder="">
                 <div class="invalid-feedback" v-if="errors.quadruple_room">{{errors.quadruple_room[0]}}</div>
             </div>
@@ -382,7 +382,7 @@ export default {
 
           events.push({
               id: uuid.v1(),
-              details: 'Fecha limite de pago cliente: ' + this.sale.quote.customer_order.customer.full_name 
+              details: 'Fecha limite de pago cliente: ' + this.sale.quote.customer_order.customer.full_name
               + ' Importe a cobrar: $ ' + this.sale.price,
               date: then_compare,
               open: false,
@@ -405,7 +405,7 @@ export default {
 
           this.sale.quote_id = this.quote_id;
           this.sale.events = events
-          
+
           this.submiting = true
           axios.put(`../../api/sales/update/${this.sale.id}`, this.sale)
           .then(response => {
@@ -446,7 +446,7 @@ export default {
         })
         .then((willDelete) => {
           if (willDelete) {
-            axios.delete(`./api/product_detail_sales/${productDetailSale}`)
+            axios.delete(`../../api/product_detail_sales/${productDetailSale}`)
             .then(response => {
                 this.$toasted.global.error('producto eliminado!')
                 this.getDetails();
@@ -513,7 +513,7 @@ export default {
       this.loading = true
       let str = window.location.pathname
       let res = str.split("/")
-      
+
       axios.get(`../../api/sales/get-sale/` + res[3])
         .then(response => {
             this.sale = response.data;
@@ -522,9 +522,9 @@ export default {
             }
             this.sale.schedule = [{'id': response.data.schedule, 'name': response.data.schedule}];
             if(response.data.supplier){
-              this.sale.supplier_id = [response.data.supplier];  
+              this.sale.supplier_id = [response.data.supplier];
             }
-            
+
             this.sale.quote.currency = [{'id': response.data.quote.currency, 'name': response.data.quote.currency}];
 
             this.getDetails();
