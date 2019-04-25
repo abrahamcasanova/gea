@@ -42,7 +42,6 @@ class ProductDetailSalesController extends Controller
      */
     public function store(Request $request)
     {
-
         $this->validate($request, [
             'product_id'            => 'required|array',
             'supplier_id'           => 'required|array',
@@ -54,6 +53,27 @@ class ProductDetailSalesController extends Controller
 
         $request->merge(['product_id'  => $request->product_id['product']['id']]);
         $request->merge(['supplier_id' => $request->supplier_id['id']]);
+
+        ProductDetailSale::create($request->all());
+
+        return ProductDetailSale::with('product','quote','supplier')->Active()
+            ->where('quote_id',$request->quote_id)->get();
+    }
+
+    public function storeEdit(Request $request){
+        $this->validate($request, [
+            'product_id'            => 'required|array',
+            'supplier_id'           => 'required|array',
+            'price'                 => 'required',
+            'rate_price'            => 'required',
+            'confirmation'          => 'required',
+            'date_payment_supplier_table' => 'required'
+        ]);
+
+        $request->merge(['product_id'  => $request->product_id['id']]);
+        $request->merge(['supplier_id' => $request->supplier_id['id']]);
+        $request->merge(['date_payment_supplier'  => $request->date_payment_supplier_table]);
+
 
         ProductDetailSale::create($request->all());
 

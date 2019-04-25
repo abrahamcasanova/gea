@@ -68,14 +68,14 @@ class ProductController extends Controller
             $request->merge([
                 'product_type_id' => $request->product_types['id'],
                 'url_image' => $imageName
-         
+
             ]);
 
             if(file_exists(storage_path('app/public/product_img/'.$product->url_image))){
                 unlink(storage_path('app/public/product_img/'.$product->url_image));
             }
         }
-    
+
         $product->fill($request->all())->save();
 
         return $product;
@@ -100,7 +100,7 @@ class ProductController extends Controller
 
     public function getProductByQuoteSpecial($quoteId)
     {
-        
+
         $quoteDetail = QuoteDetail::with('product')->WhereQuoteId($quoteId)->get();
         $products =  Product::whereNotIn('id',$quoteDetail->pluck('product_id')->toArray())
             ->get();
@@ -123,7 +123,7 @@ class ProductController extends Controller
                 ]);
             }
         }
-        
+
         return $collection;
     }
 
@@ -151,7 +151,7 @@ class ProductController extends Controller
         if(Storage::disk('public')->exists('product_img/{$product->url_image}')){
             $templateProcessor->setImageValue('CompanyLogo', storage_path("app/public/product_img/{$product->url_image}"));
         }
-        
+
         try {
             $templateProcessor->saveAs(storage_path("word/{$product->name}.docx"));
             $headers = ['Content-Type: application/msword'];

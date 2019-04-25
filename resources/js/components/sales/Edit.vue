@@ -76,6 +76,64 @@
                 </multiselect>
                 <div class="invalid-feedback" v-if="errors.currency">{{errors.currency[0]}}</div>
             </div>
+            <v-spacer></v-spacer>
+            <div class="form-group col-md-12">
+                <label>Producto</label>
+                 <multiselect
+                  v-model="saleTable.product_id"
+                  :options="allProducts"
+                  openDirection="bottom"
+                  track-by="id"
+                  @input="getPrice"
+                  label="name"
+                  :class="{'input border border-danger rounded': errors.product_id}">
+                </multiselect>
+                <div class="invalid-feedback" v-if="errors.product_id">{{errors.product_id[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Precio ({{ quote_sale.currency | capitalize({ onlyFirstLetter: true }) }})</label>
+                <input type="number" class="form-control" :class="{'is-invalid': errors.price}" v-model="saleTable.price" placeholder="">
+                <div class="invalid-feedback" v-if="errors.price">{{errors.price[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Confirmación</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.confirmation}" v-model="saleTable.confirmation" placeholder="">
+                <div class="invalid-feedback" v-if="errors.confirmation">{{errors.confirmation[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Fecha de pagar al proveedor</label>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterSupplierTable" v-model="saleTable.date_payment_supplier_table" :input-class="{'is-invalid': errors.date_payment_supplier}"></datepicker>
+                <div class="invalid-feedback" v-if="errors.date_payment_supplier">{{errors.date_payment_supplier[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Proveedor</label>
+                <multiselect
+                  v-model="saleTable.supplier_id"
+                  :options="suppliers"
+                  openDirection="bottom"
+                  track-by="id"
+                  label="name"
+                  :class="{'border border-danger rounded': errors.supplier_id}">
+                </multiselect>
+                <div class="invalid-feedback" v-if="errors.supplier_id">{{errors.supplier_id[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Precio/Tarifa neta</label>
+                <vue-numeric class="form-control"  :class="{'is-invalid': errors.rate_price}" currency="$" separator="," :precision="2" v-model="saleTable.rate_price"></vue-numeric>
+                <div class="invalid-feedback" v-if="errors.rate_price">{{errors.rate_price[0]}}</div>
+            </div>
+            <div class="form-group col-md-12">
+              <v-btn style="margin-top: 25px"
+                :loading="isLoading"
+                :disabled="isLoading"
+                color="blue"
+                @click="saveDetail()"
+                class="white--text"
+                >
+                Agregar
+                <v-icon right dark>add_circle</v-icon>
+              </v-btn>
+            </div>
             <div class="form-group col-md-12">
               <table class="table table-hover">
                 <thead>
@@ -213,6 +271,7 @@ export default {
           }
       },
       docs: [],
+      saleTable:{},
       saleEdit: {},
       sale:{
           events:[],
@@ -220,6 +279,7 @@ export default {
             currency:null
           }
       },
+      isLoading: false,
       events:[],
       schedules:[
           { id: 'SEMANAL', name: 'CADA SEMANA' },
@@ -260,6 +320,7 @@ export default {
       submiting: false,
       submitingDestroy: false,
       products:[],
+      allProducts:[],
       suppliers:[],
     }
   },
@@ -270,8 +331,50 @@ export default {
     this.getSale();
     this.getDestinations();
     this.getSuppliers();
+    this.getProductsByQuoteSpecial();
   },
   methods: {
+    productName ({ product }) {
+      console.log(product['name'])
+      return `${product['name']}`
+    },
+    quote_sale(){
+        this.$emit('update:quote_sale',this.quote_sale)
+    },
+    saveDetail(){
+        this.saleTable.quote_id = this.sale.quote_id;
+        this.saleTable.sale_id =  this.sale.id;
+        let obj = this.saleTable
+
+        axios.post(`../../api/product_detail_sales/storeEdit`,
+          obj
+        ).then(response => {
+            swal("Producto agregado correctamente!!", {
+                icon: 'success',
+                buttons: false,
+                timer: 3000,
+            });
+            this.saleTable.product_id = null
+            this.saleTable.price = 0
+            this.saleTable.confirmation = null
+            this.saleTable.date_payment_supplier = null
+            this.saleTable.supplier_id = null
+            this.saleTable.rate_price = 0
+
+            this.getDetails();
+          })
+          .catch(error => {
+              this.errors = error.response.data.errors
+        })
+    },
+    getProductsByQuoteSpecial() {
+        axios.get(`../../api/products/all`).then(response => {
+          return this.allProducts = response.data
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
+    },
     getDestinations(){
         // Lazily load input items
         axios.get('../../api/destinations/all')
@@ -284,7 +387,6 @@ export default {
         .finally(() => (this.isLoading = false))
     },
     getDetails() {
-        console.log(this.sale.quote_id)
         axios.post('../../api/product_detail_sales/get-by-quote',{
           quote_id: this.sale.quote_id
         })
@@ -426,6 +528,11 @@ export default {
           this.sale.date_payment_supplier = moment(this.sale.date_payment_supplier).format('YYYY/MM/DD');
           return moment(this.sale.date_payment_supplier).format('YYYY/MM/DD');
     },
+    customFormatterSupplierTable(date) {
+          this.saleTable.date_payment_supplier_table = moment(this.saleTable.date_payment_supplier_table).format('YYYY/MM/DD');
+          return moment(this.saleTable.date_payment_supplier_table).format('YYYY/MM/DD');
+    },
+
     customFormatterLimit(date) {
           this.sale.date_payment_limit = moment(this.sale.date_payment_limit).format('YYYY/MM/DD');
           return moment(this.sale.date_payment_limit).format('YYYY/MM/DD');

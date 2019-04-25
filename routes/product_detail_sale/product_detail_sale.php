@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permission:read-products');
             Route::get('/{product_detail_sale}', 'ProductDetailSalesController@show')->middleware('permission:read-products');
             Route::post('/store', 'ProductDetailSalesController@store')->middleware('permission:create-products');
+            Route::post('/storeEdit', 'ProductDetailSalesController@storeEdit')->middleware('permission:create-products');
             Route::put('/update/{product_detail_sale}', 'ProductDetailSalesController@update')->middleware('permission:update-products');
             Route::delete('/{product_detail_sale}', 'ProductDetailSalesController@destroy')->middleware('permission:delete-products');
         });
