@@ -408,6 +408,7 @@ export default {
           var then_compare = moment(this.sale.date_payment_limit).format('YYYY-MM-DD');
           var events = [];
           var last_date = null;
+
           if(!this.sale.schedule){
               swal("Favor de seleccionar recordatorio..", {
                   icon: 'error',
@@ -416,8 +417,9 @@ export default {
               });
               return false;
           }
+          let type =  this.sale.schedule[0] ? this.sale.schedule[0].id:this.sale.schedule.id
 
-          switch(this.sale.schedule[0].id || this.sale.schedule.id) {
+          switch(type) {
             case 'SEMANAL':
               var week_date = then.diff(now, 'week');
               for (var i = 0; i <= week_date -1; i++) {

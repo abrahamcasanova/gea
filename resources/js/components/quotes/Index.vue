@@ -83,8 +83,8 @@
                 <td class="" v-else></td>
                 <td class="" v-if='quote.customer_order' >{{quote.customer_order.customer.email}}</td>
                 <td class="" v-else='quote.customer_order' ></td>
-                <td class="">{{quote.proposal_date}}</td>
                 <td class="">{{quote.travel_date}}</td>
+                <td class="">{{quote.proposal_date}}</td>
                 <td class="">
                     <label v-if="quote.status == 2">Activo</label>
                     <label v-else>Inactivo</label>
@@ -153,7 +153,7 @@
           <div class="d-block">
             <div class="col-md-12 card-body px-0">
               <div class="row">
-                  <iframe :src="path_pdf" style="width:100%" height="420"></iframe> 
+                  <iframe :src="path_pdf" style="width:100%" height="420"></iframe>
               </div>
             </div>
           </div>
@@ -253,11 +253,11 @@ export default {
             this.details = response.data
             this.$refs.myModalRef.show()
             if(response.data.path){
-                this.path_pdf = './storage/app/public/pdf/' + response.data.path;  
+                this.path_pdf = './storage/app/public/pdf/' + response.data.path;
             }else{
                 this.path_pdf = null;
             }
-            
+
         })
         .catch(error => {
             this.$toasted.global.error('Cotización no encontrada!')
@@ -325,7 +325,7 @@ export default {
                 }
                 window.open("https://wa.me/52"+ data.customer_order.customer.cellphone +"?text=Estimado " + data.customer_order.customer.full_name + ", adjunto encontrará la cotización con destino a " + travel,'_blank');
             }
-            
+
         })
         .catch(error => {
             this.$toasted.global.error('telefono no encontrada!',error)
@@ -333,7 +333,7 @@ export default {
         .then(() => {
           this.loading = false
         })
-        
+
     },
     getQuotes () {
       this.loading = true

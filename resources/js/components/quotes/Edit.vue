@@ -115,7 +115,7 @@
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="d-none d-sm-table-cell">
+                                  <td class="">
                                     <a class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(quote_detail.id)">
                                         <i class="fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                                         <i class="far fa-trash-alt" v-else style="color:red"></i>

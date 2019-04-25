@@ -158,11 +158,11 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label>Fecha inicio de viaje</label>
-                    <input type="text" readonly disabled class="form-control" v-model="details.travel_end_date" placeholder="Fecha de viaje">
+                    <input type="text" readonly disabled class="form-control" v-model="details.travel_date" placeholder="Fecha de viaje">
                 </div>
                 <div class="form-group col-md-4">
                     <label>Fecha fin de viaje</label>
-                    <input type="text" readonly disabled class="form-control" v-model="details.travel_date" placeholder="Fecha de viaje">
+                    <input type="text" readonly disabled class="form-control" v-model="details.travel_end_date" placeholder="Fecha de viaje">
                 </div>
                 <div class="form-group col-md-6">
                     <label>En que horario le podemos marcar?</label>
