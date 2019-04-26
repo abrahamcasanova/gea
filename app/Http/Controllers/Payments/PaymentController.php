@@ -68,14 +68,14 @@ class PaymentController extends Controller
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
         $user = auth()->user();
-        
+
         $destinations = Destination::whereIn('id',explode(',',$payment->sale->travel_destination))
                 ->get();
 
         $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance'))
             ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
             ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/payments/'."{$payment->id}.pdf"));
-        
+
         $payment->path = "{$payment->id}.pdf";
         $payment->save();
         if(isset($customer->email)){
@@ -124,7 +124,7 @@ class PaymentController extends Controller
             'percentage'             => 'nullable|numeric',
             'exchange_rate'          => 'nullable|numeric',
         ]);
-         
+
         $request->merge(['type_of_payment' => $request->type_of_payment['name']]);
 
         $payment = Payment::find($request->id);
@@ -136,17 +136,17 @@ class PaymentController extends Controller
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
         $user = auth()->user();
-        
+
         $destinations = Destination::whereIn('id',explode(',',$payment->sale->travel_destination))
                 ->get();
 
         $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance'))
             ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
             ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/payments/'."{$payment->id}.pdf"));
-        
+
         $payment->path = "{$payment->id}.pdf";
         $payment->save();
-        
+
         return $payment;
     }
 
@@ -162,7 +162,7 @@ class PaymentController extends Controller
     }
 
     public function getPayment($payment){
-        $user = auth()->user();        
+        $user = auth()->user();
         $payment = Payment::with('user','customer','sale')->findOrFail($payment);
         $type_payment = TypeOfPayment::where('name',$payment->type_of_payment)->first();
         $collection = collect($payment);

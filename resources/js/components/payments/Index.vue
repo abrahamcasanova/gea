@@ -1,12 +1,13 @@
 <template>
   <div class="container">
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
-      <h4 class="float-left pt-2">Ultimos Pagos Registrados</h4>
+
       <div class="card-header-actions mr-1">
-        
+
       </div>
     </div>
-    <div class="card-body px-0">
+    <!--
+      <div class="card-body px-0">
       <div class="row justify-content-between">
         <div class="col-7 col-md-5">
           <div class="input-group mb-3">
@@ -46,6 +47,10 @@
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'product_type_id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'product_type_id' && filters.orderBy.direction == 'desc'}"></i>
             </th>
             <th>
+              <a href="#" class="text-dark">Autorización</a>
+              <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'sale.saleDetail' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'product_type_id' && filters.orderBy.direction == 'desc'}"></i>
+            </th>
+            <th>
               <a href="#" class="text-dark" @click.prevent="sort('url_image')">Agente</a>
               <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'url_image' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'url_image' && filters.orderBy.direction == 'desc'}"></i>
             </th>
@@ -65,6 +70,13 @@
             <td class="">{{payment.id}}</td>
             <td class="">{{payment.customer.full_name}}</td>
             <td class="">{{ payment.price | currency }}</td>
+            <td class="">
+              <span v-if="payment.sale.sale_detail" v-for="(list, index) in payment.sale.sale_detail">
+                <h5>
+                  <span style="margin-left:5px;" class="badge badge-pill badge-info text-white"> {{list.confirmation}} </span>
+                </h5>
+              </span>
+            </td>
             <td class="">{{payment.user.name}}</td>
             <td class="">{{payment.type_of_payment}}</td>
             <td class="">
@@ -117,12 +129,39 @@
         <content-placeholders-text/>
       </content-placeholders>
     </div>
+    -->
+
+    <div class="card">
+      <div class="card-body">
+        <div class="h3 text-muted text-right mb-12">
+          <h4 class="text-muted text-uppercase font-weight-bold">ultimos pagos registrados
+              <i class="fa-lg fas fa-dollar-sign text-primary"></i>
+          </h4>
+        </div>
+        <div class="card-body px-0">
+          <b-table :items="payments" :fields="tableFields" striped>
+            <template slot="actions" slot-scope="payment">
+              <a href="#" v-if="$can('read-payments')" data-toggle="tooltip" data-placement="bottom" title="Ver recibo" @click="getReceiptPayment(payment.item.id)" class="card-header-action ml-1 text-muted">
+                <i class="fa-lg fas fa-info-circle text-primary"></i>
+              </a>
+              <a href="#" v-if="$can('update-payments')" @click="editPayment(payment.item.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt fa-lg"></i></a>
+              <a  v-if="$can('delete-payments')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(payment.item.id)">
+                  <i class="fas fa-spinner fa-spin fa-lg" v-if="submitingDestroy"></i>
+                  <i class="far fa-trash-alt fa-lg" v-else style="color:red"></i>
+                  <span class="d-md-down-none ml-1"></span>
+              </a>
+            </template>
+          </b-table>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Component -->
     <b-modal size="lg" id="modal1" ref="myModalRef" hide-footer title="Detalle">
       <div class="d-block">
         <div class="col-md-12 card-body px-0">
           <div class="row">
-              <iframe :src="path_pdf" style="width:100%" height="420"></iframe> 
+              <iframe :src="path_pdf" style="width:100%" height="420"></iframe>
           </div>
         </div>
       </div>
@@ -136,8 +175,24 @@ let csrf_token = $('meta[name="csrf-token"]').attr('content');
 export default {
   data () {
     return {
-      payments: {},
+      payments: [],
       docs: [],
+      tableFields: [
+        /*<span v-if="payment.sale.sale_detail" v-for="(list, index) in payment.sale.sale_detail">
+          <h5>
+            <span style="margin-left:5px;" class="badge badge-pill badge-info text-white"> {{list.confirmation}} </span>
+          </h5>
+        </span>*/
+
+        { key: 'id', sortable: true },
+        { key: 'customer.full_name',label:'Cliente',sortable: true,},
+        { key: 'price',label:'Precio', sortable: true },
+        { key: 'authorization_number', sortable: true,label:'Autorización' },
+        { key: 'user.name', sortable: true,label:'Agente' },
+        { key: 'type_of_payment', sortable: true,label:'Forma de pago' },
+        { key: 'created_at', sortable: true,label:'Registrado' },
+        { key: 'actions', sortable: true,label:'Acciones' },
+      ],
       filters: {
         pagination: {
           from: 0,
@@ -197,11 +252,11 @@ export default {
             this.$refs.myModalRef.show()
             console.log(response.data)
             if(response.data.path){
-                this.path_pdf = './storage/app/public/pdf/payments/' + response.data.path;  
+                this.path_pdf = './storage/app/public/pdf/payments/' + response.data.path;
             }else{
                 this.path_pdf = null;
             }
-            
+
         })
         .catch(error => {
             this.$toasted.global.error('Pago no encontrada!')
