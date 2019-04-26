@@ -300,7 +300,7 @@ class SaleController extends Controller
         $request->merge(['supplier_id' => isset($request->supplier_id[0]) ? $request->supplier_id[0]['id']:$request->supplier_id['id']]);
 
 
-        $request->merge(['schedule'    => $request->schedule[0] ? $request->schedule[0]['id']:$request->schedule['id']]);
+        $request->merge(['schedule'    => isset($request->schedule[0]) ? $request->schedule[0]['id']:$request->schedule['id']]);
         $request->merge(['user_id'     => $user->id]);
 
         $request->merge(['currency' => isset($request->quote['currency'][0]) ? $request->quote['currency'][0]['id']:$request->quote['currency']['id']]);
