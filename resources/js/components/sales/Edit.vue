@@ -200,6 +200,22 @@
           </div>
           <div>
               <span class="h3 text-success text-uppercase font-weight-bold" >
+                  <i class="fa-md fas fa-user text-dark"></i> Personas
+                </span>
+              <v-divider inset></v-divider>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-6">
+                <label>Adultos</label>
+                <input type="number" class="form-control" :class="{'is-invalid': errors.number_adults}" v-model="sale.quote.number_adults" placeholder="...">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Menores</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.number_childs}" v-model="sale.quote.number_childs" placeholder="...">
+            </div>
+          </div>
+          <div>
+              <span class="h3 text-success text-uppercase font-weight-bold" >
                   <i class="fa-md fas fa-bed text-dark"></i> Habitaciones
                 </span>
               <v-divider inset></v-divider>

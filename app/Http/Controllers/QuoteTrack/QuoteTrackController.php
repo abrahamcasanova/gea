@@ -33,7 +33,7 @@ class QuoteTrackController extends Controller
         $request->merge(['user_id' => $request->user_id['id']]);
         $request->merge(['track_status' => $request->track_status['value']]);
         $request->merge(['quote_id' => $request->quote_id['id']]);
-        
+
 
         $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.firebase'));
 
@@ -49,7 +49,7 @@ class QuoteTrackController extends Controller
                 //Estatus 4 es eliminado parcial
                 Quote::find($request->quote_id)->update([
                     'status' => 4
-                ]);    
+                ]);
             }
         }else{
             $database->getReference("quote_tracks/{$quote_track->quote_id}")->set($quote_track->toArray());
@@ -113,7 +113,7 @@ class QuoteTrackController extends Controller
                 $timeline->push($array);
             }
         }
-        
+
         return $timeline;
     }
 
@@ -143,7 +143,34 @@ class QuoteTrackController extends Controller
     public function countQuoteDashboard(){
         return $collection = Quote::selectRaw('count(*) as total')
             ->whereBetween('updated_at',[date('Y-m-d')." 00:00:00",date('Y-m-d')." 23:59:59"])
-            ->where('status',2)->first();   
+            ->where('status',2)->first();
+    }
+
+    public function quoteIndicator(){
+        $customerOrder = CustomerOrder::where('status',1)->get();
+        $customerOrder = $customerOrder->map(function($quote) {
+
+            $cDate = Carbon::parse($quote->created_at);
+            $quote->passDate = $cDate->diffInDays();
+
+            if($cDate->diffInDays() <= 2){
+              $quote->statusIndicator = 'EN TIEMPO';
+              $quote->type = 'text-success';
+            }else if($cDate->diffInDays() == 3 || $cDate->diffInDays() == 4){
+              $quote->statusIndicator = 'DAR ATENCIÓN';
+              $quote->type = 'text-warning';
+            }else{
+              $quote->statusIndicator = 'ATENCIÓN INMEDIATA';
+              $quote->type = 'text-danger';
+            }
+            return $quote;
+        });
+
+        $customerOrder = $customerOrder->groupBy('statusIndicator')->map(function ($row) {
+            return $row->count();
+        });
+
+        return response()->json($customerOrder);
     }
 
     public function topProducts()
@@ -154,7 +181,7 @@ class QuoteTrackController extends Controller
             ->selectRaw('count(product_id) as total,product_id')->with('sale','product')->whereHas('sale', function ($query) use($fromDate,$tillDate) {
             $query->whereBetween('updated_at',["{$fromDate} 00:00:00","{$tillDate} 23:59:59"]);
         })->orderBy('total','DESC')->take(5)->get();
-        
+
        return response()->json([$fromDate,$tillDate,$product]);
     }
 

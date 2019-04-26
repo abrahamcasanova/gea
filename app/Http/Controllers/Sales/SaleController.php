@@ -311,7 +311,11 @@ class SaleController extends Controller
             ]);
         }
 
-        //el precio no lo esta cambiando..
+        Quote::find(intval($request->quote['id']))->update([
+            'number_adults' => $request->quote['number_adults'],
+            'number_childs' => $request->quote['number_childs']
+        ]);
+
         if($request->quote_detail_id){
             QuoteDetail::find($request->quote_detail_id)->update([
                 'price' => $request->price

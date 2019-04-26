@@ -13,7 +13,7 @@
             </v-layout>
           </v-container>
         </v-layout>
-    @endcan 
+    @endcan
     <div class="container">
         <div class="card-body">
             @if (session('status'))
@@ -41,6 +41,9 @@
                     @can('see-count-quotes')
                         <quotes></quotes>
                     @endcan
+                </div>
+                <div class="col-sm-6 col-xl-6 col-md-6">
+                    <quote-indicator></quote-indicator>
                 </div>
                 <div class="col-sm-6 col-xl-6 col-md-6">
                     @can('see-top-products')
