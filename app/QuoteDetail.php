@@ -22,6 +22,11 @@ class QuoteDetail extends Model
         return $this->hasOne(Product::class,'id','product_id');
     }
 
+    public function supplier()
+    {
+        return $this->hasOne(Supplier::class,'id','supplier_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status',1);

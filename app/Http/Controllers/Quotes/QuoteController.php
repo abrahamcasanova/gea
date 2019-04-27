@@ -34,7 +34,7 @@ class QuoteController extends Controller
         $this->validate($request, [
             'customer_order_id' => 'required',
         ]);
- 
+
         $request->merge(['currency'  => $request->currency['id']]);
 
         $quote = Quote::updateOrCreate(
@@ -46,7 +46,7 @@ class QuoteController extends Controller
         );
 
         $quote->save();
-        
+
         if(!File::exists(storage_path('app/public/pdf'))){
             File::makeDirectory(storage_path('app/public/pdf'));
         }
@@ -59,7 +59,7 @@ class QuoteController extends Controller
             $user = auth()->user();
 
             $quote->user_id = $user->id;
-            
+
             $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
                 ->get();
 
@@ -77,9 +77,8 @@ class QuoteController extends Controller
         return $quote;
     }
 
-    public function update(Quote $quote)
+    public function update(Quote $quote,Request $request)
     {
-      
         if(!File::exists(storage_path('app/public/pdf'))){
             File::makeDirectory(storage_path('app/public/pdf'));
         }
@@ -89,6 +88,10 @@ class QuoteController extends Controller
             $quote->include = str_replace("\n","\n \r",$quote->include);
             $quote->policy = str_replace("\n","\n \r",$quote->policy);
             $quote->payment = str_replace("\n","\n \r",$quote->payment);
+            $quote->fill($request->all());
+            //$quote->number_adults = $request->number_adults;
+            //$quote->number_childs = $request->number_childs;
+
             $user = auth()->user();
             $quote->user_id = $user->id;
             $destinations = Destination::whereIn('id',explode(',',$quote->customerOrder->travel_destination))
@@ -107,7 +110,7 @@ class QuoteController extends Controller
     public function show ($quote)
     {
         return Quote::with('customerOrder')->WhereStatus(1)->findOrFail($quote);
-    }   
+    }
 
     public function all()
     {
@@ -115,7 +118,7 @@ class QuoteController extends Controller
     }
 
     public function getQuote ($quote)
-    {   
+    {
         $quotes = Quote::with('customerOrder','quoteDetails')->findOrFail($quote);
         $destinations =  Destination::whereIn('id',explode(',',$quotes->customerOrder->travel_destination))
             ->get();
@@ -127,7 +130,7 @@ class QuoteController extends Controller
     public function sendQuote(Request $request)
     {
         $quote = Quote::find($request->id);
-        
+
         if(isset($quote->customerOrder->customer->email)) {
               Mail::to($quote->customerOrder->customer->email)->send(new MailQuote($quote));
         }

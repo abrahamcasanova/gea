@@ -60,8 +60,23 @@
                         </multiselect>
                     </div>
                     <div class="form-group col-md-3">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" :class="{'is-invalid': errors.last_name}" v-model="quote_detail_add.description" placeholder="descripción">
+                    </div>
+                    <div class="form-group col-md-3">
                         <label>Precio</label>
                         <vue-numeric class="form-control"  :class="{'is-invalid': errors.price}" currency="$" separator="," :precision="2" v-model="quote_detail_add.price"></vue-numeric>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Proveedor</label>
+                        <multiselect
+                          v-model="quote_detail_add.supplier_id"
+                          :options="suppliers"
+                          openDirection="bottom"
+                          track-by="id"
+                          label="name"
+                          :class="{'border border-danger rounded': errors.supplier_id}">
+                        </multiselect>
                     </div>
                     <div class="form-group col-md-3">
                         <label>&nbsp;</label><br>
@@ -94,6 +109,10 @@
                                 <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'description' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'description' && filters.orderBy.direction == 'desc'}"></i>
                               </th>
                               <th>
+                                <a href="#" class="text-dark" @click.prevent="sort('supplier_id')">Proveedor</a>
+                                <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'supplier_id' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'supplier_id' && filters.orderBy.direction == 'desc'}"></i>
+                              </th>
+                              <th>
                                 <a href="#" class="text-dark" @click.prevent="sort('url_image')">Foto</a>
                                 <i class="mr-1 fas" :class="{'fa-long-arrow-alt-down': filters.orderBy.column == 'url_image' && filters.orderBy.direction == 'asc', 'fa-long-arrow-alt-up': filters.orderBy.column == 'url_image' && filters.orderBy.direction == 'desc'}"></i>
                               </th>
@@ -104,10 +123,18 @@
                           </thead>
                           <tbody>
                               <tr v-for="(quote_detail, index) in quote_details">
-                                  <td class="">{{quote_detail.product.name}}</td>
+                                  <td class="">
+                                    <div class="media-body">
+                                      <div>{{quote_detail.product.name}}</div>
+                                      <div class="medium text-muted">
+                                        {{quote_detail.description}}
+                                      </div>
+                                    </div>
+                                  </td>
                                   <td class="">{{quote_detail.product.category}}</td>
                                   <td class="">{{ quote_detail.price | currency }}</td>
                                   <td class="">{{quote_detail.product.description}}</td>
+                                  <td class="">{{quote_detail.supplier.name}}</td>
                                   <td>
                                     <div class="media">
                                       <div class="avatar_product float-left mr-3">
@@ -176,6 +203,7 @@ export default {
       customer: {},
       quote_details:{},
       errors: {},
+      suppliers:[],
       quote_detail_add:{
           product:{
               category:null
@@ -237,6 +265,7 @@ export default {
     this.csrf = window.Laravel.csrfToken;
     this.getQuote();
     this.getProducts();
+    this.getSuppliers();
   },
   methods: {
     updated () {
@@ -292,6 +321,18 @@ export default {
         })
         .catch(error => {
             this.errors = error.response.data.errors
+        })
+    },
+    getSuppliers() {
+        axios.get('../../api/suppliers/all')
+        .then(response => {
+            this.suppliers = response.data
+        })
+        .catch(error => {
+            this.$toasted.global.error('Error!')
+        })
+        .then(() => {
+          this.loading = false
         })
     },
     addProduct(){

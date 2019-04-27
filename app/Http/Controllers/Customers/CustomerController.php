@@ -72,7 +72,7 @@ class CustomerController extends Controller
         $request->merge(['type_of_person' => $request->type_of_person['id']]);
         $request->merge(['level' => isset($request->level) ?  $request->level['id']:null]);
         $request->merge(['customer_id' => isset($request->recommended) ? $request->recommended['id']:null]);
-        
+
         $customer = Customer::find($request->id);
         $customer->fill($request->all())->save();
 
@@ -124,25 +124,29 @@ class CustomerController extends Controller
             'first_name'          => 'required',
             'last_name'           => 'required',
         ]);
-        
+
         $request->merge(['travel_month' => $request->travel_month['id']]);
         $request->merge(['with_us' => $request->with_us['id']]);
-        $request->merge(['travel_destination' => implode($request->travel_destination,',')]);        
+        $request->merge(['travel_destination' => implode($request->travel_destination,',')]);
         if($request->type && $request->type == 'public'){
-
+            $customer_check = Customer::where('email',$request->email)->first();
+            $customer_check->fill($request->all());
             $this->validate($request, [
-                'email' => 'required|email|unique:customers',
                 'cellphone' => 'required|numeric',
             ]);
 
-            $customer = Customer::create($request->all());
-            $customer->type_of_person = 'PROSPECTO';
+            $customer = isset($customer_check) ? $customer_check:Customer::create($request->all());
+            $customer->type_of_person = isset($customer_check) ?$customer_check->type_of_person:'PROSPECTO';
             $customer->save();
-            return CustomerOrder::updateOrCreate([
-                'customer_id' => $customer->id
+            $customerOrder = CustomerOrder::create($request->all());
+            $customerOrder->customer_id = $customer->id;
+            return $customerOrder;
+
+            /*return CustomerOrder::updateOrCreate([
+                  'customer_id' => $customer->id
                 ],
                 $request->all()
-            );
+            );*/
         }else{
             return CustomerOrder::updateOrCreate([
                 'customer_id' => $request->customer_id
@@ -224,7 +228,7 @@ class CustomerController extends Controller
 
     public function sendReceived(Request $request){
         $customerOrder = CustomerOrder::with('customer')->find($request->id);
-        
+
         if(isset($customerOrder->customer->email)) {
               Mail::to($customerOrder->customer->email)->send(new CustomerOrderReceived($customerOrder));
         }

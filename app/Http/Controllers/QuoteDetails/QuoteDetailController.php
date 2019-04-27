@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 class QuoteDetailController extends Controller
 {
     public function getQuoteDetailsByQuoteId(Request $request){
-        return QuoteDetail::with('product')
+        return QuoteDetail::with('product','supplier')
             ->WhereQuoteId($request->quote_id)->get();
     }
 
@@ -33,7 +33,7 @@ class QuoteDetailController extends Controller
     {
         return QuoteDetail::active()->get();
     }
-    
+
     public function destroy ($quoteDetail)
     {
 

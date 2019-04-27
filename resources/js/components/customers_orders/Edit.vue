@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div class="row justify-content-md-center">
+    <v-app id="dayspan" v-cloak>
+      <v-layout wrap>
+        <div class="row justify-content-md-center">
       <div class="card">
           <div class="col-md-12 col-xl-12">
         <div class="card-header px-0 mt-2 bg-transparent clearfix">
@@ -82,8 +84,54 @@
             </div>
             <div class="form-group col-md-8">
                 <label>Destino del viaje</label>
-                <input type="text" class="form-control" :class="{'is-invalid': errors.travel_destination}" v-model="customerOrder.travel_destination" placeholder="Destino ..">
-                <div class="invalid-feedback" v-if="errors.travel_destination">{{errors.travel_destination[0]}}</div>
+                <v-autocomplete
+                  v-model="customerOrder.travel_destination"
+                  :items="items"
+                  :loading="isLoading"
+                  :search-input.sync="search"
+                  chips
+                  :multiple="true"
+                  clearable
+                  hide-details
+                  hide-selected
+                  item-text="name"
+                  item-value="id"
+                  label="Buscar destinos"
+                  solo
+                >
+                  <template v-slot:no-data>
+                    <v-list-tile>
+                      <v-list-tile-title>
+                        Ejemplo..
+                        <strong>Riviera Maya</strong>
+                      </v-list-tile-title>
+                    </v-list-tile>
+                  </template>
+                  <template v-slot:selection="{ item, selected }">
+                    <v-chip
+                      :selected="selected"
+                      color="blue-grey"
+                      @input="remove(item)"
+                      close
+                      class="white--text"
+                    >
+                      <span v-text="item.name"></span>
+                    </v-chip>
+                  </template>
+                  <template v-slot:item="{ item }">
+                    <v-list-tile-avatar
+                      color="indigo"
+                      class="headline font-weight-light white--text"
+                    >
+                      {{ item.name.charAt(0) }}
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <v-list-tile-title v-text="item.name"></v-list-tile-title>
+                    </v-list-tile-content>
+
+                  </template>
+                </v-autocomplete>
+                <small class="form-text text-danger" v-if="errors.travel_destination">{{errors.travel_destination[0]}}</small>
             </div>
             <div class="form-group col-md-8">
                 <label>Cuantos adultos irían al viaje?</label>
@@ -110,6 +158,8 @@
       </div>
       </div>
     </div>
+      </v-layout>
+    </v-app>
   </div>
 </template>
 
@@ -129,6 +179,7 @@ export default {
               profile: {}
           },
       },
+      items: [],
       type_of_person: [
           { id: 'PROSPECTO', name: 'PROSPECTO' },
           { id: 'CLIENTE', name: 'CLIENTE' },
@@ -137,8 +188,10 @@ export default {
       type_two: { id: 'CLIENTE', name: 'CLIENTE'},
       errors: {},
       es: es,
+      isLoading: false,
       loading: true,
       submiting: false,
+      search: null,
       submitingDestroy: false,
       customerOrder: {
           customer:{
@@ -167,7 +220,16 @@ export default {
     }
   },
   mounted () {
-    this.getCustomer()
+    this.getCustomer();
+    axios.get('../../customers/all-destinations')
+    .then(response => {
+        this.items = response.data
+    })
+    .catch(err => {
+        console.log(err)
+    })
+    .finally(() => (this.isLoading = false))
+
   },
   methods: {
     getCustomer() {
@@ -271,6 +333,12 @@ export default {
           this.errors = error.response.data.errors
         })
     },
+    remove(itemRemove) {
+        const index2 = this.customerOrder.travel_destination.indexOf('id',itemRemove.id)
+        console.log(this.customerOrder.travel_destination,itemRemove.id)
+        removeMemberByValue(this.customerOrder.travel_destination, itemRemove.id);
+        if (index2 >= 0) this.customerOrder.travel_destination.splice(index2, 1)
+    },
     subGroup() {
         this.$delete(this.customer, 'subgroup_id')
         axios.post(`../../api/groups/subgroup_by_gruoup_id`, {
@@ -283,6 +351,18 @@ export default {
           this.errors = error.response.data.errors
         })
     }
+  }
+}
+
+function removeMemberByValue(arr, value) {
+  for (var i=0, iLen=arr.length; i<iLen; i++) {
+    if (arr[i] && arr[i].hasOwnProperty(value));
+      //Do 1 of the following, not both:
+      // to remove member i (i.e. there will no longer be a member i)
+      delete(arr[i]);
+      // Remove member i and shift later members -1
+      arr.splice(i, 1);
+      return arr;  // return is optional
   }
 }
 </script>

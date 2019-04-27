@@ -88,6 +88,8 @@ class CustomerOrderController extends Controller
 
         $request->merge(['travel_month' => $request->travel_month['id']]);
         $request->merge(['with_us' => $request->with_us['id']]);
+        $request->merge(['travel_destination' => implode($request->travel_destination,',')]);
+        
         $customer = CustomerOrder::find($request->id);
 
         $customer->fill($request->all())->save();

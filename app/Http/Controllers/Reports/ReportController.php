@@ -23,20 +23,20 @@ class ReportController extends Controller
     			break;
     		case 'Reporte de cotizaciones':
     			$report = Quote::with('customerOrder','user')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
-    			
+
     			break;
     		case 'Reporte de ventas':
     			$report = Sale::with('user','quote','saleDetail')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
 
     			break;
     	}
-		
-		
+
+
 		if(count($report) == 0 ){
 			return 'Sin datos';
 		}else{
 			Excel::create($request->type_report, function($excel) use($report,$request) {
-		    	
+
 		        if(count($report) > 0 ){
 		        	$collection = collect();
 		        	switch ($request->type_report) {
@@ -67,7 +67,7 @@ class ReportController extends Controller
 			    			break;
 			    		case 'Reporte de cotizaciones':
 			    			foreach ($report as $key => $value) {
-				            	
+
 				            	$destinations = Destination::whereIn('id',explode(',',$value->customerOrder->travel_destination))->get();
 				            	$status = null;
 				            	switch ($value['status']) {
@@ -83,15 +83,15 @@ class ReportController extends Controller
 				            	}
 			 					//dd($value['created_at']);
 								setlocale(LC_ALL, 'es_ES');
-								$fecha = Carbon::parse($value['created_at']);
+								$fecha = Carbon::parse($value['customerOrder']['travel_date']);
 								$fecha->format("F"); // Inglés.
 								$mes = $fecha->formatLocalized('%B');// mes en idioma español
 
 				                $collection->push([
 				                    'Folio'    	  => $value['id'],
-				                    'Agente'	  => isset($value['user']) ? $value['user']['name']:null,
-				                    'Fecha'  	  => $value['created_at'],
-				                    'Mes'		  => $mes,
+				                    'Agente'	    => isset($value['user']) ? $value['user']['name']:null,
+				                    'Fecha'  	    => $value['created_at'],
+				                    'Mes'		      => $value['customerOrder']['travel_month'],
 				                    'Cliente' 	  => $value['customerOrder']['customer']['full_name'],
 				                    'Destinos'	  => implode(', ', $destinations->pluck('name')->toArray()),
 				                    'Fecha de viaje' => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
@@ -110,7 +110,7 @@ class ReportController extends Controller
 			    		case 'Reporte de ventas':
 			    			foreach ($report as $key => $value) {
 				                $sum_payment = ProductDetailSale::where('quote_id',$value['quote_id'])->where('sale_id',$value['id'])->sum('price');
-				                
+
 				                $sumRatePrice = ProductDetailSale::where('quote_id',$value['quote_id'])->where('sale_id',$value['id'])->sum('rate_price');
 
 				                $payment = Payment::where('sale_id',$value['id'])->sum('price');
@@ -138,14 +138,14 @@ class ReportController extends Controller
 							});
 			    			break;
 			    	}
-		            
-		        }			 
+
+		        }
 			})->store('xls', storage_path('excel/exports'));
-			
+
 			return "excel/exports/{$request->type_report}.xls";
 		}
-		
+
 		//$headers = ['Content-Type: application/vnd.ms-excel'];
         //return response()->download(storage_path("excel/exports/Pagos.xls"), 'Pagos.xls', $headers);
     }
-} 
+}
