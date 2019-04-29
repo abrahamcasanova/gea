@@ -5,7 +5,7 @@
     <div class="card-group">
         <div class="card">
             <div class="card-body p-5">
-                <div class="text-center d-lg-none">
+                <div class="text-center">
                     <img src="{{asset('/public/img/logo_dark.png')}}" class="mb-5" width="150" alt="New sun Logo">
                 </div>
                 <h1>{{ __('Login') }}</h1>

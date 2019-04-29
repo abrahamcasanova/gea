@@ -112,6 +112,11 @@ class QuoteController extends Controller
         return Quote::with('customerOrder')->WhereStatus(1)->findOrFail($quote);
     }
 
+    public function showWhereId($quote)
+    {
+        return Quote::with('customerOrder')->findOrFail($quote);
+    }
+
     public function all()
     {
         return Quote::with('customerOrder')->WhereStatus(2)->get();

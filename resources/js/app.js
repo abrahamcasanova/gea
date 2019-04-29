@@ -40,10 +40,11 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import App from './components/folder/App.vue';
 import VueInternationalization from 'vue-i18n';
 import 'timeline-vuejs/dist/timeline-vuejs.css';
+import vueUrlParameters from 'vue-url-parameters';
 import Locale from './vue-i18n-locales.generated';
 import lang_es from 'element-ui/lib/locale/lang/es';
 import VueContentPlaceholders from 'vue-content-placeholders';
- import Permissions from './components/Permissions';
+import Permissions from './components/Permissions';
 
 Vue.use(UUID);
 locale.use(lang_es);
@@ -261,7 +262,7 @@ export default {
     Datepicker,
     Timeline
   },
-  mixins: [Vue2Filters.mixin],
+  mixins: [Vue2Filters.mixin,vueUrlParameters],
 }
 
 

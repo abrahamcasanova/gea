@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/store-order', 'QuoteController@storeOrder');
             Route::get('/count', 'QuoteController@count');
             Route::get('/{quote}', 'QuoteController@show')->middleware('permission:read-quotes');
+            Route::get('by-id/{quote}', 'QuoteController@showWhereId')->middleware('permission:read-quotes');
             Route::get('/order/{quote}', 'QuoteController@order');
             Route::post('/get-track', 'QuoteController@getTrack')->middleware('permission:create-quotes');
             Route::post('/store-track', 'QuoteController@storeTrack')->middleware('permission:create-quotes');

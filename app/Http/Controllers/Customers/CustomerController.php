@@ -140,6 +140,7 @@ class CustomerController extends Controller
             $customer->save();
             $customerOrder = CustomerOrder::create($request->all());
             $customerOrder->customer_id = $customer->id;
+            $customerOrder->save();
             return $customerOrder;
 
             /*return CustomerOrder::updateOrCreate([

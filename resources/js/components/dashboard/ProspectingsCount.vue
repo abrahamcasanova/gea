@@ -12,8 +12,14 @@
           :fields="tableFields"
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
-          :tbody-tr-class="rowClass"
-        ></b-table>
+          :tbody-tr-class="rowClass">
+          <template slot="actions" slot-scope="row">
+            <a :href="`./quotes/track-quote?id=${row.item.quote.id}`" class="btn btn-primary">
+              Actualizar
+            </a>
+          </template>
+
+        </b-table>
       </div>
     </div>
   </div>
@@ -51,7 +57,7 @@ export default {
       sortDesc: false,
       tableFields: [
         { key: 'id', sortable: true },
-        { key: 'quote.customer_order.customer.full_name',label:'Cliente', 
+        { key: 'quote.customer_order.customer.full_name',label:'Cliente',
         sortable: true, status:'awesome'},
         { key: 'quote.customer_order.customer.cellphone',label:'Celular', sortable: true },
         { key: 'user.name', sortable: true,label:'Agente' },
@@ -59,6 +65,7 @@ export default {
         { key: 'comments', sortable: true,label:'Comentario' },
         { key: 'contact_date', sortable: true,label:'Fecha de contacto' },
         { key: 'days', sortable: true,label:'Días transcurridos' },
+        { key: 'actions', sortable: true,label:'Acciones' },
       ],
       pagination: {
         sortBy: 'name'

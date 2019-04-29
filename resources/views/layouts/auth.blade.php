@@ -30,7 +30,7 @@
     <!-- Scripts -->
     <script src="{{ asset('/public/js/app.js') }}" defer></script>
 
-    <script> 
+    <script>
     if ('serviceWorker' in navigator ) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register("{{asset('public/service-worker.js')}}").then(function(registration) {

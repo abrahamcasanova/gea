@@ -87,7 +87,7 @@
                               {{item.comment}}
                             </v-flex>
                             <v-flex xs2>
-                                <i class="fa-4x far fa-calendar-alt"></i>                        
+                                <i class="fa-4x far fa-calendar-alt"></i>
                             </v-flex>
                           </v-layout>
                         </v-card-text>
@@ -106,6 +106,8 @@ var csrf_token = $('meta[name="csrf-token"]').attr('content');
 import Datepicker from 'vuejs-datepicker';
 import {en, es} from 'vuejs-datepicker/dist/locale'
 import moment from 'moment'
+import vueUrlParameters from 'vue-url-parameters';
+
 const theme = 'red';
 
 export default {
@@ -119,6 +121,10 @@ export default {
       quotes: [],
       errors: {},
       timeline: [],
+      searchParams: {
+        q: null,
+        type: 'all'
+      },
       options: [
         { name: 'Llamada',      value: 'Llamada' },
         { name: 'Mensaje',      value: 'Mensaje' },
@@ -139,7 +145,7 @@ export default {
   methods: {
       fullQuote ({ id, customer_order }) {
           if(id){
-             return `Folio: ${id} | ${customer_order.customer.full_name}`  
+             return `Folio: ${id} | ${customer_order.customer.full_name}`
           }
       },
       customFormatter(date) {
@@ -177,6 +183,18 @@ export default {
         axios.get(`../api/quotes/all`)
         .then(response => {
           this.quotes = response.data
+          let uri = window.location.search.substring(1);
+          let params = new URLSearchParams(uri);
+          if(params.get('id')){
+              axios.get(`../api/quotes/by-id/` + params.get('id'))
+              .then(response => {
+                  this.track.quote_id =  response.data
+                  this.onChange();
+              })
+              .catch(error => {
+                  this.errors = error.response.data.errors
+              })
+          }
         })
       },
       nameWithLang ({ first_name, last_name, branches }) {
