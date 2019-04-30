@@ -35,7 +35,9 @@ class SaleController extends Controller
             $query->where('id', 'LIKE', '%'.$request->search.'%');
         }
 
-        $sales = $query->with('product','quote','user','supplier')->Active()->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))->paginate($request->input('pagination.per_page'));
+        $sales = $query->withTrashed()->with('product','quote','user','supplier')->Active()
+            ->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
+            ->paginate($request->input('pagination.per_page'));
 
         return $sales;
     }
@@ -202,7 +204,7 @@ class SaleController extends Controller
     }
 
     public function getSale($sale){
-        $sale = Sale::with('product','quote','user','supplier','quoteDetail')->findOrFail($sale);
+        $sale = Sale::withTrashed()->with('product','quote','user','supplier','quoteDetail')->findOrFail($sale);
         $destinations =  Destination::whereIn('id',explode(',',$sale->travel_destination))
             ->get();
 
@@ -402,6 +404,7 @@ class SaleController extends Controller
     {
         $sale = Sale::find($sale);
         Quote::where('id',$sale->quote_id)->delete();
-        return Sale::destroy($sale);
+        $sale->delete();
+        return 'success';
     }
 }

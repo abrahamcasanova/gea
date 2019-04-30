@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sale extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
       'price',
       'travel_destination',
@@ -31,6 +34,8 @@ class Sale extends Model
       'status',
     ];
 
+    protected $dates = ['deleted_at'];
+
     public function product()
     {
         return $this->hasOne(Product::class,'id','product_id')->with('product_types');
@@ -38,7 +43,7 @@ class Sale extends Model
 
     public function quote()
     {
-        return $this->hasOne(Quote::class,'id','quote_id')->with('customerOrder','quoteDetails');
+        return $this->hasOne(Quote::class,'id','quote_id')->with('customerOrder','quoteDetails')->withTrashed();
     }
 
     public function quoteDetail()

@@ -3,9 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerOrder extends Model
 {
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+    
     protected $fillable = [
         'travel_month',
         'travel_date',

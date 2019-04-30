@@ -63,7 +63,7 @@ class PaymentController extends Controller
         $customer =  Customer::find($request->customer_id);
         $payment = Payment::with('sale')->create($request->all());
         $payment->authorization_number = $request->authorization_number;
-        $sale = Sale::with('quote','payments')->where('id',$payment->sale_id)->first();
+        $sale = Sale::withTrashed()->with('quote','payments')->where('id',$payment->sale_id)->first();
 
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
@@ -131,7 +131,7 @@ class PaymentController extends Controller
         $payment->authorization_number = $request->authorization_number;
         $payment->fill($request->all())->save();
 
-        $sale = Sale::with('quote','payments')->where('id',$payment->sale_id)->first();
+        $sale = Sale::withTrashed()->with('quote','payments')->where('id',$payment->sale_id)->first();
 
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
@@ -159,6 +159,17 @@ class PaymentController extends Controller
     public function destroy($payment)
     {
         return Payment::destroy($payment);
+    }
+
+    public function saveConfirm(Request $request){
+        Payment::findOrFail($request->id)->update([
+          'confirm'         => 1,
+          'break'           => $request->break,
+          'note'            => $request->note,
+          'date_received'   => $request->date_received
+        ]);
+
+        return Payment::findOrFail($request->id);
     }
 
     public function getPayment($payment){

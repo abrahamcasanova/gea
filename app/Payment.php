@@ -19,6 +19,10 @@ class Payment extends Model
       'deposit_date',
       'payment_date',
       'comments',
+      'confirm',
+      'break',
+      'note',
+      'date_received',
       'path',
       'status',
       'customer_id',
@@ -43,6 +47,7 @@ class Payment extends Model
 
     public function sale()
     {
-        return $this->hasOne(Sale::class,'id','sale_id')->with('product','saleDetail','quote','quoteDetail');
+        return $this->hasOne(Sale::class,'id','sale_id')
+          ->with('product','saleDetail','quote','quoteDetail')->withTrashed();
     }
 }

@@ -3,7 +3,7 @@
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <h4 class="float-left pt-2">Ventas</h4>
       <div class="card-header-actions mr-1">
-         
+
       </div>
     </div>
     <div class="card-body px-0">
@@ -82,15 +82,19 @@
                 <td class="">{{ sale.id }}</td>
                 <td class="">{{ sale.quote ? sale.quote.customer_order.customer.full_name:null }}</td>
                 <td class="">{{ sale.quote ? sale.quote.customer_order.customer.cellphone:null }}</td>
-                <td class="">{{ sale.price | currency }}</td> 
+                <td class="">{{ sale.price | currency }}</td>
                 <td class="">{{ sale.date_payment_limit }}</td>
                 <td class="">{{ sale.date_payment_supplier }}</td>
                 <td class="">{{ sale.date_advance }}</td>
                 <td class="">{{ sale.schedule}} / {{ sale.amount_receivable | currency }}</td>
 
                 <td class="">
-                    <label v-if="sale.status == 1">Activo</label>
-                    <label v-else>Inactivo</label>
+                    <a v-if="!sale.deleted_at" class="badge badge-success text-white">
+                        Activo
+                    </a>
+                    <a v-else class="badge badge-danger text-white">
+                        Cancelado
+                    </a>
                 </td>
                 <td class="">
                   <small>{{sale.created_at | moment("LL")}}</small> - <small class="text-muted">{{sale.created_at | moment("LT")}}</small>
@@ -112,7 +116,7 @@
                     <i class="fa-lg fas fa-hand-holding-usd"></i>
                   </a>
                   <a v-if="$can('update-sales')" href="#" @click="editSale(sale.id)" class="card-header-action ml-1 text-muted"><i class="fa-lg fas fa-pencil-alt"></i></a>
-                  <a v-if="$can('delete-sales')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(sale.id)">
+                  <a v-if="$can('delete-sales') && !sale.deleted_at" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(sale.id)">
                       <i class="fa-lg fas fa-spinner fa-spin" v-if="submitingDestroy"></i>
                       <i class="fa-lg far fa-trash-alt" v-else></i>
                       <span class="d-md-down-none ml-1"></span>
@@ -159,7 +163,7 @@
           <div class="d-block">
             <div class="col-md-12 card-body px-0">
               <div class="row">
-                  <iframe :src="path_pdf" style="width:100%" height="420"></iframe> 
+                  <iframe :src="path_pdf" style="width:100%" height="420"></iframe>
               </div>
             </div>
           </div>
@@ -287,11 +291,11 @@ export default {
             this.details = response.data
             this.$refs.myModalRef.show()
             if(response.data.path){
-                this.path_pdf = './storage/app/public/pdf/sales/' + response.data.path;  
+                this.path_pdf = './storage/app/public/pdf/sales/' + response.data.path;
             }else{
                 this.path_pdf = null;
             }
-            
+
         })
         .catch(error => {
             this.$toasted.global.error('Venta no encontrada!')
@@ -378,7 +382,7 @@ export default {
                 }
                 window.open("https://wa.me/52"+ data.quote.customer_order.customer.cellphone +"?text=Estimado " + data.quote.customer_order.customer.full_name + ", adjunto encontrará la venta con destino a " + travel,'_blank');
             }
-            
+
         })
         .catch(error => {
             this.$toasted.global.error('telefono no encontrada!',error)
@@ -386,7 +390,7 @@ export default {
         .then(() => {
           this.loading = false
         })
-        
+
     },
     getSales () {
       this.loading = true

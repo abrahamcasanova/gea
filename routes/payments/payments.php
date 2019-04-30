@@ -7,7 +7,7 @@ Route::middleware('auth')->group(function () {
             Route::view('/create/{id}', 'payments.create')->middleware('permission:create-payments');
             Route::view('/{payment}/edit', 'payments.edit')->middleware('permission:update-payments');
         });
- 
+
         // api
         Route::group(['prefix' => 'api/payments'], function() {
             Route::get('/get-payment/{payment}', 'PaymentController@getPayment');
@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permission:read-payments');
             Route::get('/{payment}', 'PaymentController@show')->middleware('permission:read-payments');
             Route::post('/store', 'PaymentController@store')->middleware('permission:create-payments');
+            Route::post('/save-confirm', 'PaymentController@saveConfirm');
             Route::put('/update/{payment}', 'PaymentController@update')->middleware('permission:update-payments');
             Route::delete('/{payment}', 'PaymentController@destroy')->middleware('permission:delete-payments');
         });

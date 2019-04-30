@@ -1,9 +1,17 @@
 <template>
   <div class="container">
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
-
       <div class="card-header-actions mr-1">
-
+        <b-col md="12" class="my-1">
+          <b-form-group label-cols-sm="3" class="mb-0">
+            <b-input-group>
+              <b-form-input v-model="Bfilter" placeholder="Buscar.."></b-form-input>
+              <b-input-group-append>
+                <b-button :disabled="!Bfilter" @click="Bfilter = ''">Borrar</b-button>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+        </b-col>
       </div>
     </div>
     <!--
@@ -139,8 +147,18 @@
           </h4>
         </div>
         <div class="card-body px-0">
-          <b-table :items="payments" :fields="tableFields" striped>
+          <b-table :items="payments" :fields="tableFields" :filter="Bfilter"
+          :current-page="currentPage" :per-page="perPage" @filtered="onFiltered" striped>
+            <template slot="confirm" slot-scope="row">
+                <center>
+                  <span v-if="row.item.confirm == 1" class='badge badge-primary'>SI</span>
+                  <span v-else class='badge badge-secondary'>NO</span>
+                </center>
+            </template>
             <template slot="actions" slot-scope="payment">
+              <a href="#" @click="modalPayment(payment.item.id)" v-if="$can('take-payment-sales')" class="card-header-action ml-1 text-muted">
+                <i class="fa-lg fas fa-check-double"></i>
+              </a>
               <a href="#" v-if="$can('read-payments')" data-toggle="tooltip" data-placement="bottom" title="Ver recibo" @click="getReceiptPayment(payment.item.id)" class="card-header-action ml-1 text-muted">
                 <i class="fa-lg fas fa-info-circle text-primary"></i>
               </a>
@@ -152,6 +170,17 @@
               </a>
             </template>
           </b-table>
+
+          <b-row>
+           <b-col md="6" class="my-1">
+             <b-pagination
+               v-model="currentPage"
+               :total-rows="totalRows"
+               :per-page="perPage"
+               class="my-0"
+             ></b-pagination>
+           </b-col>
+         </b-row>
         </div>
       </div>
     </div>
@@ -167,31 +196,73 @@
       </div>
       <b-button class="mt-3" variant="outline-success" block @click="hideModal">Cerrar</b-button>
     </b-modal>
+
+    <!-- Modal Component -->
+    <b-modal size="lg" id="modal2" ref="myModalRef2" hide-footer title="Confirmar">
+      <div class="d-block">
+        <div class="col-md-12 card-body px-0">
+          <div class="row">
+            <div class="form-group col-md-6">
+                <label>Corte</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.break}" v-model="payment.break" placeholder="">
+                <div class="invalid-feedback" v-if="errors.break">{{errors.break[0]}}</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Fecha en que se recibe</label>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterLimit" v-model="payment.date_received" :input-class="{'is-invalid': errors.date_payment_limit}"></datepicker>
+                <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
+            </div>
+            <div class="form-group col-md-12">
+                <label>Nota</label>
+                <b-form-textarea
+                  v-model="payment.note"
+                  placeholder="Nota..."
+                  rows="6"
+                  max-rows="6"
+                ></b-form-textarea>
+                <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <b-button class="mt-3" variant="outline-primary" block @click="saveConfirm()">Confirmar</b-button>
+    </b-modal>
   </div>
 </template>
 
 <script>
 let csrf_token = $('meta[name="csrf-token"]').attr('content');
+import {en, es} from 'vuejs-datepicker/dist/locale'
+import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
+
 export default {
+  components: {
+      Datepicker,
+  },
   data () {
     return {
       payments: [],
+      payment:{},
       docs: [],
+      totalRows: 1,
+      currentPage: 1,
+      errors:{},
+      es:es,
+      perPage: 10,
+      pageOptions: [5, 10, 15],
+      Bfilter: null,
       tableFields: [
-        /*<span v-if="payment.sale.sale_detail" v-for="(list, index) in payment.sale.sale_detail">
-          <h5>
-            <span style="margin-left:5px;" class="badge badge-pill badge-info text-white"> {{list.confirmation}} </span>
-          </h5>
-        </span>*/
-
-        { key: 'id', sortable: true },
+        { key: 'id', label:'Folio',sortable: true },
         { key: 'customer.full_name',label:'Cliente',sortable: true,},
         { key: 'price',label:'Precio', sortable: true },
         { key: 'authorization_number', sortable: true,label:'Autorización' },
+        { key: 'deposit_date', sortable: true,label:'Fecha deposito' },
         { key: 'user.name', sortable: true,label:'Agente' },
         { key: 'type_of_payment', sortable: true,label:'Forma de pago' },
+        { key: 'confirm', sortable: true,label:'Confirmado' },
         { key: 'created_at', sortable: true,label:'Registrado' },
-        { key: 'actions', sortable: true,label:'Acciones' },
+        { key: 'actions', sortable: false,label:'Acciones' },
       ],
       filters: {
         pagination: {
@@ -243,14 +314,24 @@ export default {
         title: 'Information',
       });
     },
-    hideModal() {
-        this.$refs.myModalRef.hide()
+    saveConfirm() {
+        axios.post('./api/payments/save-confirm',this.payment).then(response => {
+            this.$refs.myModalRef2.hide();
+            location.href = './payments'
+        });
+    },
+    customFormatterLimit(date) {
+        this.payment.date_received = moment(date).format('YYYY/MM/DD');
+        return moment(date).format('YYYY/MM/DD');
+    },
+    onFiltered(filteredItems) {
+      this.totalRows = filteredItems.length
+      this.currentPage = 1
     },
     getReceiptPayment(paymentId){
         axios.get(`./api/payments/get-payment/` + paymentId)
         .then(response => {
             this.$refs.myModalRef.show()
-            console.log(response.data)
             if(response.data.path){
                 this.path_pdf = './storage/app/public/pdf/payments/' + response.data.path;
             }else{
@@ -265,6 +346,13 @@ export default {
           this.loading = false
         })
     },
+    hideModal() {
+        this.$refs.myModalRef.hide()
+    },
+    modalPayment(paymentId){
+          this.payment.id = paymentId;
+          this.$refs.myModalRef2.show();
+    },
     getPayments () {
       this.loading = true
       this.payments = []
@@ -274,6 +362,7 @@ export default {
       axios.post(`./api/payments/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
         this.payments = response.data.data
+        this.totalRows = this.payments.length
         delete response.data.data
         this.filters.pagination = response.data
         this.loading = false
