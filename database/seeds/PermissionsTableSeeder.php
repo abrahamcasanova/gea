@@ -528,6 +528,24 @@ class PermissionsTableSeeder extends Seeder
                 'display_name' => 'Eliminar',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
+            ],
+            [
+                'name' => 'confirm-payments',
+                'display_name' => 'Confirmar pagos',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'export-payments',
+                'display_name' => 'Reporte de pagos',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'send-mail-payment',
+                'display_name' => 'Enviar pago por correo',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
             ]
         ]);
 
@@ -599,7 +617,7 @@ class PermissionsTableSeeder extends Seeder
                 'display_name' => 'Visualizar Contador(Cotizaciones)',
                 'guard_name' => 'web',
                 'module_id' => $moduleId
-            ], 
+            ],
             [
                 'name' => 'see-tracing',
                 'display_name' => 'Visualizar Tabla de Seguimiento',

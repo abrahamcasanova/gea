@@ -33,8 +33,6 @@ export default {
       axios.get(`./api/quote-tracks/count-quotes`)
       .then(response => {
         this.quotes = response.data
-        console.log(response.data)
-
       })
     },
   }

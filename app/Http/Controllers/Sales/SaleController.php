@@ -298,7 +298,7 @@ class SaleController extends Controller
 
         $user = auth()->user();
 
-        $request->merge(['product_id'  => $request->product_id[0]['id']]);
+        $request->merge(['product_id'  => null]);
         $request->merge(['supplier_id' => isset($request->supplier_id[0]) ? $request->supplier_id[0]['id']:$request->supplier_id['id']]);
 
 

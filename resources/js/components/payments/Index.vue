@@ -147,7 +147,8 @@
           </h4>
         </div>
         <div class="card-body px-0">
-          <b-table :items="payments" :fields="tableFields" :filter="Bfilter"
+        <div class="table-responsive">
+          <b-table class="table" :items="payments" :fields="tableFields" :filter="Bfilter"
           :current-page="currentPage" :per-page="perPage" @filtered="onFiltered" striped>
             <template slot="confirm" slot-scope="row">
                 <center>
@@ -156,11 +157,14 @@
                 </center>
             </template>
             <template slot="actions" slot-scope="payment">
-              <a href="#" @click="modalPayment(payment.item.id)" v-if="$can('take-payment-sales')" class="card-header-action ml-1 text-muted">
-                <i class="fa-lg fas fa-check-double"></i>
+              <a href="#" @click="modalPayment(payment.item.id)" v-if="$can('confirm-payments')" class="card-header-action ml-1 text-muted">
+                <i class="fa-lg fas fa-check-double" style="color:#4dbd74"></i>
               </a>
               <a href="#" v-if="$can('read-payments')" data-toggle="tooltip" data-placement="bottom" title="Ver recibo" @click="getReceiptPayment(payment.item.id)" class="card-header-action ml-1 text-muted">
                 <i class="fa-lg fas fa-info-circle text-primary"></i>
+              </a>
+              <a href="#" v-if="$can('send-mail-payment')" @click="sendMail(payment.item.id)" data-toggle="tooltip" data-placement="bottom" title="Enviar correo" class="card-header-action ml-1 text-muted">
+                <i class="fa-lg fas fa-envelope" style="color:#ffa000"></i>
               </a>
               <a href="#" v-if="$can('update-payments')" @click="editPayment(payment.item.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt fa-lg"></i></a>
               <a  v-if="$can('delete-payments')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(payment.item.id)">
@@ -170,7 +174,6 @@
               </a>
             </template>
           </b-table>
-
           <b-row>
            <b-col md="6" class="my-1">
              <b-pagination
@@ -181,6 +184,7 @@
              ></b-pagination>
            </b-col>
          </b-row>
+        </div>
         </div>
       </div>
     </div>
@@ -314,6 +318,40 @@ export default {
         title: 'Information',
       });
     },
+    sendMail(paymentId){
+        swal({
+          title: "¿Estás seguro?",
+          text: "Desea enviar el correo",
+          icon: "warning",
+          buttons: ['Cancelar','Enviar'],
+          dangerMode: false,
+        })
+        .then((willSented) => {
+          if (willSented) {
+              swal("Enviando..", {
+                  icon: 'info',
+                  buttons: false,
+              });
+
+              axios.post(`./api/payments/send-payment`,{
+                id: paymentId
+              })
+              .then(response => {
+                  swal("Enviado correctamente!", {
+                    icon: 'success',
+                    buttons: false,
+                  });
+              })
+              .catch(error => {
+                  this.$toasted.global.error('Error!' + error)
+              })
+              .then(() => {
+                this.loading = false
+              })
+          }
+          this.submitingDestroy = false
+        })
+    },
     saveConfirm() {
         axios.post('./api/payments/save-confirm',this.payment).then(response => {
             this.$refs.myModalRef2.hide();
@@ -361,9 +399,9 @@ export default {
 
       axios.post(`./api/payments/filter?page=${this.filters.pagination.current_page}`, this.filters)
       .then(response => {
-        this.payments = response.data.data
+        this.payments = response.data
         this.totalRows = this.payments.length
-        delete response.data.data
+        delete response.data
         this.filters.pagination = response.data
         this.loading = false
       })

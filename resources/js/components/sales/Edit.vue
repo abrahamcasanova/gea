@@ -36,9 +36,11 @@
               <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterLimit" v-model="sale.date_payment_limit" :input-class="{'is-invalid': errors.date_payment_limit}"></datepicker>
               <small class="invalid-feedback" v-if="errors.email">{{errors.email[0]}}</small>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6" style="display:none;">
                 <label>Fecha de pagar al proveedor</label>
-                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterSupplier" v-model="sale.date_payment_supplier" :input-class="{'is-invalid': errors.date_payment_supplier}"></datepicker>
+                <!--
+                  <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterSupplier" v-model="sale.date_payment_supplier" :input-class="{'is-invalid': errors.date_payment_supplier}"></datepicker>
+                -->
                 <small class="invalid-feedback" v-if="errors.date_payment_supplier">{{errors.date_payment_supplier[0]}}</small>
             </div>
             <div class="form-group col-md-6">
@@ -290,6 +292,7 @@ export default {
       saleTable:{},
       saleEdit: {},
       sale:{
+          amount_receivable: 0,
           events:[],
           quote:{
             currency:null
@@ -351,7 +354,6 @@ export default {
   },
   methods: {
     productName ({ product }) {
-      console.log(product['name'])
       return `${product['name']}`
     },
     quote_sale(){
@@ -649,7 +651,7 @@ export default {
             if(response.data.supplier){
               this.sale.supplier_id = [response.data.supplier];
             }
-
+            this.sale.amount_receivable = response.data.amount_receivable != null ? response.data.amount_receivable:0;
             this.sale.quote.currency = [{'id': response.data.quote.currency, 'name': response.data.quote.currency}];
 
             this.getDetails();

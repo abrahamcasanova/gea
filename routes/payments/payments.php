@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{payment}', 'PaymentController@show')->middleware('permission:read-payments');
             Route::post('/store', 'PaymentController@store')->middleware('permission:create-payments');
             Route::post('/save-confirm', 'PaymentController@saveConfirm');
+            Route::post('/send-payment', 'PaymentController@sendPaymentMail');
             Route::put('/update/{payment}', 'PaymentController@update')->middleware('permission:update-payments');
             Route::delete('/{payment}', 'PaymentController@destroy')->middleware('permission:delete-payments');
         });

@@ -153,10 +153,10 @@ class QuoteTrackController extends Controller
             $cDate = Carbon::parse($quote->created_at);
             $quote->passDate = $cDate->diffInDays();
 
-            if($cDate->diffInDays() <= 2){
+            if($cDate->diffInDays() <= 1){
               $quote->statusIndicator = 'EN TIEMPO';
               $quote->type = 'text-success';
-            }else if($cDate->diffInDays() == 3 || $cDate->diffInDays() == 4){
+            }else if($cDate->diffInDays() == 2 || $cDate->diffInDays() == 3){
               $quote->statusIndicator = 'DAR ATENCIÓN';
               $quote->type = 'text-warning';
             }else{

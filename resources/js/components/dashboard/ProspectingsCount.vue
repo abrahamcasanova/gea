@@ -7,7 +7,9 @@
         </h4>
       </div>
       <div class="card-body px-0">
+        <div class="table-responsive">
         <b-table
+          class="table"
           :items="items"
           :fields="tableFields"
           :sort-by.sync="sortBy"
@@ -18,8 +20,8 @@
               Actualizar
             </a>
           </template>
-
         </b-table>
+        </div>
       </div>
     </div>
   </div>
@@ -105,9 +107,9 @@ export default {
             let childDay = childData.contact_date;
             let days_trans = today_moment.diff(childDay,'days')
             let type =  null;
-            if(days_trans <= 2){
+            if(days_trans <= 1){
               type = 'text-success';
-            }else if(days_trans == 3 || days_trans == 4){
+            }else if(days_trans == 2 || days_trans == 3){
               type = 'text-warning';
             }
             else{

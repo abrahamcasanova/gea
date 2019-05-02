@@ -26,8 +26,7 @@ class PaymentController extends Controller
             $query->where('name', 'LIKE', '%'.$request->search.'%');
         }
 
-        $payment = $query->with('user','customer','sale')->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
-                    ->paginate($request->input('pagination.per_page'));
+        $payment = $query->with('user','customer','sale')->get();
 
         return $payment;
     }
@@ -72,12 +71,26 @@ class PaymentController extends Controller
         $destinations = Destination::whereIn('id',explode(',',$payment->sale->travel_destination))
                 ->get();
 
-        $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance'))
+        $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance','sale'))
             ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
             ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/payments/'."{$payment->id}.pdf"));
 
         $payment->path = "{$payment->id}.pdf";
         $payment->save();
+        /*
+        if(isset($customer->email)){
+            Mail::to($customer->email)
+                ->send(new PaymentMail($payment,$customer));
+        }
+        */
+
+        return response()->json(true);
+    }
+
+    public function sendPaymentMail(Request $request){
+        $payment =  Payment::find($request->id);
+        $customer =  Customer::find($payment->customer_id);
+
         if(isset($customer->email)){
             Mail::to($customer->email)
                 ->send(new PaymentMail($payment,$customer));
@@ -85,6 +98,7 @@ class PaymentController extends Controller
 
         return response()->json(true);
     }
+
 
     /**
      * Display the specified resource.
@@ -131,7 +145,7 @@ class PaymentController extends Controller
         $payment->authorization_number = $request->authorization_number;
         $payment->fill($request->all())->save();
 
-        $sale = Sale::withTrashed()->with('quote','payments')->where('id',$payment->sale_id)->first();
+        $sale = Sale::withTrashed()->with('quote','payments','saleDetail')->where('id',$payment->sale_id)->first();
 
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
@@ -140,7 +154,7 @@ class PaymentController extends Controller
         $destinations = Destination::whereIn('id',explode(',',$payment->sale->travel_destination))
                 ->get();
 
-        $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance'))
+        $pdf = PDF::loadView('payments.pdf.receipt',compact('payment','user','destinations','balance','sale'))
             ->setOptions(['font_dir' => public_path().'/fonts/dompdf/fonts/','defaultFont' => 'Helvetica','isHtml5ParserEnabled' => true])
             ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/payments/'."{$payment->id}.pdf"));
 

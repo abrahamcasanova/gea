@@ -6,11 +6,12 @@
 
     <style type="text/css">
         @page {
-            margin: 0px;
+            margin: 25px;
         }
 
         body {
-            margin: 0px;
+            margin: 10px;
+            font-size: x-small;
         }
 
         * {
@@ -49,7 +50,7 @@
         }
 
         .information .logo {
-            margin: 5px;
+            margin: 2px;
         }
 
         .information table {
@@ -71,7 +72,7 @@
                 </h4>
             </td>
             <td align="center">
-                <img src="{{ public_path()}}/img/logo_dark.png" alt="Logo" width="120" class="logo"/>
+                <img src="{{ public_path()}}/img/logo_dark.png" alt="Logo" width="110" class="logo"/>
             </td>
             <td align="right" style="width: 50%;">
                 <strong>FOLIO: {{$payment->id}}</strong>
@@ -86,10 +87,25 @@
 
     </table>
 </div>
-
-
 <br/>
-
+<div class="form-group">
+  <div class="row">
+    <div class="col-sm-12">
+        <strong>Ocupación: </strong>
+        @if($sale->simple_room) Habitación sencilla: {{$sale->simple_room}} @endif @if($sale->double_room) Habitación doble: {{$sale->double_room}} @endif @if($sale->triple_room) Habitación tripe: {{$sale->triple_room}} @endif @if($sale->quadruple_room) Habitación cuadruple: {{$sale->quadruple_room}} @endif
+    </div>
+    <div class="col-sm-12">
+        <strong>Adultos: </strong>
+        {{$sale->quote->number_adults}} <br>
+        <strong>Menores: </strong>
+        {{$sale->quote->number_childs}}
+    </div>
+    <div class="col-sm-12">
+        <strong>Hotel/Servicio: </strong>
+        {{ $sale->saleDetail->implode('product.name',', ') }}
+    </div>
+  </div>
+</div>
 <div class="invoice">
     <h4>Detalle</h4>
     <table width="100%">
@@ -98,14 +114,14 @@
             <th>Folio</th>
             <th>Forma de pago</th>
             @if($payment->authorization_number)
-                <th>No. Autorización</th>    
+                <th>No. Autorización</th>
             @endif
             @if($payment->percentage)
                 <th>Porcentaje</th>
             @endif
             @if($payment->deposit_date)
                     <th>Fecha Deposito</th>
-                @endif 
+                @endif
             <th>Total</th>
         </tr>
         </thead>
@@ -145,6 +161,17 @@
         </tr>
         </tfoot>
     </table>
+    <div style="margin-top:250px;" class="form-group">
+      <div class="row">
+        <div class="col-sm-12">
+            <center>
+            ___________________________________________
+            <br>
+            <label style="margin-top:5px;"><strong>Enterado</strong></label>
+            </center>
+        </div>
+      </div>
+    </div>
 </div>
 <div class="information" style="position: absolute; bottom: 0;">
     <table width="100%">

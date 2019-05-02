@@ -44,8 +44,8 @@
                     </div>
 
                     <div class="form-group col-md-12">
-                        <label>Tabla</label>
-                       
+                        <label>___</label>
+
                     </div>
 
                     <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="exportReport">
@@ -93,6 +93,10 @@ export default {
       this.typeReports.push('Reporte de ventas');
     }
 
+    if(this.$can('export-payments')){
+      this.typeReports.push('Reporte de pagos');
+    }
+
   },
   methods: {
       exportReport () {
@@ -104,11 +108,20 @@ export default {
             params: this.report
           })
           .then(response => {
-            
-            window.location = './storage/' + response.data;
-            this.submiting = false;
-            this.$toasted.global.error('Exportado correctamente!')
-            this.report.type_report = this.report.initial_date = this.report.final_date = null;
+
+            if(response.data != 'Sin datos'){
+                window.location = './storage/' + response.data;
+                this.submiting = false;
+                this.$toasted.global.error('Exportado correctamente!')
+                this.report.type_report = this.report.initial_date = this.report.final_date = null;
+            }else{
+              swal("Error, No existe información para mostrar", {
+                  icon: 'error',
+                  buttons: false,
+                  timer: 3000
+              });
+              this.submiting = false;
+            }
           })
           .catch(error => {
             this.errors = error.response.data.errors

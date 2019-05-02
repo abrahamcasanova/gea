@@ -113,7 +113,7 @@ class ProductController extends Controller
                     'category'    => null,
                     'created_at'  => null,
                     'description' => null,
-                    'id'          => null,
+                    'id'          => $value['id'],
                     'price'       => null,
                     'product'     => $value,
                     'product_id'  => $value['id'],
