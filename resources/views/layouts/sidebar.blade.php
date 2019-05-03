@@ -88,6 +88,13 @@
                     </ul>
                 </li>
             @endcan
+            @can('read-general-config')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('/general_config')}}">
+                        <i class="nav-icon fas fa-tools"></i> Configuración Gral
+                    </a>
+                </li>
+            @endcan
         </ul>
     </nav>
     <sidebar></sidebar>

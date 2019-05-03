@@ -632,6 +632,29 @@ class PermissionsTableSeeder extends Seeder
             ],
         ]);
 
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'general_config',
+            'display_name' => 'Configuración General',
+            'icon' => 'icon-graph'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-general-config',
+                'display_name' => 'Ver Configuración General',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-general-config',
+                'display_name' => 'Actualizar Configuración General',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
         // Assign permissions to admin role
         $admin = Role::findByName('admin');
         $admin->givePermissionTo(Permission::all());

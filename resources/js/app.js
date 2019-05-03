@@ -45,7 +45,10 @@ import Locale from './vue-i18n-locales.generated';
 import lang_es from 'element-ui/lib/locale/lang/es';
 import VueContentPlaceholders from 'vue-content-placeholders';
 import Permissions from './components/Permissions';
+import VueApexCharts from 'vue-apexcharts'
 
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
 Vue.use(UUID);
 locale.use(lang_es);
 Vue.use(Vuetify)
@@ -247,6 +250,9 @@ Vue.use(require('./components/plugins/acl.js'));
 
 //Reports
 Vue.component('reports-index', require('./components/reports/Index.vue'));
+
+//General Config
+Vue.component('general-config-index', require('./components/general_config/Index.vue'));
 
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;

@@ -16,6 +16,52 @@ use App\Http\Controllers\Controller;
 
 class ReportController extends Controller
 {
+    public function showChart(Request $request){
+        switch ($request->type_report) {
+      		case 'Pagos pendientes por cobrar':
+      			$report = Event::with('sale')->whereBetween('date', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+      			break;
+      		case 'Reporte de cotizaciones':
+      			$report = Quote::with('customerOrder','user')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+      			break;
+      		case 'Reporte de ventas':
+      			$report = Sale::with('user','quote','saleDetail')->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+      			break;
+          case 'Reporte de pagos':
+              return $report = Payment::with('user','customer','sale')
+                ->select('type_of_payment', DB::raw('sum(price) total'))
+                ->groupBy('type_of_payment')
+                ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+
+
+                /*foreach ($report as $key => $value) {
+                    $report_detail = Payment::with('user','customer','sale')
+                        ->where('type_of_payment',$value->type_of_payment)
+                        ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))
+                        ->orderBy('created_at')->get();
+                   //dd($report_detail);
+                   $total = 0;
+
+                   foreach ($report_detail as $key_detail => $detail) {
+                       $sum = $number + $key_detail;
+                       $sheet->setCellValue("D{$sum}" , $detail->user->name);
+                       $sheet->setCellValue("E{$sum}" , floatval($detail->price));
+                       $sheet->setCellValue("F{$sum}" , $detail->type_of_payment);
+                       $sheet->setCellValue("G{$sum}" , $detail->created_at);
+                       $sheet->setCellValue("H{$sum}" , $detail->id);
+                       $sheet->setCellValue("I{$sum}" , $detail->note);
+                       $total += floatval($detail->price);
+
+                   }
+                   //$fixnumber = intval($sum) - intval($sum - 1);
+                   $number += count($report_detail) + 2;
+                   $numberTotal = $number - 2;
+                }*/
+
+      			break;
+      	}
+    }
+
     public function getReport(Request $request){
 
     	switch ($request->type_report) {

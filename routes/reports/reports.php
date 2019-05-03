@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/store-track', 'ReportController@storeTrack')->middleware('permission:create-reports');
             Route::post('/store', 'ReportController@store')->middleware('permission:create-reports');
             Route::post('/export', 'ReportController@getReport');
+            Route::post('/show-chart', 'ReportController@showChart');
             Route::post('/send-report', 'ReportController@sendReport');
             Route::post('/order', 'ReportController@createOrder')->middleware('permission:create-reports');
             Route::post('/filter', 'ReportController@filter')->middleware('permission:read-reports');

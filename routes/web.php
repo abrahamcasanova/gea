@@ -57,5 +57,4 @@ require __DIR__ . '/product_detail_sale/product_detail_sale.php';
 require __DIR__ . '/payments/payments.php';
 require __DIR__ . '/type_of_payments/type_of_payments.php';
 require __DIR__ . '/reports/reports.php';
-
-
+require __DIR__ . '/general_config/general_config.php';

@@ -43,15 +43,22 @@
                         <small class="invalid-feedback" v-if="errors.final_date">{{errors.final_date[0]}}</small>
                     </div>
 
-                    <div class="form-group col-md-12">
-                        <label>___</label>
-
+                    <div v-if="show_chart == true && report.type_report == 'Reporte de pagos'" class="form-group col-md-12">
+                        <label>Grafica</label>
+                        <apexchart width="100%" type="bar" :options="chartOptions" :series="series"></apexchart>
                     </div>
-
-                    <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="exportReport">
-                      <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
-                      <span class="ml-1 v-else"> <i class="fas fa-file-download"></i> Exportar </span>
-                    </a>
+                    <div class="form-group col-md-2">
+                      <a class="btn btn-success" href="#" :disabled="submiting" @click.prevent="showChart">
+                        <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
+                        <span class="ml-1 v-else"> <i class="far fa-chart-bar"></i> Ver grafica </span>
+                      </a>
+                    </div>
+                    <div class="form-group col-md-2">
+                      <a class="btn btn-primary" href="#" :disabled="submiting" @click.prevent="exportReport">
+                        <i class="fas fa-spinner fa-spin" v-if="submiting"></i>
+                        <span class="ml-1 v-else"> <i class="fas fa-file-download"></i> Exportar </span>
+                      </a>
+                    </div>
 
                   </div>
                 </div>
@@ -72,11 +79,55 @@ export default {
       report: {},
       menu:false,
       menu2:false,
+      show_chart:false,
       errors: {},
       typeReports: [],
       image: '',
       url: null,
       submiting: false,
+      chartOptions: {
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '55%',
+              endingShape: 'rounded'
+            },
+          },
+          dataLabels: {
+            enabled: false
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent']
+          },
+          chart: {
+            id: 'vuechart-example'
+          },
+          xaxis: {
+            categories: [192,2]
+          },
+          fill: {
+            opacity: 1
+
+          },tooltip: {
+            y: {
+              formatter: function (val) {
+                console.log(val)
+                return "$ " + val + " thousands"
+              }
+            }
+          },
+          yaxis: {
+           title: {
+             text: '$ (thousands)'
+           }
+         },
+        },
+        series: [{
+          name: 'Precio Total',
+          data: []
+        }]
     }
   },
   mounted () {
@@ -99,6 +150,76 @@ export default {
 
   },
   methods: {
+      showChart(){
+          if (!this.submiting) {
+            this.submiting = true
+            this.series[0].data = [];
+            let categories = [];
+            axios({
+              url: './api/reports/show-chart',
+              method: 'POST',
+              params: this.report
+            })
+            .then(response => {
+              if(response.data != 'Sin datos'){
+                //this.chartOptions.xaxis.categories = [10,2]
+                let vm = this;
+
+                response.data.map(function(value, key) {
+                 categories.push(value.type_of_payment)
+                 vm.series[0].data.push(parseFloat(value.total))
+               });
+
+
+                const newData = this.series[0].data;
+
+                const colors = ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0']
+
+                // Make sure to update the whole options config and not just a single property to allow the Vue watch catch the change.
+                this.chartOptions = {
+                  colors: [colors[Math.floor(Math.random()*colors.length)]],
+                };
+                // In the same way, update the series option
+                this.chartOptions.xaxis = {
+                  categories:categories
+                };
+
+                this.chartOptions.tooltip = {
+                  y: {
+                    formatter: function (val) {
+                      return currencyFormat(val)
+                    }
+                  }
+                };
+                /*this.chartOptions = [{
+                    xaxis: {
+                      categories: categories
+                    }
+                }];*/
+
+                this.series = [{
+                    data: newData,
+                    name: 'Precio Total'
+                }];
+                this.show_chart = true;
+                this.submiting = false;
+
+              }else{
+                swal("Error, No existe información para mostrar", {
+                    icon: 'error',
+                    buttons: false,
+                    timer: 3000
+                });
+                this.submiting = false;
+              }
+            })
+            .catch(error => {
+              this.errors = error.response.data
+              this.submiting = false
+            })
+
+          }
+      },
       exportReport () {
         if (!this.submiting) {
           this.submiting = true
@@ -108,12 +229,11 @@ export default {
             params: this.report
           })
           .then(response => {
-
             if(response.data != 'Sin datos'){
                 window.location = './storage/' + response.data;
                 this.submiting = false;
                 this.$toasted.global.error('Exportado correctamente!')
-                this.report.type_report = this.report.initial_date = this.report.final_date = null;
+                this.report.initial_date = this.report.final_date = null;
             }else{
               swal("Error, No existe información para mostrar", {
                   icon: 'error',
@@ -161,4 +281,9 @@ export default {
       },
   }
 }
+
+function currencyFormat(num) {
+  return '$' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
 </script>
