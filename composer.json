@@ -19,6 +19,7 @@
         "laravolt/avatar": "^2.0",
         "maatwebsite/excel": "~2.1.0",
         "martinlindhe/laravel-vue-i18n-generator": "^0.1.35",
+        "phpoffice/phpword": "^0.16.0",
         "pusher/pusher-php-server": "^3.3",
         "spatie/laravel-permission": "^2.23"
     },

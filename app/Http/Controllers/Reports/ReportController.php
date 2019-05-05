@@ -218,7 +218,7 @@ class ReportController extends Controller
     				                    'Agente'	  => $value['user']['name'],
     				                    'Fecha'  	  => $value['created_at'],
     				                    'Cliente' 	  => $value['quote']['customerOrder']['customer']['full_name'],
-    				                    'Fecha de viaje' => "{$value['quote']['customerOrder']['travel_date']} al {$value['quote']['customerOrder']['travel_end_date']}",
+    				                    'Fecha de viaje' => "{$value['quote']['travel_date']}",
     				                    'Hotel/Servicio'	=> isset($value['saleDetail']) ? implode(', ',$value['saleDetail']->pluck('product.name')->toArray()):null,
     				                    'Precio Total'		 => $sum_payment,
     				                    'Saldo'			 => $balance,

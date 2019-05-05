@@ -178,8 +178,9 @@ class QuoteTrackController extends Controller
         $fromDate = Carbon::now()->subDay()->startOfWeek()->toDateString();
         $tillDate = Carbon::now()->toDateString();
         $product = ProductDetailSale::groupBy('product_id')
-            ->selectRaw('count(product_id) as total,product_id')->with('sale','product')->whereHas('sale', function ($query) use($fromDate,$tillDate) {
-            $query->whereBetween('updated_at',["{$fromDate} 00:00:00","{$tillDate} 23:59:59"]);
+            ->selectRaw('count(product_id) as total,product_id')->with('sale','product')
+            ->whereHas('sale', function ($query) use($fromDate,$tillDate) {
+            $query->whereBetween('created_at',["{$fromDate} 00:00:00","{$tillDate} 23:59:59"]);
         })->orderBy('total','DESC')->take(5)->get();
 
        return response()->json([$fromDate,$tillDate,$product]);

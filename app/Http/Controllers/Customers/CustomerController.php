@@ -130,7 +130,9 @@ class CustomerController extends Controller
         $request->merge(['travel_destination' => implode($request->travel_destination,',')]);
         if($request->type && $request->type == 'public'){
             $customer_check = Customer::where('email',$request->email)->first();
-            $customer_check->fill($request->all());
+            if(isset($customer_check)){
+                $customer_check->fill($request->all());
+            }
             $this->validate($request, [
                 'cellphone' => 'required|numeric',
             ]);
