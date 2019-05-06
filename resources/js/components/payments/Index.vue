@@ -2,16 +2,7 @@
   <div class="container">
     <div class="card-header px-0 mt-2 bg-transparent clearfix">
       <div class="card-header-actions mr-1">
-        <b-col md="12" class="my-1">
-          <b-form-group label-cols-sm="3" class="mb-0">
-            <b-input-group>
-              <b-form-input v-model="Bfilter" placeholder="Buscar.."></b-form-input>
-              <b-input-group-append>
-                <b-button :disabled="!Bfilter" @click="Bfilter = ''">Borrar</b-button>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-        </b-col>
+
       </div>
     </div>
     <!--
@@ -141,13 +132,10 @@
 
     <div class="card">
       <div class="card-body">
-        <div class="h3 text-muted text-right mb-12">
-          <h4 class="text-muted text-uppercase font-weight-bold">ultimos pagos registrados
-              <i class="fa-lg fas fa-dollar-sign text-primary"></i>
-          </h4>
-        </div>
+
         <div class="card-body px-0">
         <div class="table-responsive">
+          <!--
           <b-table class="table" :items="payments" :fields="tableFields" :filter="Bfilter"
           :current-page="currentPage" :per-page="perPage" @filtered="onFiltered" striped>
             <template slot="confirm" slot-scope="row">
@@ -184,11 +172,85 @@
              ></b-pagination>
            </b-col>
          </b-row>
+          -->
         </div>
         </div>
       </div>
     </div>
 
+    <v-app v-cloak>
+    <v-card>
+      <v-toolbar-title>
+        <div class="h3 text-muted text-right mb-12">
+          <h4 style="margin-right:10px;margin-top:10px;" class="text-muted text-uppercase font-weight-bold">ultimos pagos registrados
+              <i class="fa-lg fas fa-dollar-sign text-primary"></i>
+          </h4>
+        </div>
+      </v-toolbar-title>
+      <v-card-title>
+        <v-spacer></v-spacer>
+        <v-text-field
+          v-model="search"
+          append-icon="search"
+          label="Buscar.."
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-card-title>
+      <v-data-table
+        :headers="headers"
+        :items="payments"
+        :search="search"
+        v-bind:pagination.sync="pagination"
+      >
+        <template v-slot:items="props">
+          <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-left">{{ props.item.customer.full_name }}</td>
+          <td class="text-xs-center">{{ props.item.price }}</td>
+          <td class="text-xs-left">{{ props.item.authorization_number }}</td>
+          <td class="text-xs-left">{{ props.item.deposit_date }}</td>
+          <td class="text-xs-center">{{ props.item.user.name }}</td>
+          <td class="text-xs-left">{{ props.item.type_of_payment }}</td>
+          <td class="text-xs-center">
+            <center>
+              <span v-if="props.item.confirm == 1" class='badge badge-primary'>SI</span>
+              <span v-else class='badge badge-secondary'>NO</span>
+            </center>
+          </td>
+          <td class="text-xs-right">{{ props.item.created_at }}</td>
+
+          <td class="justify-center layout px-0">
+            <a href="#" @click="modalPayment(props.item.id)" v-if="$can('confirm-payments')" class="card-header-action ml-1 text-muted">
+              <i class="fa-lg fas fa-check-double" style="color:#4dbd74"></i>
+            </a>
+            <a href="#" v-if="$can('read-payments')" data-toggle="tooltip" data-placement="bottom" title="Ver recibo" @click="getReceiptPayment(props.item.id)" class="card-header-action ml-1 text-muted">
+              <i class="fa-lg fas fa-info-circle text-primary"></i>
+            </a>
+            <a href="#" v-if="$can('send-mail-payment')" @click="sendMail(props.item.id)" data-toggle="tooltip" data-placement="bottom" title="Enviar correo" class="card-header-action ml-1 text-muted">
+              <i class="fa-lg fas fa-envelope" style="color:#ffa000"></i>
+            </a>
+            <a href="#" v-if="$can('update-payments')" @click="editPayment(props.item.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt fa-lg"></i></a>
+            <a  v-if="$can('delete-payments')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroy(props.item.id)">
+                <i class="fas fa-spinner fa-spin fa-lg" v-if="submitingDestroy"></i>
+                <i class="far fa-trash-alt fa-lg" v-else style="color:red"></i>
+                <span class="d-md-down-none ml-1"></span>
+            </a>
+          </td>
+
+        </template>
+        <template v-slot:no-results>
+          <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
+            Su búsqueda de "{{search}}" no encontró resultados.
+          </v-alert>
+        </template>
+        <template v-slot:no-data>
+          <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
+            Lo sentimos, no hay nada que mostrar aquí :(
+          </v-alert>
+        </template>
+      </v-data-table>
+      </v-card>
+    </v-app>
     <!-- Modal Component -->
     <b-modal size="lg" id="modal1" ref="myModalRef" hide-footer title="Detalle">
       <div class="d-block">
@@ -268,6 +330,18 @@ export default {
         { key: 'created_at', sortable: true,label:'Registrado' },
         { key: 'actions', sortable: false,label:'Acciones' },
       ],
+      headers: [
+        { value: 'id', align: 'left', text: 'Folio' },
+        { value: 'customer.full_name',text:'Cliente',sortable: true,},
+        { value: 'price',text:'Precio', sortable: true },
+        { value: 'authorization_number', sortable: true,text:'Autorización' },
+        { value: 'deposit_date', sortable: true,text:'Fecha deposito' },
+        { value: 'user.name', sortable: true,text:'Agente' },
+        { value: 'type_of_payment', sortable: true,text:'Forma de pago' },
+        { value: 'confirm', sortable: true,text:'Confirmado' },
+        { value: 'created_at', sortable: true,text:'Registrado' },
+        { value: 'actions', sortable: false,text:'Acciones' },
+      ],
       filters: {
         pagination: {
           from: 0,
@@ -287,6 +361,153 @@ export default {
       path_pdf:'',
       submitingDestroy: false,
       searchQuery: '',
+      search: '',
+      pagination: {'sortBy': 'id', 'descending': true, rowsPerPage: 15 },
+      desserts: [
+          {
+            name: 'Frozen Yogurt',
+            calories: 159,
+            fat: 6.0,
+            carbs: 24,
+            protein: 4.0,
+            iron: '1%'
+          },
+          {
+            name: 'Ice cream sandwich',
+            calories: 237,
+            fat: 9.0,
+            carbs: 37,
+            protein: 4.3,
+            iron: '1%'
+          },
+          {
+            name: 'Eclair',
+            calories: 262,
+            fat: 16.0,
+            carbs: 23,
+            protein: 6.0,
+            iron: '7%'
+          },
+          {
+            name: 'Cupcake',
+            calories: 305,
+            fat: 3.7,
+            carbs: 67,
+            protein: 4.3,
+            iron: '8%'
+          },
+          {
+            name: 'Gingerbread',
+            calories: 356,
+            fat: 16.0,
+            carbs: 49,
+            protein: 3.9,
+            iron: '16%'
+          },
+          {
+            name: 'Jelly bean',
+            calories: 375,
+            fat: 0.0,
+            carbs: 94,
+            protein: 0.0,
+            iron: '0%'
+          },
+          {
+            name: 'Lollipop',
+            calories: 392,
+            fat: 0.2,
+            carbs: 98,
+            protein: 0,
+            iron: '2%'
+          },
+          {
+            name: 'Honeycomb',
+            calories: 408,
+            fat: 3.2,
+            carbs: 87,
+            protein: 6.5,
+            iron: '45%'
+          },
+          {
+            name: 'Donut',
+            calories: 452,
+            fat: 25.0,
+            carbs: 51,
+            protein: 4.9,
+            iron: '22%'
+          },
+          {
+            name: 'KitKat',
+            calories: 518,
+            fat: 26.0,
+            carbs: 65,
+            protein: 7,
+            iron: '6%'
+          },
+          {
+            name: 'Lollipop',
+            calories: 392,
+            fat: 0.2,
+            carbs: 98,
+            protein: 0,
+            iron: '2%'
+          },
+          {
+            name: 'Honeycomb',
+            calories: 408,
+            fat: 3.2,
+            carbs: 87,
+            protein: 6.5,
+            iron: '45%'
+          },
+          {
+            name: 'Donut',
+            calories: 452,
+            fat: 25.0,
+            carbs: 51,
+            protein: 4.9,
+            iron: '22%'
+          },
+          {
+            name: 'KitKat',
+            calories: 518,
+            fat: 26.0,
+            carbs: 65,
+            protein: 7,
+            iron: '6%'
+          },{
+            name: 'Lollipop',
+            calories: 392,
+            fat: 0.2,
+            carbs: 98,
+            protein: 0,
+            iron: '2%'
+          },
+          {
+            name: 'Honeycomb',
+            calories: 408,
+            fat: 3.2,
+            carbs: 87,
+            protein: 6.5,
+            iron: '45%'
+          },
+          {
+            name: 'Donut',
+            calories: 452,
+            fat: 25.0,
+            carbs: 51,
+            protein: 4.9,
+            iron: '22%'
+          },
+          {
+            name: 'KitKat',
+            calories: 518,
+            fat: 26.0,
+            carbs: 65,
+            protein: 7,
+            iron: '6%'
+          }
+        ]
     }
   },
   computed: {

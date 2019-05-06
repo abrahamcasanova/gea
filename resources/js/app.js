@@ -46,7 +46,10 @@ import lang_es from 'element-ui/lib/locale/lang/es';
 import VueContentPlaceholders from 'vue-content-placeholders';
 import Permissions from './components/Permissions';
 import VueApexCharts from 'vue-apexcharts'
- 
+import VdtnetTable from 'vue-datatables-net'
+import 'datatables.net-bs4'
+
+Vue.use(VdtnetTable);
 Vue.use(VueApexCharts);
 Vue.component('apexchart', VueApexCharts);
 Vue.use(UUID);

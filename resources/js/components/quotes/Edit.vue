@@ -44,6 +44,13 @@
                 <input type="text" class="form-control" :class="{'is-invalid': errors.number_childs}" v-model="quote.number_childs" placeholder="...">
             </div>
           </div>
+          <div class="row">
+            <div class="form-group col-md-3">
+                <label>Utilidad</label>
+                <vue-numeric class="form-control" :class="{'is-invalid': errors.markup}"
+                currency="$" separator="," :precision="2" v-model="quote.markup"></vue-numeric>
+            </div>
+          </div>
           <div class="card">
               <div class="card-body">
                   <h5 class="card-title">Producto</h5>

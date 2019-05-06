@@ -192,6 +192,7 @@ class ReportController extends Controller
     				                    'Mes'		      => $value['customerOrder']['travel_month'],
     				                    'Cliente' 	  => $value['customerOrder']['customer']['full_name'],
     				                    'Destinos'	  => implode(', ', $destinations->pluck('name')->toArray()),
+                                'Utilidad'    => $value['markup'],
     				                    'Fecha de viaje' => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
     				                    'Estatus'	  => $status
     				                ]);
@@ -216,7 +217,8 @@ class ReportController extends Controller
     				                $collection->push([
     				                    'Folio'    	  => $value['id'],
     				                    'Agente'	  => $value['user']['name'],
-    				                    'Fecha'  	  => $value['created_at'],
+                                'Fecha de solicitud de cotización' => "{$value['quote']['customerOrder']['created_at']}",
+    				                    'Fecha Venta'  	  => $value['created_at'],
     				                    'Cliente' 	  => $value['quote']['customerOrder']['customer']['full_name'],
     				                    'Fecha de viaje' => "{$value['quote']['travel_date']}",
     				                    'Hotel/Servicio'	=> isset($value['saleDetail']) ? implode(', ',$value['saleDetail']->pluck('product.name')->toArray()):null,

@@ -20,6 +20,7 @@ class Quote extends Model
       'payment',
       'path',
       'currency',
+      'markup',
       'customer_order_id',
       'status',
       'user_id'

@@ -113,7 +113,6 @@ export default {
           },tooltip: {
             y: {
               formatter: function (val) {
-                console.log(val)
                 return "$ " + val + " thousands"
               }
             }

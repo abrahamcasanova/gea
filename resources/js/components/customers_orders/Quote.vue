@@ -57,6 +57,13 @@
                 <div class="invalid-feedback" v-if="errors.currency">{{errors.currency[0]}}</div>
             </div>
           </div>
+          <div class="row">
+            <div class="form-group col-md-3">
+                <label>Utilidad</label>
+                <vue-numeric class="form-control" :class="{'is-invalid': errors.markup}"
+                currency="$" separator="," :precision="2" v-model="quote.markup"></vue-numeric>
+            </div>
+          </div>
           <div class="card">
               <div class="card-body">
                   <h5 class="card-title">Producto</h5>
@@ -391,7 +398,7 @@ export default {
             this.quote.payment = '* Deposito (oxxo, 7eleven o en el banco)\n* Tarjeta de credito (Comisión bancaria)\n* Transferencias';
             this.quote.travel_date = response.data.customer_order.travel_date + " Al " + response.data.customer_order.travel_end_date;
             this.quote.number_adults = response.data.customer_order.number_adults
-            
+
             this.quote.number_childs = response.data.customer_order.number_childs
 
             this.getQuoteDetails(response.data['id'])

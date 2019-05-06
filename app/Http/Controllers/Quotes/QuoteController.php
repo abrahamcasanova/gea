@@ -52,6 +52,11 @@ class QuoteController extends Controller
         }
 
         if(isset($request->status) && $request->status == 2){
+
+            $this->validate($request, [
+                'markup' => 'required|not_in:0',
+            ]);
+
             $quote = $quote->load('customerOrder','quoteDetails');
             $quote->include = str_replace("\n","\n \r",$quote->include);
             $quote->policy = str_replace("\n","\n \r",$quote->policy);
@@ -82,6 +87,10 @@ class QuoteController extends Controller
         if(!File::exists(storage_path('app/public/pdf'))){
             File::makeDirectory(storage_path('app/public/pdf'));
         }
+
+        $this->validate($request, [
+            'markup' => 'required|not_in:0',
+        ]);
 
         if(isset($quote->status) && $quote->status == 2){
             $quote = $quote->load('customerOrder','quoteDetails');

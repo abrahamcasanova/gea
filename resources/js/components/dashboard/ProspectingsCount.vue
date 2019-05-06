@@ -62,6 +62,7 @@ export default {
         { key: 'quote.customer_order.customer.full_name',label:'Cliente',
         sortable: true, status:'awesome'},
         { key: 'quote.customer_order.customer.cellphone',label:'Celular', sortable: true },
+        { key: 'quote.customer_order.customer.type_of_person', sortable: true,label:'Tipo' },
         { key: 'user.name', sortable: true,label:'Agente' },
         { key: 'track_status', sortable: true,label:'Estatus' },
         { key: 'comments', sortable: true,label:'Comentario' },
