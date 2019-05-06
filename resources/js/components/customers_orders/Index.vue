@@ -341,6 +341,7 @@ export default {
         location.href = `./customers_orders/${customerId}/edit`
     },
     createQuote(orderId){
+  
         axios.post(`./api/quotes/store`, {
           customer_order_id : orderId
         })
@@ -355,13 +356,13 @@ export default {
     },
     filter() {
       this.filters.pagination.current_page = 1
-      this.getcustomers()
+      this.getCustomerOrders()
 
     },
     changeSize (perPage) {
       this.filters.pagination.current_page = 1
       this.filters.pagination.per_page = perPage
-      this.getcustomers()
+      this.getCustomerOrders()
     },
     sort (column) {
       if(column == this.filters.orderBy.column) {
@@ -371,11 +372,11 @@ export default {
         this.filters.orderBy.direction = 'asc'
       }
 
-      this.getcustomers()
+      this.getCustomerOrders()
     },
     changePage (page) {
       this.filters.pagination.current_page = page
-      this.getcustomers()
+      this.getCustomerOrders()
     }
     ,destroy (customerId) {
       if (!this.submitingDestroy) {

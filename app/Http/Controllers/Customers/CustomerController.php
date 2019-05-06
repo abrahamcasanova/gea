@@ -129,6 +129,7 @@ class CustomerController extends Controller
         $request->merge(['with_us' => $request->with_us['id']]);
         $request->merge(['travel_destination' => implode($request->travel_destination,',')]);
         if($request->type && $request->type == 'public'){
+
             $customer_check = Customer::where('email',$request->email)->first();
             if(isset($customer_check)){
                 $customer_check->fill($request->all());
@@ -140,22 +141,15 @@ class CustomerController extends Controller
             $customer = isset($customer_check) ? $customer_check:Customer::create($request->all());
             $customer->type_of_person = isset($customer_check) ?$customer_check->type_of_person:'PROSPECTO';
             $customer->save();
-            $customerOrder = CustomerOrder::create($request->all());
+
+            $customerOrder = new CustomerOrder;
+
+            $customerOrder->fill($request->all());
             $customerOrder->customer_id = $customer->id;
             $customerOrder->save();
             return $customerOrder;
-
-            /*return CustomerOrder::updateOrCreate([
-                  'customer_id' => $customer->id
-                ],
-                $request->all()
-            );*/
         }else{
-            return CustomerOrder::updateOrCreate([
-                'customer_id' => $request->customer_id
-                ],
-                $request->all()
-            );
+            return CustomerOrder::create($request->all());
         }
     }
 
