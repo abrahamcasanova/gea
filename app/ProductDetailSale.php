@@ -19,7 +19,7 @@ class ProductDetailSale extends Model
       'quote_id',
       'sale_id'
     ];
-    
+
     public function product(){
         return $this->hasOne(Product::class,'id','product_id')->with('product_types');
     }
@@ -42,5 +42,9 @@ class ProductDetailSale extends Model
     public function scopeActive($query)
     {
         return $query->where('status',1);
+    }
+
+    public function scopeWhereNotNullSaleId($query){
+        return $query->whereNotNull('sale_id');
     }
 }

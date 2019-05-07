@@ -655,6 +655,34 @@ class PermissionsTableSeeder extends Seeder
             ]
         ]);
 
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'confirmations',
+            'display_name' => 'Pagos de confirmaciones',
+            'icon' => 'icon-graph'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-confirmations',
+                'display_name' => 'Ver',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-confirmations',
+                'display_name' => 'Actualizar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'add-payments-confirmations',
+                'display_name' => 'Capturar pago de confirmaciones',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
         // Assign permissions to admin role
         $admin = Role::findByName('admin');
         $admin->givePermissionTo(Permission::all());

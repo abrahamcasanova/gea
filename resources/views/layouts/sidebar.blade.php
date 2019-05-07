@@ -72,6 +72,13 @@
                     </a>
                 </li>
             @endcan
+            @can('read-confirmations')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('/confirmations')}}">
+                        <i class="nav-icon icon-wallet"></i> Confirmación de pagos
+                    </a>
+                </li>
+            @endcan
             @can('read-reports')
                 <li class="nav-item">
                     <a class="nav-link" href="{{url('/reports')}}">

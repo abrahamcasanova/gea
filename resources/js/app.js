@@ -257,6 +257,9 @@ Vue.component('reports-index', require('./components/reports/Index.vue'));
 //General Config
 Vue.component('general-config-index', require('./components/general_config/Index.vue'));
 
+//Confirmations
+Vue.component('confirmations-index', require('./components/confirmations/Index.vue'));
+
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = false;
 

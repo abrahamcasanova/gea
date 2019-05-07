@@ -80,7 +80,7 @@ class ProductDetailSalesController extends Controller
         return ProductDetailSale::with('product','quote','supplier')->Active()
             ->where('quote_id',$request->quote_id)->get();
     }
-
+    
     /**
      * Display the specified resource.
      *
