@@ -27,6 +27,8 @@ class Payment extends Model
       'status',
       'customer_id',
       'sale_id',
+      'sale_id',
+      'user_id_confirmation',
       'user_id',
     ];
 
@@ -38,6 +40,11 @@ class Payment extends Model
     public function user()
     {
         return $this->hasOne(User::class,'id','user_id');
+    }
+
+    public function userConfirmation()
+    {
+        return $this->hasOne(User::class,'id','user_id_confirmation');
     }
 
     public function customer()

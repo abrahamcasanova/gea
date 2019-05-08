@@ -95,23 +95,28 @@ class ReportController extends Controller
              $sheet = $doc->getActiveSheet();
              $number = 6;
              $numberTotal = 0;
-
+               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DEL {$request->initial_date} AL {$request->final_date}");
              foreach ($report as $key => $value) {
-                 $report_detail = Payment::with('user','customer','sale')
+                 $report_detail = Payment::with('user','customer','sale','userConfirmation')
                      ->where('type_of_payment',$value->type_of_payment)
                      ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))
                      ->orderBy('created_at')->get();
-                //dd($report_detail);
+
                 $total = 0;
 
                 foreach ($report_detail as $key_detail => $detail) {
+
+                    $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
                     $sum = $number + $key_detail;
-                    $sheet->setCellValue("D{$sum}" , $detail->user->name);
-                    $sheet->setCellValue("E{$sum}" , floatval($detail->price));
-                    $sheet->setCellValue("F{$sum}" , $detail->type_of_payment);
-                    $sheet->setCellValue("G{$sum}" , $detail->created_at);
+                    $sheet->setCellValue("B{$sum}" , $detail->user->name);
+                    $sheet->setCellValue("C{$sum}" , floatval($detail->price));
+                    $sheet->setCellValue("D{$sum}" , $status);
+                    $sheet->setCellValue("E{$sum}" , $detail->type_of_payment);
+                    $sheet->setCellValue("F{$sum}" , $detail->created_at);
+                    $sheet->setCellValue("G{$sum}" , $detail->sale->id);
                     $sheet->setCellValue("H{$sum}" , $detail->id);
-                    $sheet->setCellValue("I{$sum}" , $detail->note);
+                    $sheet->setCellValue("I{$sum}" , isset($detail->userConfirmation) ? $detail->userConfirmation->name:null);
+                    $sheet->setCellValue("J{$sum}" , $detail->note);
                     $total += floatval($detail->price);
 
                 }
@@ -119,10 +124,10 @@ class ReportController extends Controller
                 $number += count($report_detail) + 2;
                 $numberTotal = $number - 2;
 
-                $sheet->setCellValue("D{$numberTotal}" , 'TOTAL');
-                $sheet->setCellValue("E{$numberTotal}" , floatval($total));
-                $doc->getActiveSheet()->getStyle("D{$numberTotal}")->getFont()->setBold(true);
-                $doc->getActiveSheet()->getStyle("E{$numberTotal}")->getFont()->setBold(true);
+                $sheet->setCellValue("B{$numberTotal}" , 'TOTAL');
+                $sheet->setCellValue("C{$numberTotal}" , floatval($total));
+                $doc->getActiveSheet()->getStyle("B{$numberTotal}")->getFont()->setBold(true);
+                $doc->getActiveSheet()->getStyle("C{$numberTotal}")->getFont()->setBold(true);
                 /*
                 $numberTotal = $sum + 1;
 

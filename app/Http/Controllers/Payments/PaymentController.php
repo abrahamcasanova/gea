@@ -176,11 +176,13 @@ class PaymentController extends Controller
     }
 
     public function saveConfirm(Request $request){
+        $user = auth()->user();
         Payment::findOrFail($request->id)->update([
           'confirm'         => 1,
           'break'           => $request->break,
           'note'            => $request->note,
-          'date_received'   => $request->date_received
+          'date_received'   => $request->date_received,
+          'user_id_confirmation' => $user->id
         ]);
 
         return Payment::findOrFail($request->id);
