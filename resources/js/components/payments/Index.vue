@@ -436,8 +436,8 @@ export default {
         });
     },
     customFormatterLimit(date) {
-        this.payment.date_received = moment(date).format('YYYY/MM/DD');
-        return moment(date).format('YYYY/MM/DD');
+        this.payment.date_received = moment(this.payment.date_received).format('YYYY/MM/DD');
+        return moment(this.payment.date_received).format('YYYY/MM/DD');
     },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length
@@ -466,6 +466,10 @@ export default {
     },
     modalPayment(paymentId){
           this.payment.id = paymentId;
+          axios.get(`./api/payments/` + paymentId)
+          .then(response => {
+            this.payment = response.data;
+          })
           this.$refs.myModalRef2.show();
     },
     getPayments () {
