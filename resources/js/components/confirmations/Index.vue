@@ -33,23 +33,18 @@
       >
         <template v-slot:items="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
-          <td class="text-xs-left">{{ props.item.price }}</td>
+          <td class="text-xs-left">{{ props.item.rate_price | currency }}</td>
           <td class="text-xs-center">{{ props.item.confirmation }}</td>
           <td class="text-xs-left">{{ props.item.supplier.name }}</td>
-          <td class="text-xs-left">{{ props.item.date_payment_supplier }}</td>
+          <td class="text-xs-center">{{ props.item.date_payment_supplier }}</td>
           <td class="text-xs-center">
             <center>
-              <span v-if="props.item.confirm == 1" class='badge badge-primary'>SI</span>
+              <span v-if="props.item.liquidate == 1" class='badge badge-primary'>SI</span>
               <span v-else class='badge badge-secondary'>NO</span>
             </center>
           </td>
-          <td class="text-xs-center">
-            <center>
-              <span v-if="props.item.confirm == 1" class='badge badge-primary'>SI</span>
-              <span v-else class='badge badge-secondary'>NO</span>
-            </center>
-          </td>
-          <td class="text-xs-right">{{ props.item.created_at }}</td>
+          <td class="text-xs-center">{{ props.item.date_liquidate }}</td>
+          <td class="text-xs-center">{{ props.item.created_at }}</td>
 
           <td class="justify-center layout px-0">
             <a href="#" @click="modalPaymentProductDetails(props.item.id)" v-if="$can('add-payments-confirmations')" class="card-header-action ml-1 text-muted">
@@ -72,17 +67,107 @@
       </v-card>
     </v-app>
     <!-- Modal Component -->
-    <b-modal size="lg" id="modal1" ref="myModalRef" hide-footer title="Detalle">
+    <b-modal size="lg" id="modal2" ref="myModalRef" hide-footer title="Agregar pago">
       <div class="d-block">
         <div class="col-md-12 card-body px-0">
           <div class="row">
-              <iframe :src="path_pdf" style="width:100%" height="420"></iframe>
+            <div class="form-group col-md-4">
+                <label>Importe</label>
+                <vue-numeric class="form-control"  :class="{'is-invalid': errors.amount}" currency="$" separator="," :precision="2" v-model="confirmation.amount"></vue-numeric>
+                <div class="invalid-feedback" v-if="errors.amount">{{errors.amount[0]}}</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Fecha en que se recibe</label>
+                <datepicker :bootstrap-styling="true" :language="es" :format="customFormatterLimit" v-model="confirmation.date_confirmation" :input-class="{'is-invalid': errors.date_confirmation}"></datepicker>
+                <div class="invalid-feedback" v-if="errors.date_confirmation">{{errors.date_confirmation[0]}}</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Forma de pago</label>
+                <multiselect
+                  v-model="confirmation.type_of_payment"
+                  :options="type_of_payment"
+                  openDirection="bottom"
+                  track-by="id"
+                  label="name"
+                  :class="{'border border-danger rounded': errors.type_of_payment}">
+                </multiselect>
+                <small class="form-text text-danger" v-if="errors.type_of_payment">{{errors.type_of_payment[0]}}</small>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Tipo de comprobante</label>
+                <multiselect
+                  v-model="confirmation.type_of_voucher"
+                  :options="type_of_voucher"
+                  openDirection="bottom"
+                  track-by="name"
+                  label="name"
+                  :class="{'border border-danger rounded': errors.type_of_voucher}">
+                </multiselect>
+                <small class="form-text text-danger" v-if="errors.type_of_voucher">{{errors.type_of_voucher[0]}}</small>
+            </div>
+            <div class="form-group col-md-4">
+                <v-text-field v-model="confirmation.number_voucher" :class="{'is-invalid': errors.number_voucher}" type="text" label="Folio"></v-text-field>
+            </div>
+            <div class="form-group col-md-12">
+                <label>Nota</label>
+                <b-form-textarea
+                  v-model="confirmation.note"
+                  placeholder="Nota..."
+                  rows="6"
+                  max-rows="6"
+                ></b-form-textarea>
+                <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
+            </div>
+            <div class="form-group col-md-12">
+                <label><strong>Pagos realizados</strong></label>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="">
+                        <a href="#" class="text-dark">Importe</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Dia confirmado</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Tipo de comprobante</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Folio</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Forma de pago</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Agente</a>
+                      </th>
+                      <th>
+                        <a href="#" class="text-dark">Nota</a>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-for="supplier_payment in supplierPayment.supplierPayments">
+                          <td class="">{{ supplier_payment.amount | currency }}</td>
+                          <td class="">{{ supplier_payment.date_confirmation}}</td>
+                          <td class="">{{ supplier_payment.type_of_voucher}}</td>
+                          <td class="">{{ supplier_payment.number_voucher}}</td>
+                          <td class="">{{ supplier_payment.type_of_payment ? supplier_payment.type_of_payment.name:''}}</td>
+                          <td class="">{{ supplier_payment.user.name}}</td>
+                          <td class="">{{ supplier_payment.note}}</td>
+                      </tr>
+                      <tr>
+                          <td class=""><strong>Total: </strong>{{total | currency }}</td>
+                          <td class=""><strong>Saldo: </strong>{{ balance | currency }}</td>
+                      </tr>
+                  </tbody>
+                </table>
+            </div>
           </div>
         </div>
       </div>
-      <b-button class="mt-3" variant="outline-success" block @click="hideModal">Cerrar</b-button>
+      <b-button class="mt-3" variant="outline-primary" block @click="saveConfirmPayment()">Confirmar</b-button>
     </b-modal>
-
     <!-- Modal Component -->
     <!--
     <b-modal size="lg" id="modal2" ref="myModalRef2" hide-footer title="Confirmar">
@@ -120,7 +205,14 @@
 
 <script>
 let csrf_token = $('meta[name="csrf-token"]').attr('content');
+import {en, es} from 'vuejs-datepicker/dist/locale'
+import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
+
 export default {
+  components: {
+      Datepicker,
+  },
   data () {
     return {
       customers: [{
@@ -128,18 +220,28 @@ export default {
           last_name: ''}
       ],
       docs: [],
+      sum:0,
+      supplierPayment:[],
+      supplierPaymentReduce:[],
       payment:[],
-      errors:null,
+      confirmation:{},
+      errors:{},
+      type_of_payment: [],
+      type_of_voucher: [
+        {'name':'Factura'},
+        {'name':'Recibo'},
+      ],
+      es:es,
       search:null,
       path_pdf:null,
       headers: [
         { value: 'id', align: 'left', text: 'Folio' },
-        { value: 'price',text:'Precio Tarifa',sortable: true,},
-        { value: 'confirmation',text:'Confirmación', sortable: true },
+        { value: 'rate_price',text:'Precio Tarifa',sortable: true,},
+        { value: 'liquidate',text:'Confirmación', sortable: true },
         { value: 'supplier.name', sortable: true,text:'Proveedor' },
         { value: 'date_payment_supplier', sortable: true,text:'Fecha pago de proveedor' },
-        { value: 'invoice', sortable: true,text:'Factura' },
-        { value: 'liquidation', sortable: true,text:'Liquidado' },
+        { value: 'liquidate', sortable: true,text:'Liquidado' },
+        { value: 'date_liquidate', sortable: true,text:'Fecha Liquidado' },
         { value: 'created_at', sortable: true,text:'Registrado' },
         { value: 'actions', sortable: false,text:'Acciones' },
       ],
@@ -162,22 +264,6 @@ export default {
       },
       loading: true,
       submitingDestroy: false,
-      options: {
-          target: './api/customers/upload',
-          testChunks: false,
-          singleFile: true,
-          withCredentials: true,
-          headers:{
-              'X-CSRF-TOKEN': csrf_token,
-          },
-          query: {
-              upload_token: csrf_token,
-              customer_id: null
-          }
-      },
-      attrs: {
-
-      }
     }
   },
   computed: {
@@ -185,30 +271,62 @@ export default {
         return this.customers.map(function(customer) {
             return customer.first_name + ' ' + customer.last_name;
         });
-    }
+    },
+    total: function(){
+        let vm = this;
+        return this.supplierPaymentReduce.reduce(function(prev, item){
+            return vm.sum += item.amount;
+        },0);
+     },
+     balance: {
+        get() { return this.balance = (this.supplierPayment.rate_price - this.total); },
+        set(newValue) {  }
+     }
   },
   mounted () {
-    this.getProductDetailSales()
+    this.getProductDetailSales();
+    this.getTypePayments();
   },
   methods: {
-    show (id) {
-      this.options.query.customer_id = id
-      this.$modal.show('modal-uploader',{
-        title: 'Information',
-      });
+    saveConfirmPayment(){
+        axios.post(`./api/supplier_payments/store`,this.confirmation).then(response => {
+            swal("Pago generada correctamente!!", {
+              icon: 'success',
+              buttons: false,
+            });
+            setTimeout(function(){
+                location.href = './confirmations'
+            }, 1500);
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
+    },
+    customFormatterLimit(date) {
+        this.confirmation.date_confirmation = moment(this.confirmation.date_confirmation).format('YYYY/MM/DD');
+        return moment(this.confirmation.date_confirmation).format('YYYY/MM/DD');
     },
     hideModal() {
         this.$refs.myModalRef.hide()
     },
-    hide () {
-      this.$modal.hide('modal-uploader');
+    modalPaymentProductDetails(id) {
+        this.confirmation.product_detail_sale_id =  id;
+        axios.post(`./api/supplier_payments/get-payments/` + id).then(response => {
+            this.supplierPayment = response.data
+            this.supplierPaymentReduce = response.data.supplierPayments
+            this.$refs.myModalRef.show();
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
     },
-    showFolder (id) {
-      this.$modal.show('modal-folder',{});
-      this.getDocuments(id)
-    },
-    hideFolder () {
-      this.$modal.hide('modal-folder');
+    getTypePayments() {
+        axios.get(`./api/type_of_payments/all`).then(response => {
+            this.type_of_payment = response.data
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
     },
     getProductDetailSales () {
       this.loading = true
@@ -220,92 +338,7 @@ export default {
         this.loading = false
       })
     },
-    getDocuments (id) {
-        this.loading = true
-        axios.post('./api/customers/docs',{
-            customer_id: id
-        }).then(response => {
-            //console.log(response.data)
-            this.docs = response.data
-            this.loading = false
-        });
-    },
-    createOrderWhatsapp(customerId){
-        //Cambiar por numero de telefono seleccionado
-        axios.post('./api/customers/order/whatsapp',{
-            customer_id: customerId
-        }).then(response => {
-            swal("Espere unos segundos..", {
-                icon: 'info',
-                buttons: false,
-            });
-
-            axios.get(`./api/customers/` + customerId)
-            .then(response => {
-                let data = response.data;
-                if(data.cellphone == null || data.cellphone == ''){
-                    swal("Error..", {
-                      text:'No se puede enviar el whatsapp porque no existe un telefono registrado.',
-                      icon: 'error',
-                      timer: 3000,
-                      buttons: false,
-                    });
-                    return false;
-                }else{
-                    let str = window.location
-                    let url_location = str.pathname;
-                    let url = url_location.split('/');
-                    console.log(url)
-                    window.open(
-                    "https://wa.me/52" + data.cellphone + "?text=Favor de llenar la siguiente solicitud: %20"+ str.origin + '/' + url[1] + '/api/customers/order/' + customerId,
-                    '_blank');
-                }
-
-            })
-            .catch(error => {
-                this.$toasted.global.error('Cotización no encontrada!',error)
-            })
-            .then(() => {
-              this.loading = false
-            });
-        });
-
-    },
-    createOrder(customerId){
-        window.open(
-            `./api/customers/order/${customerId}`,
-            '_blank' // <- This is what makes it open in a new window.
-        );
-    },
-    editCustomer (customerId) {
-      location.href = `./customers/${customerId}/edit`
-    },
-    // filters
-    filter() {
-      this.filters.pagination.current_page = 1
-      this.getcustomers()
-
-    },
-    changeSize (perPage) {
-      this.filters.pagination.current_page = 1
-      this.filters.pagination.per_page = perPage
-      this.getcustomers()
-    },
-    sort (column) {
-      if(column == this.filters.orderBy.column) {
-        this.filters.orderBy.direction = this.filters.orderBy.direction == 'asc' ? 'desc' : 'asc'
-      } else {
-        this.filters.orderBy.column = column
-        this.filters.orderBy.direction = 'asc'
-      }
-
-      this.getcustomers()
-    },
-    changePage (page) {
-      this.filters.pagination.current_page = page
-      this.getcustomers()
-    }
-    ,destroy (customerId) {
+    destroy (customerId) {
       if (!this.submitingDestroy) {
         this.submitingDestroy = true
         swal({

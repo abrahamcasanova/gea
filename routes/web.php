@@ -59,3 +59,4 @@ require __DIR__ . '/type_of_payments/type_of_payments.php';
 require __DIR__ . '/reports/reports.php';
 require __DIR__ . '/general_config/general_config.php';
 require __DIR__ . '/confirmations/confirmations.php';
+require __DIR__ . '/supplier_payments/supplier_payments.php';

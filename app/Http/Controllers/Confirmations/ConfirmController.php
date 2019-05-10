@@ -10,7 +10,11 @@ class ConfirmController extends Controller
 {
     public function getDetails(Request $request)
     {
-        return ProductDetailSale::with('product','quote','sale','supplier')
+        $product_detail_sale = ProductDetailSale::with('product','quote','sale','supplier','supplierPayment')
             ->WhereNotNullSaleId()->get();
+
+        return $product_detail_sale = $product_detail_sale->map(function($product) {
+            return $product;
+        });
     }
 }

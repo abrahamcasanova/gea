@@ -39,6 +39,12 @@ class ProductDetailSale extends Model
         return $this->hasOne(Supplier::class,'id','supplier_id');
     }
 
+    public function supplierPayment()
+    {
+        return $this->hasMany(SupplierPayment::class,'product_detail_sale_id','id')
+            ->with('typeOfPayment','user');
+    }
+    
     public function scopeActive($query)
     {
         return $query->where('status',1);
