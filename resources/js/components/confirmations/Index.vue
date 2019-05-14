@@ -33,6 +33,7 @@
       >
         <template v-slot:items="props">
           <td class="text-xs-center">{{ props.item.id }}</td>
+          <td class="text-xs-left">{{  props.item.sale.quote.customer_order.customer ? props.item.sale.quote.customer_order.customer.full_name:null }}</td>
           <td class="text-xs-left">{{ props.item.rate_price | currency }}</td>
           <td class="text-xs-center">{{ props.item.confirmation }}</td>
           <td class="text-xs-left">{{ props.item.supplier.name }}</td>
@@ -257,6 +258,7 @@ export default {
       path_pdf:null,
       headers: [
         { value: 'id', align: 'left', text: 'Folio' },
+        { value: 'customer.full_name', align: 'left', text: 'Cliente' },
         { value: 'rate_price',text:'Precio Tarifa',sortable: true,},
         { value: 'liquidate',text:'Confirmación', sortable: true },
         { value: 'supplier.name', sortable: true,text:'Proveedor' },

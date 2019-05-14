@@ -31,7 +31,7 @@ class ProductDetailSale extends Model
 
     public function sale()
     {
-        return $this->hasOne(Sale::class,'id','sale_id')->withTrashed();
+        return $this->hasOne(Sale::class,'id','sale_id')->with('quote')->withTrashed();
     }
 
     public function supplier()
