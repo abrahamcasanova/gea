@@ -154,6 +154,11 @@ class PaymentController extends Controller
 
         $balance = floatval($sale->price - $sale->payments->sum('price'));
 
+        if(floatval($balance) <= 0){
+            $sale->liquidate = 1;
+            $sale->save();
+        }
+
         $user = auth()->user();
 
         $destinations = Destination::whereIn('id',explode(',',$payment->sale->travel_destination))

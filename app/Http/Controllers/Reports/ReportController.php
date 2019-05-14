@@ -108,6 +108,8 @@ class ReportController extends Controller
 
                     $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
                     $sum = $number + $key_detail;
+                    
+                    $sheet->setCellValue("A{$sum}" , $detail->customer->full_name);
                     $sheet->setCellValue("B{$sum}" , $detail->user->name);
                     $sheet->setCellValue("C{$sum}" , floatval($detail->price));
                     $sheet->setCellValue("D{$sum}" , $status);
