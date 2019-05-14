@@ -258,7 +258,7 @@ export default {
       path_pdf:null,
       headers: [
         { value: 'id', align: 'left', text: 'Folio' },
-        { value: 'customer.full_name', align: 'left', text: 'Cliente' },
+        { value: 'sale.quote.customer_order.customer.full_name', align: 'left', text: 'Cliente' },
         { value: 'rate_price',text:'Precio Tarifa',sortable: true,},
         { value: 'liquidate',text:'Confirmación', sortable: true },
         { value: 'supplier.name', sortable: true,text:'Proveedor' },

@@ -32,32 +32,6 @@ class ReportController extends Controller
                 ->select('type_of_payment', DB::raw('sum(price) total'))
                 ->groupBy('type_of_payment')
                 ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
-
-
-                /*foreach ($report as $key => $value) {
-                    $report_detail = Payment::with('user','customer','sale')
-                        ->where('type_of_payment',$value->type_of_payment)
-                        ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))
-                        ->orderBy('created_at')->get();
-                   //dd($report_detail);
-                   $total = 0;
-
-                   foreach ($report_detail as $key_detail => $detail) {
-                       $sum = $number + $key_detail;
-                       $sheet->setCellValue("D{$sum}" , $detail->user->name);
-                       $sheet->setCellValue("E{$sum}" , floatval($detail->price));
-                       $sheet->setCellValue("F{$sum}" , $detail->type_of_payment);
-                       $sheet->setCellValue("G{$sum}" , $detail->created_at);
-                       $sheet->setCellValue("H{$sum}" , $detail->id);
-                       $sheet->setCellValue("I{$sum}" , $detail->note);
-                       $total += floatval($detail->price);
-
-                   }
-                   //$fixnumber = intval($sum) - intval($sum - 1);
-                   $number += count($report_detail) + 2;
-                   $numberTotal = $number - 2;
-                }*/
-
       			break;
       	}
     }
@@ -78,10 +52,6 @@ class ReportController extends Controller
           $report = Payment::with('user','customer','sale')
               ->groupBy('type_of_payment')
               ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
-      		/*$report = Payment::with('user','customer','sale')
-              ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))
-              ->groupBy('type_of_payment')->groupBy('user_id')->groupBy('id')
-              ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();*/
     			break;
     	}
 
@@ -95,7 +65,7 @@ class ReportController extends Controller
              $sheet = $doc->getActiveSheet();
              $number = 6;
              $numberTotal = 0;
-               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DEL {$request->initial_date} AL {$request->final_date}");
+               $sheet->setCellValue("A2" , "REPORTE DE PAGOS DEL {$request->initial_date} AL {$request->final_date}");
              foreach ($report as $key => $value) {
                  $report_detail = Payment::with('user','customer','sale','userConfirmation')
                      ->where('type_of_payment',$value->type_of_payment)
@@ -108,7 +78,7 @@ class ReportController extends Controller
 
                     $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
                     $sum = $number + $key_detail;
-                    
+
                     $sheet->setCellValue("A{$sum}" , $detail->customer->full_name);
                     $sheet->setCellValue("B{$sum}" , $detail->user->name);
                     $sheet->setCellValue("C{$sum}" , floatval($detail->price));
@@ -118,7 +88,9 @@ class ReportController extends Controller
                     $sheet->setCellValue("G{$sum}" , $detail->sale->id);
                     $sheet->setCellValue("H{$sum}" , $detail->id);
                     $sheet->setCellValue("I{$sum}" , isset($detail->userConfirmation) ? $detail->userConfirmation->name:null);
-                    $sheet->setCellValue("J{$sum}" , $detail->note);
+                    $sheet->setCellValue("J{$sum}" , $detail->break);
+                    $sheet->setCellValue("K{$sum}" , $detail->date_received);
+                    $sheet->setCellValue("L{$sum}" , $detail->note);
                     $total += floatval($detail->price);
 
                 }
