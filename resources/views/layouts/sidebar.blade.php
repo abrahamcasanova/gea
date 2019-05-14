@@ -75,7 +75,7 @@
             @can('read-confirmations')
                 <li class="nav-item">
                     <a class="nav-link" href="{{url('/confirmations')}}">
-                        <i class="nav-icon icon-wallet"></i> Confirmación de pagos
+                        <i class="nav-icon icon-wallet"></i> Pago de confirmaciones
                     </a>
                 </li>
             @endcan

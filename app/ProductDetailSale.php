@@ -31,7 +31,7 @@ class ProductDetailSale extends Model
 
     public function sale()
     {
-        return $this->hasOne(Sale::class,'id','sale_id');
+        return $this->hasOne(Sale::class,'id','sale_id')->withTrashed();
     }
 
     public function supplier()
@@ -44,7 +44,7 @@ class ProductDetailSale extends Model
         return $this->hasMany(SupplierPayment::class,'product_detail_sale_id','id')
             ->with('typeOfPayment','user');
     }
-    
+
     public function scopeActive($query)
     {
         return $query->where('status',1);

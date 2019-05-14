@@ -10,7 +10,7 @@
       <v-toolbar-title>
         <div class="h3 text-muted text-right mb-12">
           <h4 style="margin-right:10px;margin-top:10px;" class="text-muted text-uppercase font-weight-bold">
-              Confirmación de pagos
+              Pago de confirmaciones
               <i class="fa-lg fas fa-dollar-sign text-primary"></i>
           </h4>
         </div>
@@ -37,6 +37,18 @@
           <td class="text-xs-center">{{ props.item.confirmation }}</td>
           <td class="text-xs-left">{{ props.item.supplier.name }}</td>
           <td class="text-xs-center">{{ props.item.date_payment_supplier }}</td>
+          <td class="text-xs-center">
+              <center>
+                <span v-if="props.item.sale.liquidate == 1" class='badge badge-success'>SI</span>
+                <span v-else class='badge badge-secondary'>NO</span>
+              </center>
+          </td>
+          <td class="text-xs-center">
+              <center>
+                <span v-if="!props.item.sale.deleted_at" class='badge badge-success'>Activo</span>
+                <span v-else class='badge badge-danger'>Cancelado</span>
+              </center>
+          </td>
           <td class="text-xs-center">
             <center>
               <span v-if="props.item.liquidate == 1" class='badge badge-primary'>SI</span>
@@ -117,6 +129,7 @@
                   max-rows="6"
                 ></b-form-textarea>
                 <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
+                <b-button v-if="confirmation.update == true" class="mt-3" variant="outline-success" block @click="updateConfirmPayment()">Actualizar</b-button>
             </div>
             <div class="form-group col-md-12">
                 <label><strong>Pagos realizados</strong></label>
@@ -144,6 +157,7 @@
                       <th>
                         <a href="#" class="text-dark">Nota</a>
                       </th>
+                      <th><a href="#" class="text-dark">Acciones</a></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -155,6 +169,13 @@
                           <td class="">{{ supplier_payment.type_of_payment ? supplier_payment.type_of_payment.name:''}}</td>
                           <td class="">{{ supplier_payment.user.name}}</td>
                           <td class="">{{ supplier_payment.note}}</td>
+                          <td class="">
+                            <a v-if="$can('update-supplier-payments')"
+                                data-toggle="tooltip" title="Editar" href="#" @click="editSupplierPayment(supplier_payment.id)"
+                                class="card-header-action ml-1 text-muted">
+                                <i class="fa-lg fas fa-pencil-alt"></i>
+                            </a>
+                          </td>
                       </tr>
                       <tr>
                           <td class=""><strong>Total: </strong>{{total | currency }}</td>
@@ -166,7 +187,7 @@
           </div>
         </div>
       </div>
-      <b-button class="mt-3" variant="outline-primary" block @click="saveConfirmPayment()">Confirmar</b-button>
+      <b-button class="mt-3" v-if="confirmation.update == false" variant="outline-primary" block @click="saveConfirmPayment()">Confirmar</b-button>
     </b-modal>
     <!-- Modal Component -->
     <!--
@@ -240,6 +261,8 @@ export default {
         { value: 'liquidate',text:'Confirmación', sortable: true },
         { value: 'supplier.name', sortable: true,text:'Proveedor' },
         { value: 'date_payment_supplier', sortable: true,text:'Fecha pago de proveedor' },
+        { value: 'sale.liquidate', sortable: true,text:'Venta Liquidada' },
+        { value: 'sale.status', sortable: true,text:'Estatus' },
         { value: 'liquidate', sortable: true,text:'Liquidado' },
         { value: 'date_liquidate', sortable: true,text:'Fecha Liquidado' },
         { value: 'created_at', sortable: true,text:'Registrado' },
@@ -302,6 +325,30 @@ export default {
             this.errors = error.response.data.errors
         })
     },
+    updateConfirmPayment(){
+        axios.put(`./api/supplier_payments/update/${this.confirmation.id}`,this.confirmation).then(response => {
+            swal("Pago actualizado correctamente!!", {
+              icon: 'success',
+              buttons: false,
+            });
+            setTimeout(function(){
+                location.href = './confirmations'
+            }, 1500);
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
+    },
+    editSupplierPayment(id){
+        axios.get(`./api/supplier_payments/` + id).then(response => {
+            this.confirmation = response.data
+            this.confirmation.type_of_voucher = {name: response.data.type_of_voucher}
+            this.confirmation.update = true;
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
+    },
     customFormatterLimit(date) {
         this.confirmation.date_confirmation = moment(this.confirmation.date_confirmation).format('YYYY/MM/DD');
         return moment(this.confirmation.date_confirmation).format('YYYY/MM/DD');
@@ -310,7 +357,13 @@ export default {
         this.$refs.myModalRef.hide()
     },
     modalPaymentProductDetails(id) {
+        /*
+        this.confirmation.amount = 0;
+        this.confirmation.date_confirmation = this.confirmation.note = this.confirmation.number_voucher
+        = this.confirmation.type_of_payment = this.confirmation.type_of_voucher = [];
+        */
         this.confirmation.product_detail_sale_id =  id;
+        this.confirmation.update = false;
         axios.post(`./api/supplier_payments/get-payments/` + id).then(response => {
             this.supplierPayment = response.data
             this.supplierPaymentReduce = response.data.supplierPayments

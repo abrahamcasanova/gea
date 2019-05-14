@@ -26,6 +26,7 @@ class Sale extends Model
       'quadruple_room',
       'rate_price',
       'confirmation',
+      'liquidate',
       'product_id',
       'supplier_id',
       'user_id',

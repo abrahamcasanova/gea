@@ -10,8 +10,13 @@ Route::middleware('auth')->group(function () {
 
         // api
         Route::group(['prefix' => 'api/supplier_payments'], function() {
+          Route::get('/{supplier_payment}', 'SupplierPaymentController@show')
+              ->middleware('permission:read-supplier-payments');
           Route::post('/get-payments/{id}', 'SupplierPaymentController@getPayments');
-          Route::post('/store', 'SupplierPaymentController@store')->middleware('permission:create-supplier-payments');
+          Route::post('/store', 'SupplierPaymentController@store')
+              ->middleware('permission:create-supplier-payments');
+          Route::put('/update/{supplier_payment}', 'SupplierPaymentController@update')
+              ->middleware('permission:update-supplier-payments');
         });
     });
 });

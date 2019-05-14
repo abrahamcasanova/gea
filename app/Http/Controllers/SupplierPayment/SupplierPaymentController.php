@@ -54,4 +54,30 @@ class SupplierPaymentController extends Controller
 
         return $collection->put('supplierPayments',$supplierPayments);
     }
+
+    public function show(SupplierPayment $supplier_payment)
+    {
+        return $supplier_payment->load('typeOfPayment','user');
+    }
+
+    public function update(Request $request, SupplierPayment $supplier_payment)
+    {
+        $this->validate($request, [
+            'amount'                 => 'required|numeric',
+            'date_confirmation'      => 'required|date',
+            'type_of_voucher'        => 'required',
+            'type_of_payment_id'     => 'required',
+            'number_voucher'         => 'required',
+            'note'                   => 'nullable',
+            'user_id'                => 'required',
+            'product_detail_sale_id' => 'required',
+        ]);
+
+        $request->merge(['type_of_voucher' => $request->type_of_voucher['name']]);
+        $request->merge(['type_of_payment_id' => $request->type_of_payment['id']]);
+
+        $supplier_payment->fill($request->all())->save();
+
+        return $supplier_payment;
+    }
 }
