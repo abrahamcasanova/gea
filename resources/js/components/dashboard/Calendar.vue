@@ -93,8 +93,7 @@
               </v-icon>
             </v-btn>
           </v-flex>
-            </v-layout>
-
+      </v-layout>
   </v-app>
 
 </template>

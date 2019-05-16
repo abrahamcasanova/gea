@@ -21,7 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar','phone','cellphone'
+        'name', 'email', 'password', 'avatar','phone','cellphone','sales_goal'
     ];
 
     /**
@@ -40,6 +40,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAvatarUrlAttribute()
     {
         return Storage::url('app/avatars/'.$this->id.'/'.$this->avatar);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class,'user_id','id');
     }
 
     public function profile()

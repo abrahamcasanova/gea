@@ -46,14 +46,16 @@ class UserController extends Controller
             'roles'     => 'required|array',
             'phone'     => 'required|numeric',
             'cellphone' => 'nullable|numeric',
+            'sales_goal' => 'nullable|numeric'
         ]);
 
         $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'phone'     => $request->phone,
-            'cellphone' => $request->cellphone,
-            'password'  => Hash::make($request->password)
+            'name'       => $request->name,
+            'email'      => $request->email,
+            'phone'      => $request->phone,
+            'cellphone'  => $request->cellphone,
+            'sales_goal' => $request->sales_goal,
+            'password'   => Hash::make($request->password)
         ]);
 
         $rolesNames = array_pluck($request->roles, ['name']);
@@ -74,11 +76,12 @@ class UserController extends Controller
             'roles'     => 'required|array',
             'phone'     => 'required|numeric',
             'cellphone' => 'nullable|numeric',
+            'sales_goal' => 'nullable|numeric'
         ]);
 
         $user = User::find($request->id);
         $user->fill($request->all());
-        
+
         if ($user->name != $request->name) {
             $avatar = Avatar::create($request->name)->getImageObject()->encode('png');
             Storage::put('avatars/'.$user->id.'/avatar.png', (string) $avatar);
@@ -133,8 +136,37 @@ class UserController extends Controller
         $user = auth()->user();
         $database->getReference("user/{$user->id}")->set($request->all());
         return 'success';
+    }
 
+    public function goals(User $user){
+        if($user->roles->pluck('name')[0] == 'admin'){
 
+          $users = User::with(['sales' => function($query) {
+              $query->whereYear('created_at',  date('Y'))
+                  ->whereMonth('created_at',  date('m'));
+          }])->get();
+
+          return $users->map(function($user) {
+              $user->total_sale = $user->sales->sum('price');
+              if($user->total_sale > 0 && $user->sales_goal != null){
+                  $user->percentage = number_format((floatval($user->total_sale / $user->sales_goal) * 100),2);
+              }else{
+                  $user->percentage = 0;
+              }
+              return $user;
+          });
+        }else{
+          $custom = User::with(['sales' => function($query) {
+              $query->whereYear('created_at',  date('Y'))
+                  ->whereMonth('created_at',  date('m'));
+          }])->where('id',$user->id)->get();
+
+          return $custom->map(function($value) {
+              $value->total_sale = $value->sales->sum('price');
+              $value->percentage = number_format((floatval($value->total_sale / $value->sales_goal) * 100),2);
+              return $value;
+          });
+        }
     }
 
 }

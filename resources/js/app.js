@@ -155,6 +155,7 @@ Vue.component('quotes-count', require('./components/dashboard/QuotesCount.vue'))
 Vue.component('quotes', require('./components/dashboard/Quotes.vue'));
 Vue.component('quote-indicator', require('./components/dashboard/QuoteIndicator.vue'));
 Vue.component('top-products', require('./components/dashboard/TopProducts.vue'));
+Vue.component('goals-indicator', require('./components/dashboard/GoalsIndicator.vue'));
 Vue.component('prospectings-count', require('./components/dashboard/ProspectingsCount.vue'));
 
 // Profile

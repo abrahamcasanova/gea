@@ -50,6 +50,11 @@
                 <div class="invalid-feedback" v-if="errors.password">{{errors.password[0]}}</div>
               </div>
               <div class="form-group">
+                <label>Meta de ventas</label>
+                <vue-numeric class="form-control"  :class="{'is-invalid': errors.sales_goal}" currency="$" separator="," :precision="2" v-model="user.sales_goal"></vue-numeric>
+                <div class="invalid-feedback" v-if="errors.sales_goal">{{errors.sales_goal[0]}}</div>
+              </div>
+              <div class="form-group">
                 <label>Roles</label>
                 <multiselect
                   v-model="user.roles"
@@ -128,7 +133,7 @@ export default {
         this.submiting = true
         axios.put(`../../api/users/update/${this.user.id}`, this.user)
         .then(response => {
-          this.$toasted.global.error('Updated user!')
+          this.$toasted.global.error('Usuario Actualizado!')
           location.href = '../../users'
         })
         .catch(error => {

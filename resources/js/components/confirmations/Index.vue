@@ -57,10 +57,8 @@
             </center>
           </td>
           <td class="text-xs-center">{{ props.item.date_liquidate }}</td>
-          <td class="text-xs-center">{{ props.item.created_at }}</td>
-
           <td class="justify-center layout px-0">
-            <a href="#" @click="modalPaymentProductDetails(props.item.id)" v-if="$can('add-payments-confirmations')" class="card-header-action ml-1 text-muted">
+            <a href="#" @click="modalPaymentProductDetails(props.item.id)" v-if="$can('show-payments-confirmations')" class="card-header-action ml-1 text-muted">
               <i class="fa-lg fas fa-hand-holding-usd text-primary"></i>
             </a>
           </td>
@@ -83,7 +81,7 @@
     <b-modal size="lg" id="modal2" ref="myModalRef" hide-footer title="Agregar pago">
       <div class="d-block">
         <div class="col-md-12 card-body px-0">
-          <div class="row">
+          <div v-if="$can('add-payments-confirmations')" class="row">
             <div class="form-group col-md-4">
                 <label>Importe</label>
                 <vue-numeric class="form-control"  :class="{'is-invalid': errors.amount}" currency="$" separator="," :precision="2" v-model="confirmation.amount"></vue-numeric>
@@ -132,6 +130,8 @@
                 <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
                 <b-button v-if="confirmation.update == true" class="mt-3" variant="outline-success" block @click="updateConfirmPayment()">Actualizar</b-button>
             </div>
+          </div>
+          <div v-if="$can('show-payments-confirmations')" class="row">
             <div class="form-group col-md-12">
                 <label><strong>Pagos realizados</strong></label>
                 <table class="table">
@@ -171,7 +171,7 @@
                           <td class="">{{ supplier_payment.user.name}}</td>
                           <td class="">{{ supplier_payment.note}}</td>
                           <td class="">
-                            <a v-if="$can('update-supplier-payments')"
+                            <a v-if="$can('update-confirmations')"
                                 data-toggle="tooltip" title="Editar" href="#" @click="editSupplierPayment(supplier_payment.id)"
                                 class="card-header-action ml-1 text-muted">
                                 <i class="fa-lg fas fa-pencil-alt"></i>
@@ -188,7 +188,9 @@
           </div>
         </div>
       </div>
-      <b-button class="mt-3" v-if="confirmation.update == false" variant="outline-primary" block @click="saveConfirmPayment()">Confirmar</b-button>
+      <span v-if="$can('add-payments-confirmations')">
+          <b-button  class="mt-3" v-if="confirmation.update == false" variant="outline-primary" block @click="saveConfirmPayment()">Confirmar</b-button>
+      </span>
     </b-modal>
     <!-- Modal Component -->
     <!--
@@ -267,7 +269,6 @@ export default {
         { value: 'sale.status', sortable: true,text:'Estatus' },
         { value: 'liquidate', sortable: true,text:'Liquidado' },
         { value: 'date_liquidate', sortable: true,text:'Fecha Liquidado' },
-        { value: 'created_at', sortable: true,text:'Registrado' },
         { value: 'actions', sortable: false,text:'Acciones' },
       ],
       productDetailSales:[],
@@ -299,6 +300,7 @@ export default {
     },
     total: function(){
         let vm = this;
+        vm.sum = 0;
         return this.supplierPaymentReduce.reduce(function(prev, item){
             return vm.sum += item.amount;
         },0);

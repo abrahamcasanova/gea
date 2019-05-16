@@ -22,6 +22,11 @@
             </div>
             @endif
             <div class="row justify-content-md-center">
+                <div class="col-sm-12 col-xl-12 col-md-12">
+                    @can('see-sales-goals')
+                        <goals-indicator :user_id={{ auth()->user()->id }}></goals-indicator>
+                    @endcan
+                </div>
                 <div class="col-sm-6 col-xl-6 col-md-6">
                     @can('see-count-tracing')
                         <tracing-count></tracing-count>

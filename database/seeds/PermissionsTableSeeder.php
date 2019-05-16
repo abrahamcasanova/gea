@@ -1,5 +1,6 @@
 <?php
 
+use App\Module;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -711,6 +712,30 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
                 'module_id' => $moduleId
             ]
+        ]);
+
+        $moduleId = Module::where('name','dashboard')->first();
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'see-sales-goals',
+                'display_name' => 'Visualizar metas',
+                'guard_name' => 'web',
+                'module_id' => $moduleId->id
+            ],
+        ]);
+
+        $moduleId = Module::where('name','confirmations')->first();
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'show-payments-confirmations',
+                'display_name' => 'Visualizar pagos realizados',
+                'guard_name' => 'web',
+                'module_id' => $moduleId->id
+            ],
         ]);
 
         // Assign permissions to admin role

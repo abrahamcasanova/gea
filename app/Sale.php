@@ -62,6 +62,11 @@ class Sale extends Model
         return $this->hasMany(ProductDetailSale::class,'sale_id','id')->with('product','quote','supplier');
     }
 
+    public function userSales()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function user()
     {
         return $this->hasOne(User::class,'id','user_id');

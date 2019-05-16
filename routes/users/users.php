@@ -13,6 +13,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/getUserRoles/{user}', 'UserController@getUserRoles');
             Route::get('/count', 'UserController@count');
             Route::get('/all', 'UserController@all');
+            Route::post('/goals/{user}', 'UserController@goals');
             Route::post('/calendar', 'UserController@calendar');
             Route::post('/-get-calendar', 'UserController@getCalendar');
             Route::post('/filter', 'UserController@filter')->middleware('permission:read-users');
