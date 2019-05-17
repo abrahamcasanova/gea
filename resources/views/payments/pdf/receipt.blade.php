@@ -68,7 +68,7 @@
                 <h4 class="textUppercase">{{$payment->sale->quote->customerOrder->customer->full_name}}</h4>
                 <h4>Moneda: {{$payment->sale->quote->currency}}</h4>
                 <h4>Destinos: {{ implode(',', $destinations->pluck('name')->toArray()) }}</h4>
-                <h4>Fecha de viaje: {{ $payment->sale->quote->customerOrder->travel_date }} AL {{ $payment->sale->quote->customerOrder->travel_end_date }}
+                <h4>Fecha de viaje: {{ $payment->sale->quote->travel_date }}
                 </h4>
             </td>
             <td align="center">
