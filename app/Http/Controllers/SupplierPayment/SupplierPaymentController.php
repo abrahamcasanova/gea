@@ -39,8 +39,13 @@ class SupplierPaymentController extends Controller
             if(!isset($product->date_liquidate)){
                 $product->date_liquidate = date('Y-m-d');
             }
+            $product->status_pending = $request->status_pending;
+            $product->save();
+        }else{
+            $product->status_pending = $request->status_pending;
             $product->save();
         }
+
 
         return response()->json(true);
     }
@@ -77,6 +82,21 @@ class SupplierPaymentController extends Controller
         $request->merge(['type_of_payment_id' => $request->type_of_payment['id']]);
 
         $supplier_payment->fill($request->all())->save();
+
+        $product = ProductDetailSale::find($request->product_detail_sale_id);
+        $sumSupplierPayment = SupplierPayment::WhereProductDetailSaleId($product->id)->sum('amount');
+        
+        if(floatval($product->rate_price) <= floatval($sumSupplierPayment)){
+            $product->liquidate = 1;
+            if(!isset($product->date_liquidate)){
+                $product->date_liquidate = date('Y-m-d');
+            }
+            $product->status_pending = $request->status_pending;
+            $product->save();
+        }else{
+            $product->status_pending = $request->status_pending;
+            $product->save();
+        }
 
         return $supplier_payment;
     }

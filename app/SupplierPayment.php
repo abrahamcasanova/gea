@@ -13,6 +13,7 @@ class SupplierPayment extends Model
       'date_confirmation',
       'type_of_voucher',
       'type_of_payment_id',
+      'authorization_number',
       'number_voucher',
       'product_detail_sale_id',
       'note',

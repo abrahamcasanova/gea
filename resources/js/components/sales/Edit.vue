@@ -458,7 +458,6 @@ export default {
             case 'QUINCENAL':
               var week_date = then.diff(now, 'week');
               week_date = parseInt(week_date/2);
-              console.log(week_date)
               for (var i = 0; i <= week_date -1; i++) {
                  let date = now.add(2,'week').format('YYYY-MM-DD');
                  if(then_compare != date){

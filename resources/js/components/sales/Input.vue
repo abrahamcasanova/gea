@@ -156,7 +156,7 @@
               <span class="h3 text-success text-uppercase font-weight-bold" >
                   <i class="fa-md fas fa-bed text-dark"></i> Habitaciones
                 </span>
-              <v-divider inset></v-divider>  
+              <v-divider inset></v-divider>
           </div>
           <div class="row">
             <div class="form-group col-md-6">
@@ -175,7 +175,7 @@
                 <div class="invalid-feedback" v-if="errors.triple_room">{{errors.triple_room[0]}}</div>
             </div>
             <div class="form-group col-md-6">
-                <label>Cuádruple</label> 
+                <label>Cuádruple</label>
                 <input type="number" class="form-control" :class="{'is-invalid': errors.quadruple_room}" v-model="sale.quadruple_room" placeholder="">
                 <div class="invalid-feedback" v-if="errors.quadruple_room">{{errors.quadruple_room[0]}}</div>
             </div>
@@ -241,7 +241,7 @@ export default {
         this.$emit('update:quote_id',this.quote_id)
         this.reset();
         this.getProductsByQuoteSpecial();
-        this.getDetails();    
+        this.getDetails();
 
     },
     'quote_sale'(){
@@ -287,7 +287,7 @@ export default {
           var events = [];
           var last_date = null;
           if(this.sale.schedule){
-              
+
               switch(this.sale.schedule.id) {
               case 'SEMANAL':
                 var week_date = then.diff(now, 'week');
@@ -352,29 +352,29 @@ export default {
                 type: 'success',
                 title: 'Pago anticipo ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
             });
-
-            events.push({
-                id: uuid.v1(),
-                details: 'Fecha limite de pago cliente: ' + this.quote_sale.customer_order.customer.full_name 
-                + ' Importe a cobrar: $ ' + this.sale.price,
-                date: then_compare,
-                open: false,
-                type: 'warning',
-                title: 'Pago Limite ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
-            });
-
-            events.push({
-                id: uuid.v1(),
-                details: 'Fecha limite de pago proveedor, Folio: ' + this.quote_sale.id,
-                date: moment(this.sale.date_payment_supplier).format('YYYY-MM-DD'),
-                open: false,
-                type: 'danger',
-                title: 'Pago Proveedor ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
-            });
-
-            this.sale.events = events
           }
-          
+
+          events.push({
+              id: uuid.v1(),
+              details: 'Fecha limite de pago cliente: ' + this.quote_sale.customer_order.customer.full_name
+              + ' Importe a cobrar: $ ' + this.sale.price,
+              date: then_compare,
+              open: false,
+              type: 'warning',
+              title: 'Pago Limite ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
+          });
+
+          events.push({
+              id: uuid.v1(),
+              details: 'Fecha limite de pago proveedor, Folio: ' + this.quote_sale.id,
+              date: moment(this.sale.date_payment_supplier).format('YYYY-MM-DD'),
+              open: false,
+              type: 'danger',
+              title: 'Pago Proveedor ' + this.quote_sale.customer_order.customer.full_name + ' Folio: ' + this.quote_sale.id
+          });
+
+          this.sale.events = events
+
           this.sale.quote_id = this.quote_id;
           this.sale.destinations = this.quote_sale.travel_destination ? this.quote_sale.travel_destination:null;
 
@@ -517,7 +517,7 @@ export default {
             this.submitingDestroy = false
           })
         }
-      }     
+      }
   }
 }
 </script>

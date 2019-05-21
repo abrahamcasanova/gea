@@ -14,6 +14,7 @@ class ProductDetailSale extends Model
       'confirmation',
       'date_payment_supplier',
       'status',
+      'status_pending',
       'product_id',
       'supplier_id',
       'quote_id',

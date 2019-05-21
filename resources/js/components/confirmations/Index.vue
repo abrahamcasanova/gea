@@ -46,6 +46,12 @@
           </td>
           <td class="text-xs-center">
               <center>
+                <span v-if="props.item.status_pending == 1" class='badge badge-danger'>SI</span>
+                <span v-else class='badge badge-success'>NO</span>
+              </center>
+          </td>
+          <td class="text-xs-center">
+              <center>
                 <span v-if="!props.item.sale.deleted_at" class='badge badge-success'>Activo</span>
                 <span v-else class='badge badge-danger'>Cancelado</span>
               </center>
@@ -102,6 +108,9 @@
                   :class="{'border border-danger rounded': errors.type_of_payment}">
                 </multiselect>
                 <small class="form-text text-danger" v-if="errors.type_of_payment">{{errors.type_of_payment[0]}}</small>
+            </div>
+            <div v-if="confirmation.type_of_payment.with_authorization == 1" class="form-group col-md-4">
+                <v-text-field v-model="confirmation.authorization_number" :class="{'is-invalid': errors.authorization_number}" type="text" label="Numero de autorización"></v-text-field>
             </div>
             <div class="form-group col-md-4">
                 <label>Tipo de comprobante</label>
@@ -252,7 +261,9 @@ export default {
       supplierPayment:[],
       supplierPaymentReduce:[],
       payment:[],
-      confirmation:{},
+      confirmation:{
+        type_of_payment:[]
+      },
       errors:{},
       type_of_payment: [],
       type_of_voucher: [
@@ -270,6 +281,7 @@ export default {
         { value: 'supplier.name', sortable: true,text:'Proveedor' },
         { value: 'date_payment_supplier', sortable: true,text:'Fecha pago de proveedor' },
         { value: 'sale.liquidate', sortable: true,text:'Venta Liquidada' },
+        { value: 'sale.status_pending', sortable: true,text:'Pendiente' },
         { value: 'sale.status', sortable: true,text:'Estatus' },
         { value: 'liquidate', sortable: true,text:'Liquidado' },
         { value: 'actions', sortable: false,text:'Acciones' },
@@ -319,31 +331,61 @@ export default {
   },
   methods: {
     saveConfirmPayment(){
-        axios.post(`./api/supplier_payments/store`,this.confirmation).then(response => {
-            swal("Pago generada correctamente!!", {
-              icon: 'success',
-              buttons: false,
-            });
-            setTimeout(function(){
-                location.href = './confirmations'
-            }, 1500);
+
+        if(this.confirmation.type_of_payment.with_authorization != 1){
+            this.confirmation.authorization_number = '';
+        }
+
+        swal({
+          title: "Estatus",
+          text: "¿Este registro aun esta pendiente?",
+          icon: "warning",
+          buttons: ["NO", "SI"],
         })
-        .catch(error => {
-            this.errors = error.response.data.errors
+        .then((willDelete) => {
+          this.confirmation.status_pending = willDelete == true ? 1:0;
+          axios.post(`./api/supplier_payments/store`,this.confirmation).then(response => {
+              swal("Pago generada correctamente!!", {
+                icon: 'success',
+                buttons: false,
+              });
+              setTimeout(function(){
+                  location.href = './confirmations'
+              }, 1500);
+          })
+          .catch(error => {
+              this.errors = error.response.data.errors
+          })
+
         })
     },
     updateConfirmPayment(){
-        axios.put(`./api/supplier_payments/update/${this.confirmation.id}`,this.confirmation).then(response => {
-            swal("Pago actualizado correctamente!!", {
-              icon: 'success',
-              buttons: false,
-            });
-            setTimeout(function(){
-                location.href = './confirmations'
-            }, 1500);
+
+        if(this.confirmation.type_of_payment.with_authorization != 1){
+            this.confirmation.authorization_number = '';
+        }
+
+        swal({
+          title: "Estatus",
+          text: "¿Este registro aun esta pendiente?",
+          icon: "warning",
+          buttons: ["NO", "SI"],
         })
-        .catch(error => {
-            this.errors = error.response.data.errors
+        .then((willDelete) => {
+          this.confirmation.status_pending = willDelete == true ? 1:0;
+          axios.put(`./api/supplier_payments/update/${this.confirmation.id}`,this.confirmation).then(response => {
+              swal("Pago actualizado correctamente!!", {
+                icon: 'success',
+                buttons: false,
+              });
+              setTimeout(function(){
+                  location.href = './confirmations'
+              }, 1500);
+          })
+          .catch(error => {
+              this.errors = error.response.data.errors
+          })
+
         })
     },
     editSupplierPayment(id){
