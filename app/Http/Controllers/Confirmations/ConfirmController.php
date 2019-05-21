@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Confirmations;
 
+use App\SupplierPayment;
 use App\ProductDetailSale;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,5 +17,10 @@ class ConfirmController extends Controller
         return $product_detail_sale = $product_detail_sale->map(function($product) {
             return $product;
         });
+    }
+
+    public function destroy ($confirmation)
+    {
+        return SupplierPayment::destroy($confirmation);
     }
 }

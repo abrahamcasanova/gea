@@ -67,7 +67,7 @@ class SupplierPaymentController extends Controller
             'date_confirmation'      => 'required|date',
             'type_of_voucher'        => 'required',
             'type_of_payment_id'     => 'required',
-            'number_voucher'         => 'required',
+            'number_voucher'         => 'nullable',
             'note'                   => 'nullable',
             'user_id'                => 'required',
             'product_detail_sale_id' => 'required',

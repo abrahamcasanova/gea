@@ -11,6 +11,8 @@ Route::middleware('auth')->group(function () {
         // api
         Route::group(['prefix' => 'api/confirmations'], function() {
             Route::post('/getDetails', 'ConfirmController@getDetails');
+            Route::delete('/{confirmation}', 'ConfirmController@destroy')
+                ->middleware('permission:delete-confirmations');
         });
     });
 });

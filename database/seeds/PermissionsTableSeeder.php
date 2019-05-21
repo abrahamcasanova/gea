@@ -736,6 +736,12 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
                 'module_id' => $moduleId->id
             ],
+            [
+                'name' => 'delete-confirmations',
+                'display_name' => 'Eliminar pagos realizados',
+                'guard_name' => 'web',
+                'module_id' => $moduleId->id
+            ],
         ]);
 
         // Assign permissions to admin role

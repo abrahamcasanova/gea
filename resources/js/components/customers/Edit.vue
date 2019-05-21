@@ -61,7 +61,7 @@
                 <datepicker :bootstrap-styling="true" :language="es" :format="customFormatter" v-model="customer.birthdate"></datepicker>
                 <div class="invalid-feedback" v-if="errors.birthdate">{{errors.birthdate[0]}}</div>
             </div>
-            
+
             <div class="form-group col-md-6">
               <label>Nivel de cliente</label>
               <multiselect
@@ -187,8 +187,8 @@ export default {
         }
     },
     customFormatter(date) {
-      this.customer.birthdate = moment(date).format('YYYY/MM/DD');
-      return moment(date).format('YYYY/MM/DD');
+      this.customer.birthdate = moment(this.customer.birthdate).format('YYYY/MM/DD');
+      return moment(this.customer.birthdate).format('YYYY/MM/DD');
     },
     getGroups() {
         axios.get(`../../api/groups/all`).then(response => {

@@ -36,7 +36,7 @@
           <td class="text-xs-left">{{  props.item.sale.quote.customer_order.customer ? props.item.sale.quote.customer_order.customer.full_name:null }}</td>
           <td class="text-xs-left">{{ props.item.rate_price | currency }}</td>
           <td class="text-xs-center">{{ props.item.confirmation }}</td>
-          <td class="text-xs-left">{{ props.item.supplier.name }}</td>
+          <td class="text-xs-left">{{ props.item.supplier ? props.item.supplier.name:null }}</td>
           <td class="text-xs-center">{{ props.item.date_payment_supplier }}</td>
           <td class="text-xs-center">
               <center>
@@ -56,7 +56,6 @@
               <span v-else class='badge badge-secondary'>NO</span>
             </center>
           </td>
-          <td class="text-xs-center">{{ props.item.date_liquidate }}</td>
           <td class="justify-center layout px-0">
             <a href="#" @click="modalPaymentProductDetails(props.item.id)" v-if="$can('show-payments-confirmations')" class="card-header-action ml-1 text-muted">
               <i class="fa-lg fas fa-hand-holding-usd text-primary"></i>
@@ -168,13 +167,18 @@
                           <td class="">{{ supplier_payment.type_of_voucher}}</td>
                           <td class="">{{ supplier_payment.number_voucher}}</td>
                           <td class="">{{ supplier_payment.type_of_payment ? supplier_payment.type_of_payment.name:''}}</td>
-                          <td class="">{{ supplier_payment.user.name}}</td>
+                          <td class="">{{ supplier_payment.user ? supplier_payment.user.name:null}}</td>
                           <td class="">{{ supplier_payment.note}}</td>
                           <td class="">
                             <a v-if="$can('update-confirmations')"
                                 data-toggle="tooltip" title="Editar" href="#" @click="editSupplierPayment(supplier_payment.id)"
                                 class="card-header-action ml-1 text-muted">
                                 <i class="fa-lg fas fa-pencil-alt"></i>
+                            </a>
+                            <a v-if="$can('delete-confirmations')"
+                                data-toggle="tooltip" title="Editar" href="#" @click="deleteSupplierPayment(supplier_payment.id)"
+                                class="card-header-action ml-1 text-muted">
+                                <i class="fa-lg fas fa-trash-alt"></i>
                             </a>
                           </td>
                       </tr>
@@ -268,7 +272,6 @@ export default {
         { value: 'sale.liquidate', sortable: true,text:'Venta Liquidada' },
         { value: 'sale.status', sortable: true,text:'Estatus' },
         { value: 'liquidate', sortable: true,text:'Liquidado' },
-        { value: 'date_liquidate', sortable: true,text:'Fecha Liquidado' },
         { value: 'actions', sortable: false,text:'Acciones' },
       ],
       productDetailSales:[],
@@ -300,13 +303,13 @@ export default {
     },
     total: function(){
         let vm = this;
-        vm.sum = 0;
+        this.sum = 0;
         return this.supplierPaymentReduce.reduce(function(prev, item){
-            return vm.sum += item.amount;
+            return vm.sum += item.amount ? parseFloat(item.amount):0;
         },0);
      },
      balance: {
-        get() { return this.balance = (this.supplierPayment.rate_price - this.total); },
+        get() { return this.balance = this.supplierPayment.rate_price ? parseFloat(this.supplierPayment.rate_price - this.total):0; },
         set(newValue) {  }
      }
   },
@@ -352,6 +355,31 @@ export default {
         .catch(error => {
             this.errors = error.response.data.errors
         })
+    },
+    deleteSupplierPayment(id){
+        if (!this.submitingDestroy) {
+          this.submitingDestroy = true
+          swal({
+            title: "Eliminar",
+            text: "Desea eliminar el registro?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+              axios.delete(`./api/confirmations/` + id)
+              .then(response => {
+                this.$toasted.global.error('Eliminado!')
+                location.href = './confirmations'
+              })
+              .catch(error => {
+                this.errors = error.response.data.errors
+              })
+            }
+            this.submitingDestroy = false
+          })
+        }
     },
     customFormatterLimit(date) {
         this.confirmation.date_confirmation = moment(this.confirmation.date_confirmation).format('YYYY/MM/DD');
