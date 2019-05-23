@@ -288,6 +288,13 @@
                 ></b-form-textarea>
                 <div class="invalid-feedback" v-if="errors.date_received">{{errors.date_received[0]}}</div>
             </div>
+            <div class="form-group col-md-12">
+                <v-checkbox
+                  v-model="payment.confirm"
+                  color="blue"
+                  :label="`Confirmado`"
+                ></v-checkbox>
+            </div>
           </div>
         </div>
       </div>
@@ -309,11 +316,14 @@ export default {
   data () {
     return {
       payments: [],
-      payment:{},
+      payment:{
+        confirm:false
+      },
       docs: [],
       totalRows: 1,
       currentPage: 1,
       errors:{},
+      checkbox: false,
       es:es,
       perPage: 10,
       pageOptions: [5, 10, 15],

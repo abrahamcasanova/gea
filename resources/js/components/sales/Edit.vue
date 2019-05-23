@@ -78,6 +78,11 @@
                 </multiselect>
                 <div class="invalid-feedback" v-if="errors.currency">{{errors.currency[0]}}</div>
             </div>
+            <div class="form-group col-md-6">
+                <label>Fecha de viaje</label>
+                <input type="text" class="form-control" :class="{'is-invalid': errors.travel_date}" v-model="sale.quote.travel_date" placeholder="">
+                <div class="invalid-feedback" v-if="errors.travel_date">{{errors.travel_date[0]}}</div>
+            </div>
             <v-spacer></v-spacer>
             <div class="form-group col-md-12">
                 <label>Producto</label>

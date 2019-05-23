@@ -309,7 +309,8 @@ class SaleController extends Controller
 
         Quote::find(intval($request->quote['id']))->update([
             'number_adults' => $request->quote['number_adults'],
-            'number_childs' => $request->quote['number_childs']
+            'number_childs' => $request->quote['number_childs'],
+            'travel_date'   => $request->quote['travel_date']
         ]);
 
         if($request->quote_detail_id){
