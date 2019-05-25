@@ -31,6 +31,11 @@ class SupplierPayment extends Model
         return $this->hasOne(TypeOfPayment::class,'id','type_of_payment_id');
     }
 
+    public function productDetailSale()
+    {
+        return $this->hasOne(ProductDetailSale::class,'id','product_detail_sale_id')->with('sale');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status',1);

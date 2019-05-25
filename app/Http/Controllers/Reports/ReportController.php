@@ -9,6 +9,7 @@ use App\Quote;
 use App\Payment;
 use Carbon\Carbon;
 use App\Destination;
+use App\SupplierPayment;
 use App\ProductDetailSale;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -33,6 +34,12 @@ class ReportController extends Controller
                 ->groupBy('type_of_payment')
                 ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
       			break;
+          case 'Reporte de pagos de confirmaciones (resumen)':
+              return $report = SupplierPayment::with('user','typeOfPayment','productDetailSale')
+                ->select('type_of_payment', DB::raw('sum(price) total'))
+                ->groupBy('type_of_payment')
+                ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+      			break;
       	}
     }
 
@@ -53,6 +60,14 @@ class ReportController extends Controller
               ->groupBy('type_of_payment')
               ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
     			break;
+        case 'Reporte de pagos de confirmaciones (resumen)':
+          $report = SupplierPayment::with('user','typeOfPayment','productDetailSale')
+              ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+          break;
+        case 'Reporte de pagos de confirmaciones (gral)':
+          $report = ProductDetailSale::with('quote','sale','supplier')
+              ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+          break;
     	}
 
   		if(count($report) == 0 ){
@@ -90,7 +105,10 @@ class ReportController extends Controller
                     $sheet->setCellValue("I{$sum}" , isset($detail->userConfirmation) ? $detail->userConfirmation->name:null);
                     $sheet->setCellValue("J{$sum}" , $detail->break);
                     $sheet->setCellValue("K{$sum}" , $detail->date_received);
-                    $sheet->setCellValue("L{$sum}" , $detail->note);
+                    $sheet->setCellValue("L{$sum}" , isset($detail->authorization_number) ? $detail->authorization_number:null);
+                    $sheet->setCellValue("M{$sum}" , isset($detail->deposit_date) ? $detail->deposit_date:null);
+                    $sheet->setCellValue("N{$sum}" , $detail->note);
+
                     $total += floatval($detail->price);
 
                 }
@@ -106,6 +124,70 @@ class ReportController extends Controller
                 $numberTotal = $sum + 1;
 
                 */
+
+             }
+           })->setFilename($filename)->store('xls', storage_path('excel/exports'));
+           return "excel/exports/{$filename}.xls";
+          break;
+          case 'Reporte de pagos de confirmaciones (resumen)':
+            $filename = "Reporte de pagos de confirmaciones resumen_".date('Y_m_d H_i_s');
+            Excel::load(storage_path('excel/exports/Reporte de pagos de confirmaciones resumen.xls'), function($doc) use($report,$request){
+             $sheet = $doc->getActiveSheet();
+             $number = 6;
+             $numberTotal = 0;
+               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+             foreach ($report as $key => $value) {
+
+                $total = 0;
+                $sum = $number + $key;
+
+                $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
+
+                $sheet->setCellValue("B{$sum}" , isset($value->productDetailSale) ? $value->productDetailSale->id:null);
+                $sheet->setCellValue("C{$sum}" , isset($value->productDetailSale->sale->quote->customerOrder) ?
+                $value->productDetailSale->sale->quote->customerOrder->customer->full_name:null);
+                $sheet->setCellValue("D{$sum}" , floatval($value->amount));
+                $sheet->setCellValue("E{$sum}" , $value->date_confirmation);
+                $sheet->setCellValue("F{$sum}" , $value->type_of_voucher);
+                $sheet->setCellValue("G{$sum}" , isset($value->number_voucher) ? $value->number_voucher:'PENDIENTE');
+                $sheet->setCellValue("H{$sum}" , isset($value->typeOfPayment) ? $value->typeOfPayment->name:null);
+                $sheet->setCellValue("I{$sum}" , $value->authorization_number);
+                $sheet->setCellValue("J{$sum}" , isset($value->user) ? $value->user->name:null);
+                $sheet->setCellValue("K{$sum}" , $value->note);
+
+                //$fixnumber = intval($sum) - intval($sum - 1);
+                $numberTotal = $number - 2;
+
+             }
+           })->setFilename($filename)->store('xls', storage_path('excel/exports'));
+           return "excel/exports/{$filename}.xls";
+          break;
+          case 'Reporte de pagos de confirmaciones (gral)':
+            $filename = "Reporte de pagos de confirmaciones gral_".date('Y_m_d H_i_s');
+            Excel::load(storage_path('excel/exports/Reporte de pagos de confirmaciones gral.xls'), function($doc) use($report,$request){
+             $sheet = $doc->getActiveSheet();
+             $number = 6;
+             $numberTotal = 0;
+               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+             foreach ($report as $key => $value) {
+
+                $total = 0;
+                $sum = $number + $key;
+
+                $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
+
+                $sheet->setCellValue("B{$sum}" , $value->id);
+                $sheet->setCellValue("C{$sum}" , isset($value->sale->quote->customerOrder) ?
+                $value->sale->quote->customerOrder->customer->full_name:null);
+                $sheet->setCellValue("D{$sum}" , floatval($value->rate_price));
+                $sheet->setCellValue("E{$sum}" , $value->confirmation);
+                $sheet->setCellValue("F{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
+                $sheet->setCellValue("G{$sum}" , $value->date_payment_supplier);
+                $sheet->setCellValue("H{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
+                $sheet->setCellValue("I{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
+
+                //$fixnumber = intval($sum) - intval($sum - 1);
+                $numberTotal = $number - 2;
 
              }
            })->setFilename($filename)->store('xls', storage_path('excel/exports'));
@@ -145,14 +227,17 @@ class ReportController extends Controller
     			    		case 'Reporte de cotizaciones':
     			    			foreach ($report as $key => $value) {
 
-    				            	$destinations = Destination::whereIn('id',explode(',',$value->customerOrder->travel_destination))->get();
+    				            	$destinations = isset($value->customerOrder->travel_destination) ?
+                            destination::whereIn('id',explode(',',$value->customerOrder->travel_destination))
+                            ->get():null;
+
     				            	$status = null;
     				            	switch ($value['status']) {
     				            		case 2:
     				            			$status = 'Pendiente por cerrar';
     				            			break;
     				            		case 3:
-    				            			$status = 'Cotización cerrada';
+    				            			$status = 'Cotizaci贸n cerrada';
     				            			break;
     				            		case 4:
     				            			$status = 'No viajo';
@@ -161,8 +246,8 @@ class ReportController extends Controller
     			 					//dd($value['created_at']);
     								setlocale(LC_ALL, 'es_ES');
     								$fecha = Carbon::parse($value['customerOrder']['travel_date']);
-    								$fecha->format("F"); // Inglés.
-    								$mes = $fecha->formatLocalized('%B');// mes en idioma español
+    								$fecha->format("F"); // Ingl茅s.
+    								$mes = $fecha->formatLocalized('%B');// mes en idioma espa帽ol
 
     				                $collection->push([
     				                    'Folio'    	  => $value['id'],
@@ -170,7 +255,7 @@ class ReportController extends Controller
     				                    'Fecha'  	    => $value['created_at'],
     				                    'Mes'		      => $value['customerOrder']['travel_month'],
     				                    'Cliente' 	  => $value['customerOrder']['customer']['full_name'],
-    				                    'Destinos'	  => implode(', ', $destinations->pluck('name')->toArray()),
+    				                    'Destinos'	  => isset($destinations) ?  implode(', ', $destinations->pluck('name')->toArray()):null,
                                 'Utilidad'    => $value['markup'],
     				                    'Fecha de viaje' => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
     				                    'Estatus'	  => $status
@@ -196,7 +281,7 @@ class ReportController extends Controller
     				                $collection->push([
     				                    'Folio'    	  => $value['id'],
     				                    'Agente'	  => $value['user']['name'],
-                                'Fecha de solicitud de cotización' => "{$value['quote']['customerOrder']['created_at']}",
+                                'Fecha de solicitud de cotizaci贸n' => "{$value['quote']['customerOrder']['created_at']}",
     				                    'Fecha Venta'  	  => $value['created_at'],
     				                    'Cliente' 	  => $value['quote']['customerOrder']['customer']['full_name'],
     				                    'Fecha de viaje' => "{$value['quote']['travel_date']}",

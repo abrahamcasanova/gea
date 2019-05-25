@@ -147,6 +147,14 @@ export default {
       this.typeReports.push('Reporte de pagos');
     }
 
+    if(this.$can('export-confirmation-payments-resume')){
+      this.typeReports.push('Reporte de pagos de confirmaciones (resumen)');
+    }
+
+    if(this.$can('export-confirmation-payments')){
+      this.typeReports.push('Reporte de pagos de confirmaciones (gral)');
+    }
+
   },
   methods: {
       showChart(){
