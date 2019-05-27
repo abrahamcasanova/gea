@@ -183,8 +183,9 @@ class ReportController extends Controller
                 $sheet->setCellValue("E{$sum}" , $value->confirmation);
                 $sheet->setCellValue("F{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
                 $sheet->setCellValue("G{$sum}" , $value->date_payment_supplier);
-                $sheet->setCellValue("H{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
-                $sheet->setCellValue("I{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
+                $sheet->setCellValue("H{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
+                $sheet->setCellValue("I{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
+                $sheet->setCellValue("J{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
 
                 //$fixnumber = intval($sum) - intval($sum - 1);
                 $numberTotal = $number - 2;

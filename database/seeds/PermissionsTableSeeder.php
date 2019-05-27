@@ -762,6 +762,47 @@ class PermissionsTableSeeder extends Seeder
             ]
         ]);
 
+        // Module
+        $moduleId = DB::table('modules')->insertGetId([
+            'name' => 'services',
+            'display_name' => 'Servicios',
+            'icon' => 'icon-graph'
+        ]);
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'read-services',
+                'display_name' => 'Ver',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'update-services',
+                'display_name' => 'Actualizar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'create-services',
+                'display_name' => 'Crear',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'delete-services',
+                'display_name' => 'Eliminar',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ],
+            [
+                'name' => 'add-payment-services',
+                'display_name' => 'Crear pago',
+                'guard_name' => 'web',
+                'module_id' => $moduleId
+            ]
+        ]);
+
         // Assign permissions to admin role
         $admin = Role::findByName('admin');
         $admin->givePermissionTo(Permission::all());

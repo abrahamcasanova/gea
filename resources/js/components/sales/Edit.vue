@@ -556,7 +556,6 @@ export default {
           this.saleTable.date_payment_supplier_table = moment(this.saleTable.date_payment_supplier_table).format('YYYY/MM/DD');
           return moment(this.saleTable.date_payment_supplier_table).format('YYYY/MM/DD');
     },
-
     customFormatterLimit(date) {
           this.sale.date_payment_limit = moment(this.sale.date_payment_limit).format('YYYY/MM/DD');
           return moment(this.sale.date_payment_limit).format('YYYY/MM/DD');

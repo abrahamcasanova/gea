@@ -21,8 +21,8 @@
           <div class="row" v-if="!loading">
             <div class="form-group col-md-6">
               <label>Monto maximo para gastos de oficina</label>
-              <vue-numeric class="form-control"  :class="{'is-invalid': errors.rate_price}" currency="$" separator="," :precision="2" v-model="general_config.maximum_expenses"></vue-numeric>
-              <div class="invalid-feedback" v-if="errors.name">{{errors.name[0]}}</div>
+              <vue-numeric v-on:change="changeMaxExpenses" class="form-control"  :class="{'is-invalid': errors.maximum_expenses}" currency="$" separator="," :precision="2" v-model="general_config.maximum_expenses"></vue-numeric>
+              <div class="invalid-feedback" v-if="errors.maximum_expenses">{{errors.maximum_expenses[0]}}</div>
             </div>
             <div class="form-group col-md-5">
               <label>Fecha ultima actualización</label>
@@ -58,10 +58,19 @@ export default {
     this.getGeneralConfig()
   },
   methods: {
+    changeMaxExpenses(){
+        console.log('asas')
+        this.$forceUpdate();
+    },
     getGeneralConfig () {
       axios.get(`./api/general_config/all`)
       .then(response => {
-        this.general_config = response.data
+        if(response.data){
+            this.general_config = response.data
+        }else{
+            this.general_config.maximum_expenses = 0;
+        }
+
         this.loading = false;
         this.$forceUpdate();
       })

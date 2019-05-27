@@ -22,6 +22,11 @@
             </div>
             @endif
             <div class="row justify-content-md-center">
+                <div class="col-sm-12 col-xl-12 col-md-6">
+                    @can('read-services')
+                        <services></services>
+                    @endcan
+                </div>
                 <div class="col-sm-12 col-xl-12 col-md-12">
                     @can('see-sales-goals')
                         <goals-indicator :user_id={{ auth()->user()->id }}></goals-indicator>

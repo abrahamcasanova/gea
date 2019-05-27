@@ -157,6 +157,7 @@ Vue.component('quote-indicator', require('./components/dashboard/QuoteIndicator.
 Vue.component('top-products', require('./components/dashboard/TopProducts.vue'));
 Vue.component('goals-indicator', require('./components/dashboard/GoalsIndicator.vue'));
 Vue.component('prospectings-count', require('./components/dashboard/ProspectingsCount.vue'));
+Vue.component('services', require('./components/dashboard/Services.vue'));
 
 // Profile
 Vue.component('profile', require('./components/profile/Profile.vue'));
@@ -248,6 +249,12 @@ Vue.component('payments-edit', require('./components/payments/Edit.vue'));
 Vue.component('type-payments-index', require('./components/type_payments/Index.vue'));
 Vue.component('type-payments-create', require('./components/type_payments/Create.vue'));
 Vue.component('type-payments-edit', require('./components/type_payments/Edit.vue'));
+
+//Services
+Vue.component('services-index', require('./components/services/Index.vue'));
+Vue.component('services-create', require('./components/services/Create.vue'));
+Vue.component('services-edit', require('./components/services/Edit.vue'));
+
 
 //Permmissions
 Vue.use(require('./components/plugins/acl.js'));

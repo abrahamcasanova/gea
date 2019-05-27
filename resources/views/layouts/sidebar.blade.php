@@ -41,6 +41,12 @@
                                     Formas  de pago
                                 </a>
                             @endcan
+                            @can('read-services')
+                                <a class="dropdown-item" href="{{url('/services')}}">
+                                    <i class="nav-icon fas fa-wallet currentColor"></i>
+                                    Servicios
+                                </a>
+                            @endcan
                         </div>
                     </div>
             @endcan
