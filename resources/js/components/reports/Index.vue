@@ -155,6 +155,10 @@ export default {
       this.typeReports.push('Reporte de pagos de confirmaciones (gral)');
     }
 
+    if(this.$can('export-cross-payments')){
+      this.typeReports.push('Reporte de pagos vs pago de confirmaciones');
+    }
+
   },
   methods: {
       showChart(){

@@ -803,6 +803,18 @@ class PermissionsTableSeeder extends Seeder
             ]
         ]);
 
+        $moduleId = Module::where('name','payments')->first();
+
+        // Permissions
+        DB::table('permissions')->insert([
+            [
+                'name' => 'export-cross-payments',
+                'display_name' => 'Reporte de pagos vs pago de confirmaciones',
+                'guard_name' => 'web',
+                'module_id' => $moduleId->id
+            ]
+        ]);
+
         // Assign permissions to admin role
         $admin = Role::findByName('admin');
         $admin->givePermissionTo(Permission::all());

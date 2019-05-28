@@ -62,6 +62,7 @@ class ReportController extends Controller
     			break;
         case 'Reporte de pagos de confirmaciones (resumen)':
           $report = SupplierPayment::with('user','typeOfPayment','productDetailSale')
+              ->groupBy('type_of_payment_id')
               ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
           break;
         case 'Reporte de pagos de confirmaciones (gral)':
@@ -135,28 +136,43 @@ class ReportController extends Controller
              $sheet = $doc->getActiveSheet();
              $number = 6;
              $numberTotal = 0;
-               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+             $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
              foreach ($report as $key => $value) {
+
+                $report_detail = SupplierPayment::with('user','typeOfPayment','productDetailSale')
+                    ->where('type_of_payment_id',$value->typeOfPayment->id)
+                    ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
 
                 $total = 0;
                 $sum = $number + $key;
 
-                $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
+                foreach ($report_detail as $key_detail => $detail) {
 
-                $sheet->setCellValue("B{$sum}" , isset($value->productDetailSale) ? $value->productDetailSale->id:null);
-                $sheet->setCellValue("C{$sum}" , isset($value->productDetailSale->sale->quote->customerOrder) ?
-                $value->productDetailSale->sale->quote->customerOrder->customer->full_name:null);
-                $sheet->setCellValue("D{$sum}" , floatval($value->amount));
-                $sheet->setCellValue("E{$sum}" , $value->date_confirmation);
-                $sheet->setCellValue("F{$sum}" , $value->type_of_voucher);
-                $sheet->setCellValue("G{$sum}" , isset($value->number_voucher) ? $value->number_voucher:'PENDIENTE');
-                $sheet->setCellValue("H{$sum}" , isset($value->typeOfPayment) ? $value->typeOfPayment->name:null);
-                $sheet->setCellValue("I{$sum}" , $value->authorization_number);
-                $sheet->setCellValue("J{$sum}" , isset($value->user) ? $value->user->name:null);
-                $sheet->setCellValue("K{$sum}" , $value->note);
+                    $sum = $number + $key_detail;
 
-                //$fixnumber = intval($sum) - intval($sum - 1);
+                    $sheet->setCellValue("B{$sum}" , isset($detail->productDetailSale) ? $detail->productDetailSale->id:null);
+                    $sheet->setCellValue("C{$sum}" , isset($detail->productDetailSale->sale->quote->customerOrder) ?
+                    $detail->productDetailSale->sale->quote->customerOrder->customer->full_name:null);
+                    $sheet->setCellValue("D{$sum}" , floatval($detail->amount));
+                    $sheet->setCellValue("E{$sum}" , $detail->date_confirmation);
+                    $sheet->setCellValue("F{$sum}" , $detail->type_of_voucher);
+                    $sheet->setCellValue("G{$sum}" , isset($detail->number_voucher) ? $detail->number_voucher:'PENDIENTE');
+                    $sheet->setCellValue("H{$sum}" , isset($detail->typeOfPayment) ? $detail->typeOfPayment->name:null);
+                    $sheet->setCellValue("I{$sum}" , $detail->authorization_number);
+                    $sheet->setCellValue("J{$sum}" , isset($detail->user) ? $detail->user->name:null);
+                    $sheet->setCellValue("K{$sum}" , $detail->note);
+
+                    $total += floatval($detail->amount);
+
+                }
+
+                $number += count($report_detail) + 2;
                 $numberTotal = $number - 2;
+
+                $sheet->setCellValue("C{$numberTotal}" , 'TOTAL');
+                $sheet->setCellValue("D{$numberTotal}" , floatval($total));
+                $doc->getActiveSheet()->getStyle("C{$numberTotal}")->getFont()->setBold(true);
+                $doc->getActiveSheet()->getStyle("D{$numberTotal}")->getFont()->setBold(true);
 
              }
            })->setFilename($filename)->store('xls', storage_path('excel/exports'));
