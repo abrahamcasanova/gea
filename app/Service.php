@@ -28,7 +28,7 @@ class Service extends Model
     public function scopeCurrentPayment($query)
     {
         return $query->with(['payments' => function ($query) {
-    		      $query->whereYear('date',  date('Y'))
+    		      $query->Active()->whereYear('date',  date('Y'))
                   ->whereMonth('date', date('m'));
 		    }]);
     }

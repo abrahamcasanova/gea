@@ -12,14 +12,14 @@ Route::middleware('auth')->group(function () {
         Route::group(['prefix' => 'api/services'], function() {
             Route::get('/get-service/{service}', 'ServiceController@getService');
             Route::get('/all', 'ServiceController@all');
-            Route::get('/{supplier}', 'ServiceController@show')->middleware('permission:read-services');
+            Route::get('/{service}', 'ServiceController@show')->middleware('permission:read-services');
             Route::post('/get-track', 'ServiceController@getTrack')->middleware('permission:create-services');
             Route::post('/store', 'ServiceController@store')->middleware('permission:create-services');
             Route::post('/filter', 'ServiceController@filter')->middleware('permission:read-services');
             Route::post('/upload', 'ServiceController@upload')->middleware('permission:read-services');
             Route::post('/docs', 'ServiceController@getDocs')->middleware('permission:read-services');
-            Route::put('/update/{supplier}', 'ServiceController@update')->middleware('permission:update-services');
-            Route::delete('/{supplier}', 'ServiceController@destroy')->middleware('permission:delete-services');
+            Route::put('/update/{service}', 'ServiceController@update')->middleware('permission:update-services');
+            Route::delete('/{service}', 'ServiceController@destroy')->middleware('permission:delete-services');
         });
     });
 });

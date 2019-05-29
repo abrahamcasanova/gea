@@ -61,7 +61,7 @@ export default {
       axios.get(`./api/services-payment/all`)
       .then(response => {
         this.payments = response.data
-        this.payments.current_payment = this.payments.reduce((acc, item) => acc + item.amount, 0);
+        this.payments.current_payment = this.payments.reduce((acc, item) => acc + parseFloat(item.amount), 0); 
       })
     },
   }

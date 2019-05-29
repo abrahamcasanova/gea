@@ -129,7 +129,14 @@
                           <td class="text-xs-left">{{ props.item.type_of_payment ? props.item.type_of_payment.name:null }}</td>
                           <td class="text-xs-left">{{ props.item.date }}</td>
                           <td class="text-xs-left">{{ props.item.note }}</td>
-
+                          <td class="text-xs-left">
+                            <a href="#" v-if="$can('edit-payment-service')" @click="editPaymentService(props.item.id)" class="card-header-action ml-1 text-muted"><i class="fas fa-pencil-alt fa-lg"></i></a>
+                            <a  v-if="$can('delete-payment-service')" class="card-header-action ml-1" href="#" :disabled="submitingDestroy"  @click="destroyPayment(props.item.id)">
+                                <i class="fas fa-spinner fa-spin fa-lg" v-if="submitingDestroy"></i>
+                                <i class="far fa-trash-alt fa-lg" v-else style="color:red"></i>
+                                <span class="d-md-down-none ml-1"></span>
+                            </a>
+                          </td>
                         </template>
                         <template v-slot:no-results>
                           <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
@@ -190,6 +197,7 @@ export default {
         { value: 'type_of_payment_id',text:'Forma de pago',sortable: true,},
         { value: 'date',text:'Dia de pago',sortable: true,},
         { value: 'note',text:'Nota',sortable: true,},
+        { value: 'actions', sortable: false,text:'Acciones' },
       ],
       search: '',
       pagination: {'sortBy': 'id', 'descending': true, rowsPerPage: 15 },
@@ -203,9 +211,9 @@ export default {
   },
   methods: {
     addPayment (id) {
+      this.payment = {};
       this.payment.service_id = id;
       this.$refs.myModalRef.show()
-
     },
     getTypePayments() {
         axios.get(`./api/type_of_payments/all`).then(response => {
@@ -254,6 +262,7 @@ export default {
         this.loading = false
       })
     },
+
     editPayment (serviceId) {
       location.href = `./services/${serviceId}/edit`
     },
@@ -262,6 +271,15 @@ export default {
       this.filters.pagination.current_page = 1
       this.getProspectings()
 
+    },
+    editPaymentService(id){
+        axios.get('./api/services-payment/' + id)
+        .then(response => {
+          this.payment = response.data
+          this.payment.type_of_payment_id = response.data.type_of_payment ? response.data.type_of_payment:null
+          this.$refs.myModalRef.show()
+          this.loading = false
+        })
     },
     changeSize (perPage) {
       this.filters.pagination.current_page = 1
@@ -281,8 +299,36 @@ export default {
     changePage (page) {
       this.filters.pagination.current_page = page
       this.getProspectings()
-    }
-    ,destroy (serviceId) {
+    },
+    destroyPayment(paymentId){
+      if (!this.submitingDestroy) {
+        this.submitingDestroy = true
+        swal({
+          title: this.$t('Supplier.Warning_Title') ,
+          text: 'Una vez eliminado, no podrá recuperar este pago!',
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            axios.delete(`./api/services-payment/${paymentId}`)
+            .then(response => {
+                this.$toasted.global.error('Pago eliminado!')
+                location.href = './services'
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors ? error.response.data.errors:error.response.data.message
+                this.$toasted.error(error.response.data.errors ? error.response.data.errors:error.response.data.message,{
+                    duration: 5000
+                });
+            })
+          }
+          this.submitingDestroy = false
+        })
+      }
+    },
+    destroy (serviceId) {
       if (!this.submitingDestroy) {
         this.submitingDestroy = true
         swal({

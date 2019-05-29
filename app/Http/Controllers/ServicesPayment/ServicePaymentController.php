@@ -18,7 +18,10 @@ class ServicePaymentController extends Controller
         ]);
         $request->merge(['type_of_payment_id' => $request->type_of_payment_id['id']]);
 
-        return ServicePayment::create($request->all());
+        return ServicePayment::updateOrCreate(
+          ['id' => $request->id],
+          $request->all()
+        );
     }
 
     public function getService($service){
@@ -26,9 +29,22 @@ class ServicePaymentController extends Controller
             ->whereMonth('date', date('m'))->Active()->where('service_id',$service)->get();
     }
 
-    public function all ()
+    public function all()
     {
-      return ServicePayment::with('service')->whereYear('date',  date('Y'))
-          ->whereMonth('date', date('m'))->Active()->get();
+        return ServicePayment::with('service')->whereYear('date',  date('Y'))
+            ->whereMonth('date', date('m'))->Active()->get();
+    }
+
+    public function show($service_payment)
+    {
+        return ServicePayment::with('typeOfPayment')->findOrFail($service_payment);
+    }
+
+    public function destroy ($service)
+    {
+        ServicePayment::find($service)->update([
+            'status' => 2
+        ]);
+        return 'success';
     }
 }
