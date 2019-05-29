@@ -152,7 +152,7 @@ export default {
     }
 
     if(this.$can('export-confirmation-payments')){
-      this.typeReports.push('Reporte de pagos de confirmaciones (gral)');
+      this.typeReports.push('Reporte de ventas liquidadas');
     }
 
     if(this.$can('export-cross-payments')){

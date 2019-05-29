@@ -756,7 +756,7 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'name' => 'export-confirmation-payments',
-                'display_name' => 'Reporte de pagos de confirmaciones (gral)',
+                'display_name' => 'Reporte de ventas liquidadas',
                 'guard_name' => 'web',
                 'module_id' => $moduleId->id
             ]

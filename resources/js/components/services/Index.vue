@@ -88,6 +88,18 @@
                       <div class="invalid-feedback" v-if="errors.date">{{errors.date[0]}}</div>
                   </div>
                   <div class="form-group col-md-12">
+                      <label>Forma de pago</label>
+                      <multiselect
+                        v-model="payment.type_of_payment_id"
+                        :options="type_of_payment"
+                        openDirection="bottom"
+                        track-by="id"
+                        label="name"
+                        :class="{'border border-danger rounded': errors.type_of_payment}">
+                      </multiselect>
+                      <div class="invalid-feedback" v-if="errors.date">{{errors.date[0]}}</div>
+                  </div>
+                  <div class="form-group col-md-12">
                       <label>Nota</label>
                       <textarea class="form-control" rows="5" :class="{'is-invalid': errors.note}"  v-model="payment.note"></textarea>
                       <div class="invalid-feedback" v-if="errors.note">{{errors.note[0]}}</div>
@@ -99,40 +111,43 @@
             <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Cerrar</b-button>
           </b-modal>
 
-          <b-modal size="md" id="modal2" ref="myModalRef2" hide-footer title="Detalle">
+          <b-modal size="lg" id="modal2" ref="myModalRef2" hide-footer title="Detalle">
             <div class="d-block">
               <div class="col-md-12 card-body px-0">
                 <div class="row">
-                <v-card>
-                  <v-data-table
-                    :headers="headersPayments"
-                    :items="detailPayments"
-                    :search="search"
-                    v-bind:pagination.sync="pagination"
-                  >
-                    <template v-slot:items="props">
-                      <td class="text-xs-let">{{ props.item.id }}</td>
-                      <td class="text-xs-left">{{ props.item.amount | currency }}</td>
-                      <td class="text-xs-left">{{ props.item.date }}</td>
-                      <td class="text-xs-left">{{ props.item.note }}</td>
+                <div class="col-md-12">
+                    <v-card>
+                      <v-data-table
+                        :headers="headersPayments"
+                        :items="detailPayments"
+                        :search="search"
+                        v-bind:pagination.sync="pagination"
+                      >
+                        <template v-slot:items="props">
+                          <td class="text-xs-let">{{ props.item.id }}</td>
+                          <td class="text-xs-left">{{ props.item.amount | currency }}</td>
+                          <td class="text-xs-left">{{ props.item.type_of_payment ? props.item.type_of_payment.name:null }}</td>
+                          <td class="text-xs-left">{{ props.item.date }}</td>
+                          <td class="text-xs-left">{{ props.item.note }}</td>
 
-                    </template>
-                    <template v-slot:no-results>
-                      <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
-                        Su búsqueda de "{{search}}" no encontró resultados.
-                      </v-alert>
-                    </template>
-                    <template v-slot:no-data>
-                      <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
-                        Lo sentimos, no hay nada que mostrar aquí :(
-                      </v-alert>
-                    </template>
-                  </v-data-table>
-                </v-card>
+                        </template>
+                        <template v-slot:no-results>
+                          <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
+                            Su búsqueda de "{{search}}" no encontró resultados.
+                          </v-alert>
+                        </template>
+                        <template v-slot:no-data>
+                          <v-alert :value="true" color="error" icon="warning" style="background-color:#ff5252!important;">
+                            Lo sentimos, no hay nada que mostrar aquí :(
+                          </v-alert>
+                        </template>
+                      </v-data-table>
+                    </v-card>
+                </div>
                 </div>
               </div>
             </div>
-            <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Cerrar</b-button>
+            <b-button class="mt-2" variant="outline-danger" block @click="hideModalDetail">Cerrar</b-button>
           </b-modal>
 
         </v-app>
@@ -159,6 +174,7 @@ export default {
       payment:{},
       detailPayments: [],
       docs: [],
+      type_of_payment: [],
       headers: [
         { value: 'id', align: 'left', text: 'Folio' },
         { value: 'name',text:'Servicio',sortable: true,},
@@ -171,6 +187,7 @@ export default {
       headersPayments: [
         { value: 'id', align: 'left', text: 'Folio' },
         { value: 'amount',text:'Pagado',sortable: true,},
+        { value: 'type_of_payment_id',text:'Forma de pago',sortable: true,},
         { value: 'date',text:'Dia de pago',sortable: true,},
         { value: 'note',text:'Nota',sortable: true,},
       ],
@@ -181,13 +198,22 @@ export default {
     }
   },
   mounted () {
-    this.getServices()
+    this.getServices();
+    this.getTypePayments();
   },
   methods: {
     addPayment (id) {
       this.payment.service_id = id;
       this.$refs.myModalRef.show()
 
+    },
+    getTypePayments() {
+        axios.get(`./api/type_of_payments/all`).then(response => {
+            this.type_of_payment = response.data
+        })
+        .catch(error => {
+            this.errors = error.response.data.errors
+        })
     },
     modalPayment (id) {
       axios.get('./api/services-payment/get-service-payment/' +  id)
@@ -214,6 +240,9 @@ export default {
     },
     hideModal () {
       this.$refs.myModalRef.hide()
+    },
+    hideModalDetail () {
+      this.$refs.myModalRef2.hide()
     },
     getServices () {
       this.loading = true

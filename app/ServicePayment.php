@@ -13,6 +13,7 @@ class ServicePayment extends Model
         'date',
         'note',
         'service_id',
+        'type_of_payment_id',
         'status',
     ];
 
@@ -24,5 +25,10 @@ class ServicePayment extends Model
     public function service()
     {
         return $this->hasOne(Service::class,'id','service_id');
+    }
+
+    public function typeOfPayment()
+    {
+        return $this->hasOne(TypeOfPayment::class,'id','type_of_payment_id');
     }
 }

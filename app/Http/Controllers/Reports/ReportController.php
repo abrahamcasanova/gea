@@ -65,8 +65,13 @@ class ReportController extends Controller
               ->groupBy('type_of_payment_id')
               ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
           break;
-        case 'Reporte de pagos de confirmaciones (gral)':
+        case 'Reporte de ventas liquidadas':
           $report = ProductDetailSale::with('quote','sale','supplier')
+              ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+          break;
+        case 'Reporte de pagos vs pago de confirmaciones':
+          $report = Payment::with('user','customer','sale')
+              ->groupBy('type_of_payment')
               ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
           break;
     	}
@@ -178,13 +183,55 @@ class ReportController extends Controller
            })->setFilename($filename)->store('xls', storage_path('excel/exports'));
            return "excel/exports/{$filename}.xls";
           break;
-          case 'Reporte de pagos de confirmaciones (gral)':
-            $filename = "Reporte de pagos de confirmaciones gral_".date('Y_m_d H_i_s');
+          case 'Reporte de ventas liquidadas':
+            $filename = "Reporte de ventas liquidadas_".date('Y_m_d H_i_s');
             Excel::load(storage_path('excel/exports/Reporte de pagos de confirmaciones gral.xls'), function($doc) use($report,$request){
              $sheet = $doc->getActiveSheet();
              $number = 6;
              $numberTotal = 0;
-               $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+             $sheet->setCellValue("B2" , "REPORTE DE PAGOS DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+             foreach ($report as $key => $value) {
+
+                $total = 0;
+                $sum = $number + $key;
+
+                $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
+
+                $sheet->setCellValue("B{$sum}" , $value->id);
+                $sheet->setCellValue("C{$sum}" , isset($value->sale->quote->customerOrder) ?
+                $value->sale->quote->customerOrder->customer->full_name:null);
+                $sheet->setCellValue("D{$sum}" , floatval($value->rate_price));
+                $sheet->setCellValue("E{$sum}" , $value->confirmation);
+                $sheet->setCellValue("F{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
+                $sheet->setCellValue("G{$sum}" , $value->date_payment_supplier);
+                $sheet->setCellValue("H{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
+                $sheet->setCellValue("I{$sum}" , $value->sale->liquidate == 1 ? 'SI':'NO');
+                $sheet->setCellValue("J{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
+                $sheet->setCellValue("K{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
+
+                //$fixnumber = intval($sum) - intval($sum - 1);
+                $numberTotal = $number - 2;
+
+             }
+           })->setFilename($filename)->store('xls', storage_path('excel/exports'));
+           return "excel/exports/{$filename}.xls";
+          break;
+          case 'Reporte de pagos vs pago de confirmaciones':
+             $filename = "Reporte de pagos vs pago de confirmaciones_".date('Y_m_d H_i_s');
+             Excel::load(storage_path('excel/exports/Reporte de pagos vs pagos de confirmaciones.xls'), function($doc) use($report,$request){
+             $sheet = $doc->getActiveSheet();
+
+             $report = Payment::whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+
+             $group = $report->groupBy('type_of_payment')->map(function ($row) {
+                 return $row->sum('price');
+             });
+             dd($group);
+
+
+             $number = 6;
+             $numberTotal = 0;
+               $sheet->setCellValue("B2" , "REPORTE DE PAGOS VS PAGO DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
              foreach ($report as $key => $value) {
 
                 $total = 0;
