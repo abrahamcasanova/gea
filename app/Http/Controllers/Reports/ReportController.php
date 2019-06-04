@@ -9,6 +9,7 @@ use App\Quote;
 use App\Payment;
 use Carbon\Carbon;
 use App\Destination;
+use App\ServicePayment;
 use App\SupplierPayment;
 use App\ProductDetailSale;
 use Illuminate\Http\Request;
@@ -67,7 +68,8 @@ class ReportController extends Controller
           break;
         case 'Reporte de ventas liquidadas':
           $report = ProductDetailSale::with('quote','sale','supplier')
-              ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+              ->whereBetween('date_liquidate', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))
+              ->orWhere('liquidate',0)->orderBy('date_liquidate','DESC')->get();
           break;
         case 'Reporte de pagos vs pago de confirmaciones':
           $report = Payment::with('user','customer','sale')
@@ -196,6 +198,7 @@ class ReportController extends Controller
                 $sum = $number + $key;
 
                 $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
+                $sale_liquidate = isset($value->sale->liquidate) ?  $value->sale->liquidate:0;
 
                 $sheet->setCellValue("B{$sum}" , $value->id);
                 $sheet->setCellValue("C{$sum}" , isset($value->sale->quote->customerOrder) ?
@@ -205,7 +208,7 @@ class ReportController extends Controller
                 $sheet->setCellValue("F{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
                 $sheet->setCellValue("G{$sum}" , $value->date_payment_supplier);
                 $sheet->setCellValue("H{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
-                $sheet->setCellValue("I{$sum}" , $value->sale->liquidate == 1 ? 'SI':'NO');
+                $sheet->setCellValue("I{$sum}" , $sale_liquidate == 1 ? 'SI':'NO');
                 $sheet->setCellValue("J{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
                 $sheet->setCellValue("K{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
 
@@ -226,34 +229,56 @@ class ReportController extends Controller
              $group = $report->groupBy('type_of_payment')->map(function ($row) {
                  return $row->sum('price');
              });
-             dd($group);
+
+             if(isset($group)){
+
+                  $number = 6;
+                  $numberTotal = $numberMore = 0;
+                  foreach ($group as $key => $value) {
+
+                      $reportSupplier = SupplierPayment::with('user','typeOfPayment','productDetailSale')
+                          ->whereHas('typeOfPayment', function ($query) use($key){
+                              $query->where('name', $key);
+                          })->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+
+                      $groupSupplierPayment = $reportSupplier->groupBy('typeOfPayment.name')->map(function ($row) {
+                          return $row->sum('amount');
+                      });
+
+                      $reportService = ServicePayment::with('typeOfPayment')
+                           ->where('type_of_payment_id','<>',null)
+                           ->whereHas('typeOfPayment', function ($query) use($key){
+                               $query->where('name', $key);
+                           })
+                          ->whereBetween('created_at', array("{$request->initial_date} 00:00:00","{$request->final_date} 23:59:59"))->get();
+
+                      $groupService = $reportService->groupBy('typeOfPayment.name')->map(function ($row) {
+                          return $row->sum('amount');
+                      });
+
+                      $total = 0;
+                      $sum = $number + $numberMore;
+
+                      $totalRest = floatval(array_values($groupSupplierPayment->toArray()) ? array_values($groupSupplierPayment->toArray())[0]:0)
+                          + floatval(array_values($groupService->toArray()) ? array_values($groupService->toArray())[0]:0);
+
+                      $balance = floatval($value - $totalRest);
 
 
-             $number = 6;
-             $numberTotal = 0;
-               $sheet->setCellValue("B2" , "REPORTE DE PAGOS VS PAGO DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
-             foreach ($report as $key => $value) {
+                      $sheet->setCellValue("B{$sum}" , $key);
+                      $sheet->setCellValue("C{$sum}" , $value);
+                      $sheet->setCellValue("D{$sum}" , floatval(array_values($groupSupplierPayment->toArray()) ? array_values($groupSupplierPayment->toArray())[0]:0));
+                      $sheet->setCellValue("E{$sum}" , floatval(array_values($groupService->toArray()) ? array_values($groupService->toArray())[0]:0));
+                      $sheet->setCellValue("F{$sum}" , isset($balance) ?  $balance:0);
 
-                $total = 0;
-                $sum = $number + $key;
-
-                $status = isset($detail->sale->deleted_at) ?  'Eliminado':'Activo';
-
-                $sheet->setCellValue("B{$sum}" , $value->id);
-                $sheet->setCellValue("C{$sum}" , isset($value->sale->quote->customerOrder) ?
-                $value->sale->quote->customerOrder->customer->full_name:null);
-                $sheet->setCellValue("D{$sum}" , floatval($value->rate_price));
-                $sheet->setCellValue("E{$sum}" , $value->confirmation);
-                $sheet->setCellValue("F{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
-                $sheet->setCellValue("G{$sum}" , $value->date_payment_supplier);
-                $sheet->setCellValue("H{$sum}" , isset($value->supplier) ? $value->supplier->name:null);
-                $sheet->setCellValue("I{$sum}" , $value->liquidate == 1 ? 'SI':'NO');
-                $sheet->setCellValue("J{$sum}" , $value->status_pending == 1 ? 'SI':'NO');
-
-                //$fixnumber = intval($sum) - intval($sum - 1);
-                $numberTotal = $number - 2;
-
+                      //$fixnumber = intval($sum) - intval($sum - 1);
+                      $numberTotal = $number - 2;
+                      $numberMore++;
+                  }
              }
+
+             $sheet->setCellValue("B2" , "REPORTE DE PAGOS VS PAGO DE CONFIRMACIONES DEL {$request->initial_date} AL {$request->final_date}");
+
            })->setFilename($filename)->store('xls', storage_path('excel/exports'));
            return "excel/exports/{$filename}.xls";
           break;
@@ -290,7 +315,6 @@ class ReportController extends Controller
     			    			break;
     			    		case 'Reporte de cotizaciones':
     			    			foreach ($report as $key => $value) {
-
     				            	$destinations = isset($value->customerOrder->travel_destination) ?
                             destination::whereIn('id',explode(',',$value->customerOrder->travel_destination))
                             ->get():null;
@@ -301,7 +325,7 @@ class ReportController extends Controller
     				            			$status = 'Pendiente por cerrar';
     				            			break;
     				            		case 3:
-    				            			$status = 'Cotizaci贸n cerrada';
+    				            			$status = 'Cotización cerrada';
     				            			break;
     				            		case 4:
     				            			$status = 'No viajo';
@@ -310,19 +334,20 @@ class ReportController extends Controller
     			 					//dd($value['created_at']);
     								setlocale(LC_ALL, 'es_ES');
     								$fecha = Carbon::parse($value['customerOrder']['travel_date']);
-    								$fecha->format("F"); // Ingl茅s.
-    								$mes = $fecha->formatLocalized('%B');// mes en idioma espa帽ol
+    								$fecha->format("F"); // Inglés.
+    								$mes = $fecha->formatLocalized('%B');// mes en idioma español
 
     				                $collection->push([
-    				                    'Folio'    	  => $value['id'],
-    				                    'Agente'	    => isset($value['user']) ? $value['user']['name']:null,
-    				                    'Fecha'  	    => $value['created_at'],
-    				                    'Mes'		      => $value['customerOrder']['travel_month'],
-    				                    'Cliente' 	  => $value['customerOrder']['customer']['full_name'],
-    				                    'Destinos'	  => isset($destinations) ?  implode(', ', $destinations->pluck('name')->toArray()):null,
-                                'Utilidad'    => $value['markup'],
-    				                    'Fecha de viaje' => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
-    				                    'Estatus'	  => $status
+    				                    'Folio'    	      => $value['id'],
+    				                    'Agente'	        => isset($value['user']) ? $value['user']['name']:null,
+    				                    'Fecha'  	        => $value['created_at'],
+    				                    'Mes'		          => $value['customerOrder']['travel_month'],
+    				                    'Cliente' 	      => $value['customerOrder']['customer']['full_name'],
+                                'Tipo de cliente'	=> isset($value['customerOrder']['customer']) ? $value['customerOrder']['customer']['type_of_person']:null,
+    				                    'Destinos'	      => isset($destinations) ?  implode(', ', $destinations->pluck('name')->toArray()):null,
+                                'Utilidad'        => $value['markup'],
+    				                    'Fecha de viaje'  => "{$value['customerOrder']['travel_date']} al {$value['customerOrder']['travel_end_date']}",
+    				                    'Estatus'	        => $status
     				                ]);
     				            }
 
@@ -345,7 +370,7 @@ class ReportController extends Controller
     				                $collection->push([
     				                    'Folio'    	  => $value['id'],
     				                    'Agente'	  => $value['user']['name'],
-                                'Fecha de solicitud de cotizaci贸n' => "{$value['quote']['customerOrder']['created_at']}",
+                                'Fecha de solicitud de cotización' => "{$value['quote']['customerOrder']['created_at']}",
     				                    'Fecha Venta'  	  => $value['created_at'],
     				                    'Cliente' 	  => $value['quote']['customerOrder']['customer']['full_name'],
     				                    'Fecha de viaje' => "{$value['quote']['travel_date']}",

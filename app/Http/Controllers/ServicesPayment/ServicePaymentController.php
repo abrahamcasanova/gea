@@ -26,7 +26,7 @@ class ServicePaymentController extends Controller
 
     public function getService($service){
         return ServicePayment::with('typeOfPayment')->whereYear('date',  date('Y'))
-            ->whereMonth('date', date('m'))->Active()->where('service_id',$service)->get();
+            ->Active()->where('service_id',$service)->get();
     }
 
     public function all()

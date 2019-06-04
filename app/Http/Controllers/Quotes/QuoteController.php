@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Quotes;
 use PDF;
 use File;
 use App\Quote;
+use App\QuoteTrack;
 use App\Destination;
+use Kreait\Firebase;
 use App\CustomerOrder;
-use App\Mail\Quote as MailQuote;
 use Illuminate\Http\Request;
+use Kreait\Firebase\Factory;
+use App\Mail\Quote as MailQuote;
+use Kreait\Firebase\ServiceAccount;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
 
@@ -73,6 +77,22 @@ class QuoteController extends Controller
                 ->setPaper('a4', 'portrait')->save(storage_path('app/public/pdf/'."{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf"));
             $quote->path = "{$quote->customerOrder->customer->full_name}_{$quote->id}.pdf";
             $quote->save();
+
+            $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.config('firebase.firebase'));
+
+            $firebase = (new Factory)->withServiceAccount($serviceAccount)
+                ->withDatabaseUri(config('firebase.firebase_uri'))->create();
+
+            $quote_track = QuoteTrack::create([
+                'quote_id'     => $quote->id,
+                'user_id'      => $user->id,
+                'track_status' => 'Enviado',
+                'contact_date' => date('Y-m-d'),
+                'comments'     => 'Comentario automatico generado por cotización primer estatus',
+            ]);
+            $quote_track->load('quote','user');
+            $database = $firebase->getDatabase();
+            $database->getReference("quote_tracks/{$quote_track->quote_id}")->set($quote_track->toArray());
 
             CustomerOrder::find($request->customer_order_id)->update([
                 'status' => 2
