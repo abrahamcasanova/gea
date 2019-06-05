@@ -55,6 +55,9 @@
                     <v-btn round color="success" style="width: auto;" v-on:click="firebasePayment(event.firebase_id)">
                       Pagar
                     </v-btn>
+                    <v-btn v-if="event.type != 'danger'" round color="success" style="width: auto;" v-on:click="whatsappPayment(event.details,event.sale_id)">
+                      Recordatorio &nbsp; <i class="fa-lg fab fa-whatsapp"></i>
+                    </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-menu>
@@ -262,6 +265,48 @@ export default {
     {
       moment.locale(code);
       //this.$refs.app.$forceUpdate();
+    },
+    whatsappPayment(text,sale_id){
+        console.log(text,sale_id)
+        /*
+        MSG = para todos excepto pago de proveedores
+        Buen día, espero se encuentre muy bien.
+        Somos de la agencia de viajes New Sun Travel, el motivó del siguiente mensaje es para informarle que su fecha de ABONO con el hotel ya venció.
+        En caso de que usted presente algún imprevisto o por algún motivo personal, se le haya complicado, podría ser tan amable de informarnos para poder aplazar la fecha de ABONO con el hotel y solicitar extender la fecha.
+
+        En caso de ya haber enviado su ABONO sería tan amable de enviarme de nuevo su comprobante, para aplicarlo
+        */
+
+        axios.get(`./api/sales/` + sale_id)
+        .then(response => {
+            let data = response.data;
+            if(data == false){
+                swal("Error..", {
+                  text:'No se puede enviar el whatsapp porque no existe un telefono registrado.',
+                  icon: 'error',
+                  timer: 3000,
+                  buttons: false,
+                });
+                return false;
+            }
+
+            if(data.quote.customer_order.customer.cellphone == null || data.quote.customer_order.customer.cellphone == ''){
+                swal("Error..", {
+                  text:'No se puede enviar el whatsapp porque no existe un telefono registrado.',
+                  icon: 'error',
+                  timer: 3000,
+                  buttons: false,
+                });
+                return false;
+            }else{
+                let str = window.location
+
+                window.open("https://wa.me/52"+ data.quote.customer_order.customer.cellphone +"?text=Buen día, espero se encuentre muy bien."
+                 + "Somos de la agencia de viajes New Sun Travel, el motivó del siguiente mensaje es para informarle que su fecha de ABONO con el hotel ya venció."
+                 + "En caso de que usted presente algún imprevisto o por algún motivo personal, se le haya complicado, podría ser tan amable de informarnos para poder aplazar la fecha de ABONO con el hotel y solicitar extender la fecha."
+                 + "En caso de ya haber enviado su ABONO sería tan amable de enviarme de nuevo su comprobante, para aplicarlo " ,'_blank');
+            }
+        })
     },
     saveState()
     {

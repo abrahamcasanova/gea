@@ -255,9 +255,10 @@ class SaleController extends Controller
      * @param  \App\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function show(Sale $sale)
+    public function show($sale)
     {
-        //
+        $sale = Sale::find($sale);
+        return isset($sale) ? $sale->load('quote'):'false';
     }
 
     /**
