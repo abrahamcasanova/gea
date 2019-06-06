@@ -21,13 +21,21 @@ class QuoteController extends Controller
 
     public function filter (Request $request)
     {
-        $query = Quote::query();
 
         if($request->search) {
-            $query->where('id', 'LIKE', '%'.$request->search.'%');
+            $sql = "CONCAT(first_name,' ',last_name,' ') like ?";
+            $quotes = Quote::with('customerOrder','quoteDetails')->whereHas('customerOrder.customer', function ($query) use ($sql, $request) {
+                $query->whereRaw($sql, ["%{$request->search}%"]);
+            })->WhereStatus(2)
+            ->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
+            ->paginate($request->input('pagination.per_page'));
+        }else{
+            $query = Quote::with('customerOrder','quoteDetails');
+            $quotes = $query->with('customerOrder','quoteDetails')
+                ->WhereStatus(2)
+                ->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))
+                ->paginate($request->input('pagination.per_page'));
         }
-
-        $quotes = $query->with('customerOrder','quoteDetails')->WhereStatus(2)->orderBy($request->input('orderBy.column'), $request->input('orderBy.direction'))->paginate($request->input('pagination.per_page'));
 
         return $quotes;
     }
